@@ -1,2 +1,2 @@
 TEMPLATE = subdirs
-SUBDIRS = lib plugins
+SUBDIRS = lib plugins bin

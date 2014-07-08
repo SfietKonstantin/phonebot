@@ -1,0 +1,23 @@
+Name: phonebot
+Summary: The phonebot daemon
+Version: 0.0
+Release: 1
+Group: Qt/Qt
+URL: https://github.com/SfietKonstantin/phonebot
+License: BSD
+Sources:
+- '%{name}-%{version}.tar.bz2'
+Description: |
+  phonebot allows to schedule actions based on 
+  triggers. This package contains the daemon.
+Configure: none
+Builder: qtc5
+PkgConfigBR:
+- Qt5Core
+- Qt5DBus
+- Qt5Test
+- Qt5Qml
+PkgBR: 
+- libprofile-qt5-devel
+Files:
+- '%{_bindir}/%{name}d'
