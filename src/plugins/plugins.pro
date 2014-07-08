@@ -1,2 +1,2 @@
 TEMPLATE = subdirs
-SUBDIRS = debug
+SUBDIRS = debug profile

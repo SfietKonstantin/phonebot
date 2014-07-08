@@ -1,0 +1,3 @@
+[submodule "libprofile-qt"]
+	path = libprofile-qt
+	url = https://github.com/nemomobile/libprofile-qt.git
