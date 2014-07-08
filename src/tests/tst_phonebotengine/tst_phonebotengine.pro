@@ -3,8 +3,8 @@ TARGET = tst_phonebotengine
 
 QT = core qml testlib
 
-INCLUDEPATH += ../../src/lib
-LIBS += -L../../src/lib -lphonebot
+INCLUDEPATH += ../../lib
+LIBS += -L../../lib -lphonebot
 
 SOURCES += tst_phonebotengine.cpp
 

@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
-SUBDIRS = src tests
+SUBDIRS = src
+
 
 OTHER_FILES = rpm/phonebot.yaml \
     rpm/phonebot.spec \

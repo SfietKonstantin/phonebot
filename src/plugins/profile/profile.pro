@@ -1,7 +1,7 @@
 TEMPLATE = lib
 TARGET = phonebotprofile
-
 QT = core dbus
+
 INCLUDEPATH += ../../lib
 
 CONFIG += plugin static
@@ -14,5 +14,7 @@ SOURCES = plugin.cpp \
 
 CONFIG(harbour) {
     include(libprofile-qt.pri)
+} else {
+    QMAKE_CXXFLAGS += -I/usr/include/profile-qt5
 }
 

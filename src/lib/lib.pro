@@ -1,6 +1,8 @@
 TEMPLATE = lib
 TARGET = phonebot
 
+QT = core qml
+
 CONFIG += staticlib
 
 HEADERS = rule.h \

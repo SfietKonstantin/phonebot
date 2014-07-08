@@ -4,7 +4,6 @@ TARGET = phonebotd
 QT = core dbus qml
 
 !CONFIG(harbour) {
-    QMAKE_CXXFLAGS += -I/usr/include/profile-qt5
     QMAKE_LFLAGS += -lprofile-qt5
 }
 
@@ -22,6 +21,6 @@ SOURCES = \
     enginemanager.cpp
 
 !CONFIG(harbour) {
-target.path = /usr/bin
-INSTALLS += target
+    target.path = /usr/bin
+    INSTALLS += target
 }
