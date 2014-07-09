@@ -31,6 +31,7 @@
 
 #include "phonebotengine.h"
 #include "phonebotengine_p.h"
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QPluginLoader>
 #include <QtCore/QSet>
@@ -53,7 +54,12 @@ void PhoneBotEnginePrivate::slotComponentFinished(QQmlComponent::Status status)
 {
     Q_Q(PhoneBotEngine);
     Q_UNUSED(status)
-    QQmlComponent *component = qobject_cast<QQmlComponent *>(q->sender());
+    manageComponentFinished(qobject_cast<QQmlComponent *>(q->sender()));
+}
+
+void PhoneBotEnginePrivate::manageComponentFinished(QQmlComponent *component)
+{
+    Q_Q(PhoneBotEngine);
     if (!component) {
         return;
     }
@@ -138,9 +144,13 @@ bool PhoneBotEngine::addComponent(const QUrl &url)
         return false;
     }
     QQmlComponent *component = new QQmlComponent(this, url, QQmlComponent::Asynchronous, this);
-    Q_ASSERT(component->isLoading());
-    connect(component, SIGNAL(statusChanged(QQmlComponent::Status)),
-            this, SLOT(slotComponentFinished(QQmlComponent::Status)));
+    if(component->isLoading()) {
+        connect(component, SIGNAL(statusChanged(QQmlComponent::Status)),
+                this, SLOT(slotComponentFinished(QQmlComponent::Status)));
+    } else {
+        d->loadedComponents.append(component);
+        QCoreApplication::instance()->postEvent(this, new QEvent(QEvent::User));
+    }
     return true;
 }
 
@@ -208,6 +218,21 @@ void PhoneBotEngine::stop()
         PhoneBotEnginePrivate::deleteRule(rule);
     }
     d->rules.clear();
+}
+
+bool PhoneBotEngine::event(QEvent *e)
+{
+    Q_D(PhoneBotEngine);
+    if (e->type() == QEvent::User) {
+        e->accept();
+        foreach (QQmlComponent *component, d->loadedComponents) {
+            d->manageComponentFinished(component);
+        }
+        d->loadedComponents.clear();
+        return true;
+    }
+
+    return QObject::event(e);
 }
 
 #include "moc_phonebotengine.cpp"

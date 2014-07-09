@@ -54,6 +54,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void componentLoadingFinished(const QUrl &url, bool ok);
 protected:
+    bool event(QEvent *e);
     QScopedPointer<PhoneBotEnginePrivate> d_ptr;
 private:
     Q_DECLARE_PRIVATE(PhoneBotEngine)

@@ -40,9 +40,11 @@ class PhoneBotEnginePrivate
 public:
     explicit PhoneBotEnginePrivate(PhoneBotEngine *q);
     void slotComponentFinished(QQmlComponent::Status status);
+    void manageComponentFinished(QQmlComponent *component);
     void setRuleError(const QUrl &url, const QString &error);
     static bool checkRule(Rule *rule);
     static void deleteRule(Rule *rule);
+    QList<QQmlComponent *> loadedComponents;
     QMap<QUrl, QQmlComponent *> components;
     QMap<QUrl, QString> componentErrors;
     QMap<QUrl, Rule *> rules;
