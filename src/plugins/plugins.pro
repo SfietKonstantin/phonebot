@@ -1,2 +1,2 @@
 TEMPLATE = subdirs
-SUBDIRS = debug profile
+SUBDIRS = debug profile time

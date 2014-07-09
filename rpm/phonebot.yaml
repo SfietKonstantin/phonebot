@@ -17,6 +17,7 @@ PkgConfigBR:
 - Qt5DBus
 - Qt5Test
 - Qt5Qml
+- keepalive
 PkgBR: 
 - libprofile-qt5-devel
 Files:

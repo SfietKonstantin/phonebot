@@ -29,24 +29,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QtPlugin>
-#include "enginemanager.h"
+#ifndef TIMETRIGGER_H
+#define TIMETRIGGER_H
 
-Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
-Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
-Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
+#include <trigger.h>
+#include <QtCore/QTime>
 
-int main(int argc, char **argv)
+class TimeTriggerPrivate;
+class TimeTrigger : public Trigger
 {
-    QCoreApplication app (argc, argv);
-    app.setOrganizationName("phonebot");
-    app.setApplicationName("phonebotd");
+    Q_OBJECT
+    Q_PROPERTY(QTime time READ time WRITE setTime NOTIFY timeChanged)
+public:
+    explicit TimeTrigger(QObject *parent = 0);
+    virtual ~TimeTrigger();
+    QTime time() const;
+    void setTime(const QTime &time);
+Q_SIGNALS:
+    void timeChanged();
+private:
+    Q_DECLARE_PRIVATE(TimeTrigger)
+    Q_PRIVATE_SLOT(d_func(), void slotTriggered())
+};
 
-    EngineManager manager;
-    manager.reloadEngine();
-
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, &manager, &EngineManager::stop);
-
-    return app.exec();
-}
+#endif // TIMETRIGGER_H

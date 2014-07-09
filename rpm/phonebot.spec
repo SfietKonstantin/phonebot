@@ -24,6 +24,7 @@ BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5DBus)
 BuildRequires:  pkgconfig(Qt5Test)
 BuildRequires:  pkgconfig(Qt5Qml)
+BuildRequires:  pkgconfig(keepalive)
 BuildRequires:  libprofile-qt5-devel
 
 %description

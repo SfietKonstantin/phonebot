@@ -1,3 +1,15 @@
 [submodule "libprofile-qt"]
 	path = libprofile-qt
 	url = https://github.com/nemomobile/libprofile-qt.git
+[submodule "nemo-keepalive"]
+	path = nemo-keepalive
+	url = https://github.com/SfietKonstantin/nemo-keepalive.git
+[submodule "libdsme"]
+	path = libdsme
+	url = https://github.com/nemomobile/libdsme.git
+[submodule "libiphb"]
+	path = libiphb
+	url = https://github.com/nemomobile/libiphb.git
+[submodule "mce-dev"]
+	path = mce-dev
+	url = https://github.com/nemomobile/mce-dev.git
