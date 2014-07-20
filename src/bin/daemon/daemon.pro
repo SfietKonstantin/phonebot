@@ -9,12 +9,12 @@ QT = core dbus qml
     PKGCONFIG += keepalive
 }
 
-INCLUDEPATH += ../../lib
+INCLUDEPATH += ../../lib/core
 
 LIBS += -L../../plugins/debug -lphonebotdebug \
     -L../../plugins/profile -lphonebotprofile \
     -L../../plugins/time -lphonebottime \
-    -L../../lib -lphonebot
+    -L../../lib/core -lphonebot
 
 HEADERS = \
     enginemanager.h

@@ -2,12 +2,11 @@ TEMPLATE = lib
 TARGET = phonebotprofile
 QT = core dbus
 
-INCLUDEPATH += ../../lib
+INCLUDEPATH += ../../lib/core
 
 CONFIG += plugin static
 
-HEADERS = \
-    profileaction.h
+HEADERS = profileaction.h
 
 SOURCES = plugin.cpp \
     profileaction.cpp

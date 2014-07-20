@@ -2,12 +2,11 @@ TEMPLATE = lib
 TARGET = phonebottime
 QT = core dbus qml
 
-INCLUDEPATH += ../../lib
+INCLUDEPATH += ../../lib/core
 
 CONFIG += plugin static
 
-HEADERS = \
-    timetrigger.h
+HEADERS = timetrigger.h
 
 SOURCES = plugin.cpp \
     timetrigger.cpp

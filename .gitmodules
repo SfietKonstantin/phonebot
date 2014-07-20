@@ -1,15 +1,15 @@
-[submodule "libprofile-qt"]
-	path = libprofile-qt
+[submodule "src/3rdparty/libprofile-qt"]
+	path = src/3rdparty/libprofile-qt
 	url = https://github.com/nemomobile/libprofile-qt.git
-[submodule "nemo-keepalive"]
-	path = nemo-keepalive
-	url = https://github.com/SfietKonstantin/nemo-keepalive.git
-[submodule "libdsme"]
-	path = libdsme
+[submodule "src/3rdparty/libdsme"]
+	path = src/3rdparty/libdsme
 	url = https://github.com/nemomobile/libdsme.git
-[submodule "libiphb"]
-	path = libiphb
-	url = https://github.com/nemomobile/libiphb.git
-[submodule "mce-dev"]
-	path = mce-dev
+[submodule "src/3rdparty/mce-dev"]
+	path = src/3rdparty/mce-dev
 	url = https://github.com/nemomobile/mce-dev.git
+[submodule "src/3rdparty/libiphb"]
+	path = src/3rdparty/libiphb
+	url = https://github.com/nemomobile/libiphb.git
+[submodule "src/3rdparty/nemo-keepalive"]
+	path = src/3rdparty/nemo-keepalive
+	url = https://github.com/SfietKonstantin/nemo-keepalive.git

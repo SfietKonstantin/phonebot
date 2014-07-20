@@ -4,7 +4,7 @@ QT = core dbus qml
 
 system(qdbusxml2cpp dbus/org.SfietKonstantin.phonebotdebug.xml -i debugtrigger.h -a adaptor)
 
-INCLUDEPATH += ../../lib
+INCLUDEPATH += ../../lib/core
 
 CONFIG += plugin static
 

@@ -2,8 +2,8 @@
     INCLUDEPATH += /usr/include/keepalive
 }
 
-INCLUDEPATH += ../../../nemo-keepalive/plugin/
+INCLUDEPATH += ../../3rdparty/nemo-keepalive/plugin/
 
-HEADERS += ../../../nemo-keepalive/plugin/declarativebackgroundactivity.h
+HEADERS += ../../3rdparty/nemo-keepalive/plugin/declarativebackgroundactivity.h
 
-SOURCES += ../../../nemo-keepalive/plugin/declarativebackgroundactivity.cpp
+SOURCES += ../../3rdparty/nemo-keepalive/plugin/declarativebackgroundactivity.cpp

@@ -87,6 +87,7 @@ void TstAction::testJsAction()
     // Some checks
     engine->start();
     Rule *rule = engine->rule(source);
+    rule->setEnabled(true);
     QVERIFY(rule);
 
     Trigger *trigger = rule->trigger();

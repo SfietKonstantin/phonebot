@@ -3,8 +3,8 @@ TARGET = tst_action
 
 QT = core qml testlib
 
-INCLUDEPATH += ../../lib
-LIBS += -L../../lib -lphonebot
+INCLUDEPATH += ../../lib/core
+LIBS += -L../../lib/core -lphonebot
 
 SOURCES += tst_action.cpp
 
