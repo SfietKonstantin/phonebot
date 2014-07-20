@@ -34,6 +34,7 @@
 
 #include <QtCore/QSharedPointer>
 #include <QtCore/QMetaType>
+#include <QtCore/QStringList>
 
 class ImportStatementPrivate;
 class ImportStatement
