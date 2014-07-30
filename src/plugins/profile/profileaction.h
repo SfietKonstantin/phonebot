@@ -33,12 +33,14 @@
 #define PROFILEACTION_H
 
 #include <action.h>
+#include <abstractmetadata.h>
 
 class ProfileActionPrivate;
 class ProfileAction : public Action
 {
     Q_OBJECT
     Q_PROPERTY(QString profile READ profile WRITE setProfile NOTIFY profileChanged)
+    PHONEBOT_METADATA(ProfileActionMeta)
 public:
     explicit ProfileAction(QObject *parent = 0);
     QString profile() const;
@@ -48,6 +50,17 @@ Q_SIGNALS:
     void profileChanged();
 private:
     Q_DECLARE_PRIVATE(ProfileAction)
+};
+
+class ProfileActionMeta: public AbstractMetaData
+{
+    Q_OBJECT
+public:
+    Q_INVOKABLE explicit ProfileActionMeta(QObject * parent = 0);
+    QString name() const;
+    QString description() const;
+protected:
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
 };
 
 #endif // PROFILEACTION_H

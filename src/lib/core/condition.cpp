@@ -33,7 +33,7 @@
 #include "condition_p.h"
 
 ConditionPrivate::ConditionPrivate(Condition *q)
-    : valid(true), enabled(true), q_ptr(q)
+    : enabled(true), q_ptr(q)
 {
 }
 
@@ -71,20 +71,5 @@ void Condition::setEnabled(bool enabled)
     if (d->enabled != enabled) {
         d->enabled = enabled;
         emit enabledChanged();
-    }
-}
-
-bool Condition::isValid() const
-{
-    Q_D(const Condition);
-    return d->valid;
-}
-
-void Condition::setValid(bool valid)
-{
-    Q_D(Condition);
-    if (d->valid != valid) {
-        d->valid = valid;
-        emit validChanged();
     }
 }

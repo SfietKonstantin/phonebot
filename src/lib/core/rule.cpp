@@ -74,6 +74,40 @@ int RulePrivate::actions_count(QQmlListProperty<Action> *list)
     return 0;
 }
 
+void RulePrivate::mappers_append(QQmlListProperty<AbstractMapper> *list, AbstractMapper *mapper)
+{
+    Rule *rule = qobject_cast<Rule *>(list->object);
+    if (rule && mapper) {
+        rule->d_func()->mappers.append(mapper);
+    }
+}
+
+AbstractMapper * RulePrivate::mappers_at(QQmlListProperty<AbstractMapper> *list, int index)
+{
+    Rule *rule = qobject_cast<Rule *>(list->object);
+    if (rule && index >= 0 && index < rule->d_func()->mappers.count()) {
+        return rule->d_func()->mappers.at(index);
+    }
+    return 0;
+}
+
+void RulePrivate::mappers_clear(QQmlListProperty<AbstractMapper> *list)
+{
+    Rule *rule = qobject_cast<Rule *>(list->object);
+    if (rule) {
+        rule->d_func()->mappers.clear();
+    }
+}
+
+int RulePrivate::mappers_count(QQmlListProperty<AbstractMapper> *list)
+{
+    Rule *rule = qobject_cast<Rule *>(list->object);
+    if (rule) {
+        return rule->d_func()->mappers.count();
+    }
+    return 0;
+}
+
 void RulePrivate::slotTriggered()
 {
     Q_Q(Rule);
@@ -89,7 +123,7 @@ void RulePrivate::slotTriggered()
     if (condition) {
         ok = condition->isEnabled();
         if (ok) {
-            ok = condition->isValid();
+            ok = condition->isValid(q);
         }
     }
 
@@ -190,6 +224,15 @@ QQmlListProperty<Action> Rule::actions()
                                     &RulePrivate::actions_count,
                                     &RulePrivate::actions_at,
                                     &RulePrivate::actions_clear);
+}
+
+QQmlListProperty<AbstractMapper> Rule::mappers()
+{
+    return QQmlListProperty<AbstractMapper>(this, 0,
+                                            &RulePrivate::mappers_append,
+                                            &RulePrivate::mappers_count,
+                                            &RulePrivate::mappers_at,
+                                            &RulePrivate::mappers_clear);
 }
 
 #include "moc_rule.cpp"

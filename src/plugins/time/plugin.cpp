@@ -41,6 +41,7 @@ public:
     void registerTypes()
     {
         qmlRegisterType<TimeTrigger>("org.SfietKonstantin.phonebot.time", 1, 0, "TimeTrigger");
+        qRegisterMetaType<TimeTriggerMeta *>();
     }
 };
 

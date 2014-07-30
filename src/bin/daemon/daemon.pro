@@ -14,6 +14,7 @@ INCLUDEPATH += ../../lib/core
 LIBS += -L../../plugins/debug -lphonebotdebug \
     -L../../plugins/profile -lphonebotprofile \
     -L../../plugins/time -lphonebottime \
+    -L../../lib/meta -lphonebotmeta \
     -L../../lib/core -lphonebot
 
 HEADERS = \

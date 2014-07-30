@@ -17,7 +17,12 @@ HEADERS = rule.h \
     phonebotengine.h \
     phonebotextensioninterface.h \
     phonebotextensionplugin.h \
-    jsaction.h
+    jsaction.h \
+    jscondition.h \
+    abstractmapper.h \
+    abstractmapper_p.h \
+    timemapper.h \
+    basetype.h
 
 SOURCES = rule.cpp \
     trigger.cpp \
@@ -25,4 +30,7 @@ SOURCES = rule.cpp \
     condition.cpp \
     phonebotengine.cpp \
     phonebotextensionplugin.cpp \
-    jsaction.cpp
+    jsaction.cpp \
+    jscondition.cpp \
+    abstractmapper.cpp \
+    timemapper.cpp

@@ -38,7 +38,6 @@ class ConditionPrivate
 {
 public:
     explicit ConditionPrivate(Condition *q);
-    bool valid;
     bool enabled;
 protected:
     Condition * const q_ptr;

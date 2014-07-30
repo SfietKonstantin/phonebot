@@ -33,6 +33,7 @@
 #define TIMETRIGGER_H
 
 #include <trigger.h>
+#include <abstractmetadata.h>
 #include <QtCore/QTime>
 
 class TimeTriggerPrivate;
@@ -40,6 +41,7 @@ class TimeTrigger : public Trigger
 {
     Q_OBJECT
     Q_PROPERTY(QTime time READ time WRITE setTime NOTIFY timeChanged)
+    PHONEBOT_METADATA(TimeTriggerMeta)
 public:
     explicit TimeTrigger(QObject *parent = 0);
     virtual ~TimeTrigger();
@@ -50,6 +52,17 @@ Q_SIGNALS:
 private:
     Q_DECLARE_PRIVATE(TimeTrigger)
     Q_PRIVATE_SLOT(d_func(), void slotTriggered())
+};
+
+class TimeTriggerMeta: public AbstractMetaData
+{
+    Q_OBJECT
+public:
+    Q_INVOKABLE explicit TimeTriggerMeta(QObject * parent = 0);
+    QString name() const;
+    QString description() const;
+protected:
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
 };
 
 #endif // TIMETRIGGER_H

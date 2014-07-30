@@ -2,7 +2,8 @@ TEMPLATE = lib
 TARGET = phonebotprofile
 QT = core dbus
 
-INCLUDEPATH += ../../lib/core
+INCLUDEPATH += ../../lib/core \
+    ../../lib/meta
 
 CONFIG += plugin static
 

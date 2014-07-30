@@ -40,11 +40,14 @@ class MetaComponentPrivate;
 class MetaComponent : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString description READ description CONSTANT)
     Q_PROPERTY(QStringList properties READ properties CONSTANT)
 public:
     explicit MetaComponent(QObject *parent = 0);
     virtual ~MetaComponent();
     static MetaComponent * create(const QString &componentType, QObject *parent = 0);
+    QString name() const;
+    QString description() const;
     QStringList properties() const;
     Q_INVOKABLE MetaProperty * property(const QString &name) const;
 protected:

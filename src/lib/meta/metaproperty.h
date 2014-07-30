@@ -35,21 +35,54 @@
 #include <QtCore/QObject>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QMetaType>
+#include <basetype.h>
+#include "choicemodel.h"
 
 class MetaPropertyPrivate;
 class MetaProperty: public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString name READ name CONSTANT)
+    Q_PROPERTY(QString description READ description CONSTANT)
+    Q_PROPERTY(MetaProperty::Type type READ type CONSTANT)
+    Q_PROPERTY(MetaProperty::SubType subType READ subType CONSTANT)
+    Q_PROPERTY(ChoiceModel * choiceModel READ choiceModel CONSTANT)
+    Q_ENUMS(Type)
+    Q_ENUMS(SubType)
 public:
+    enum Type {
+        String = StringType,
+        Int = IntType,
+        Double = DoubleType,
+        Bool = BoolType,
+        Time = TimeType
+    };
+    enum SubType {
+        NoSubType,
+        ChoiceSubType
+    };
+
     explicit MetaProperty(QObject *parent = 0);
     virtual ~MetaProperty();
-    static MetaProperty * create(const QString &name, QMetaType::Type type, QObject *parent = 0);
-    static MetaProperty * createString(const QString &name, QObject *parent = 0);
-    static MetaProperty * createInt(const QString &name, QObject *parent = 0);
-    static MetaProperty * createDouble(const QString &name, QObject *parent = 0);
-    static MetaProperty * createBool(const QString &name, QObject *parent = 0);
+    static MetaProperty * create(const QString &name, Type type, const QString &description,
+                                 QObject *parent = 0);
+    static MetaProperty * create(const QString &name, Type type, SubType subType,
+                                 const QString &description, QObject *parent = 0);
+    static MetaProperty * createString(const QString &name, const QString &description,
+                                       QObject *parent = 0);
+    static MetaProperty * createInt(const QString &name, const QString &description,
+                                    QObject *parent = 0);
+    static MetaProperty * createDouble(const QString &name, const QString &description,
+                                       QObject *parent = 0);
+    static MetaProperty * createBool(const QString &name, const QString &description,
+                                     QObject *parent = 0);
+    static MetaProperty * createChoice(const QString &name, const QString &description,
+                                       ChoiceModel *choice, QObject *parent = 0);
     QString name() const;
-    QMetaType::Type type() const;
+    Type type() const;
+    SubType subType() const;
+    QString description() const;
+    ChoiceModel * choiceModel() const;
     bool isCompatible(QMetaType::Type other) const;
 protected:
     QScopedPointer<MetaPropertyPrivate> d_ptr;

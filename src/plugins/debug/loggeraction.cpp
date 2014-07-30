@@ -100,6 +100,15 @@ bool LoggerAction::execute(Rule *rule)
         stream << "        }" << endl;
     }
     stream << "    }" << endl;
+
+    QQmlListReference mappers (rule, "mappers");
+    stream << "    mappers: [" << endl;
+    for (int i = 0; i < mappers.count(); ++i) {
+        stream << "        Mapper {" << endl;
+        dumpMetadata(stream, mappers.at(i), 3);
+        stream << "        }" << endl;
+    }
+    stream << "    }" << endl;
     stream << "}" << endl << endl;
 
     log.close();

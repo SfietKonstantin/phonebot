@@ -1,3 +1,5 @@
 import QtQuick 2.0
 
-Item {}
+Item {
+    property Item test: Item {}
+}

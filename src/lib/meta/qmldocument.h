@@ -43,12 +43,23 @@ public:
     typedef QSharedPointer<ImportStatement> Ptr;
     typedef QSharedPointer<const ImportStatement> ConstPtr;
     virtual ~ImportStatement();
+    static ImportStatement::Ptr create(const QString &importUri, const QString &importFile,
+                                       const QString &version, const QString &importId);
+    static ImportStatement::Ptr createImport(const QString &importUri, const QString &version,
+                                             const QString &importId = QString());
+    static ImportStatement::Ptr createFileImport(const QString &importFile,
+                                                 const QString &version = QString(),
+                                                 const QString &importId = QString());
     QString importUri() const;
+    void setImportUri(const QString importUri);
     QString importFile() const;
+    void setImportFile(const QString importFile);
     QString version() const;
+    void setVersion(const QString importVersion);
     QString importId() const;
+    void setImportId(const QString importId);
+    QString toString() const;
 protected:
-    explicit ImportStatement(ImportStatementPrivate &dd);
     QScopedPointer<ImportStatementPrivate> d_ptr;
 private:
     ImportStatement();
@@ -67,20 +78,39 @@ private:
 
 Q_DECLARE_METATYPE(Expression)
 
+class Reference
+{
+public:
+    explicit Reference();
+    explicit Reference(const QString &identifier, const QStringList &fieldMembers = QStringList());
+    QString identifier() const;
+    QStringList fieldMembers() const;
+    QString value() const;
+private:
+    QString m_identifier;
+    QStringList m_fieldMembers;
+};
+
+Q_DECLARE_METATYPE(Reference)
+
 class QmlObjectPrivate;
 class QmlObject
 {
 public:
     typedef QSharedPointer<QmlObject> Ptr;
     typedef QSharedPointer<const QmlObject> ConstPtr;
-
     virtual ~QmlObject();
+    static QmlObject::Ptr create(const QString &type);
     QString type() const;
     QString id() const;
+    void setId(const QString &id);
     QStringList properties() const;
     bool hasProperty(const QString &key) const;
     QVariant property(const QString &key) const;
+    void setProperties(const QVariantMap &properties);
     QList<QmlObject::Ptr> children() const;
+    void setChildren(const QList<QmlObject::Ptr> &children);
+    QString toString(int indentLevel) const;
 protected:
     explicit QmlObject(QmlObjectPrivate &dd);
     QScopedPointer<QmlObjectPrivate> d_ptr;
@@ -91,24 +121,66 @@ private:
 
 Q_DECLARE_METATYPE(QmlObject::Ptr)
 
-class QmlDocumentPrivate;
-class QmlDocument
+
+class QmlDocumentBasePrivate;
+class QmlDocumentBase
 {
 public:
+    typedef QSharedPointer<QmlDocumentBase> Ptr;
+    typedef QSharedPointer<const QmlDocumentBase> ConstPtr;
+    virtual ~QmlDocumentBase();
+    QList<ImportStatement::Ptr> imports() const;
+    QmlObject::Ptr rootObject() const;
+    QString toString() const;
+protected:
+    explicit QmlDocumentBase(QmlDocumentBasePrivate &dd);
+    QScopedPointer<QmlDocumentBasePrivate> d_ptr;
+private:
+    explicit QmlDocumentBase();
+    Q_DECLARE_PRIVATE(QmlDocumentBase)
+};
+
+class QmlDocumentPrivate;
+class QmlDocument: public QmlDocumentBase
+{
+public:
+    enum ErrorType {
+        NoError,
+        ParseError,
+        NoRuleError,
+        ComplexRuleError
+    };
     typedef QSharedPointer<QmlDocument> Ptr;
     typedef QSharedPointer<const QmlDocument> ConstPtr;
 
     virtual ~QmlDocument();
     static Ptr create(const QString &fileName);
+    static QmlDocumentBase::Ptr toBase(Ptr object);
+    static QmlDocumentBase::ConstPtr toBase(ConstPtr object);
     QString fileName() const;
-    QList<ImportStatement::Ptr> imports() const;
-    QmlObject::Ptr rootObject() const;
-protected:
-    QScopedPointer<QmlDocumentPrivate> d_ptr;
+    ErrorType error() const;
+    QString errorMessage() const;
 private:
     explicit QmlDocument();
     Q_DECLARE_PRIVATE(QmlDocument)
+};
 
+class WritableQmlDocument: public QmlDocumentBase
+{
+public:
+    typedef QSharedPointer<WritableQmlDocument> Ptr;
+    typedef QSharedPointer<const WritableQmlDocument> ConstPtr;
+
+    virtual ~WritableQmlDocument();
+    static Ptr create();
+    static QmlDocumentBase::Ptr toBase(Ptr object);
+    static QmlDocumentBase::ConstPtr toBase(ConstPtr object);
+    void clearImports();
+    void addImport(ImportStatement::Ptr import);
+    void setRootObject(QmlObject::Ptr rootObject);
+private:
+    explicit WritableQmlDocument();
+    Q_DECLARE_PRIVATE(QmlDocumentBase)
 };
 
 #endif // QMLDOCUMENT_H

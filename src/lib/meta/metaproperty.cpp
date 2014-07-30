@@ -34,9 +34,18 @@
 
 struct MetaPropertyPrivate
 {
+    explicit MetaPropertyPrivate();
     QString name;
-    QMetaType::Type type;
+    MetaProperty::Type type;
+    MetaProperty::SubType subType;
+    QString description;
+    ChoiceModel *choiceModel;
 };
+
+MetaPropertyPrivate::MetaPropertyPrivate()
+    : choiceModel(0)
+{
+}
 
 MetaProperty::MetaProperty(QObject *parent)
     : QObject(parent), d_ptr(new MetaPropertyPrivate)
@@ -47,32 +56,63 @@ MetaProperty::~MetaProperty()
 {
 }
 
-MetaProperty * MetaProperty::create(const QString &name, QMetaType::Type type, QObject *parent)
+MetaProperty * MetaProperty::create(const QString &name, Type type, const QString &description,
+                                    QObject *parent)
 {
     MetaProperty *object = new MetaProperty(parent);
     object->d_ptr->name = name;
     object->d_ptr->type = type;
+    object->d_ptr->subType = NoSubType;
+    object->d_ptr->description = description;
     return object;
 }
 
-MetaProperty * MetaProperty::createString(const QString &name, QObject *parent)
+MetaProperty * MetaProperty::create(const QString &name, Type type, SubType subType,
+                                    const QString &description, QObject *parent)
 {
-    return create(name, QMetaType::QString, parent);
+    MetaProperty *object = new MetaProperty(parent);
+    object->d_ptr->name = name;
+    object->d_ptr->type = type;
+    object->d_ptr->subType = subType;
+    object->d_ptr->description = description;
+    return object;
 }
 
-MetaProperty * MetaProperty::createInt(const QString &name, QObject *parent)
+MetaProperty * MetaProperty::createString(const QString &name, const QString &description,
+                                          QObject *parent)
 {
-    return create(name, QMetaType::Int, parent);
+    return create(name, String, description, parent);
 }
 
-MetaProperty * MetaProperty::createDouble(const QString &name, QObject *parent)
+MetaProperty * MetaProperty::createInt(const QString &name, const QString &description,
+                                       QObject *parent)
 {
-    return create(name, QMetaType::Double, parent);
+    return create(name, Int, description, parent);
 }
 
-MetaProperty * MetaProperty::createBool(const QString &name, QObject *parent)
+MetaProperty * MetaProperty::createDouble(const QString &name, const QString &description,
+                                          QObject *parent)
 {
-    return create(name, QMetaType::Bool, parent);
+    return create(name, Double, description, parent);
+}
+
+MetaProperty * MetaProperty::createBool(const QString &name, const QString &description,
+                                        QObject *parent)
+{
+    return create(name, Bool, description, parent);
+}
+
+MetaProperty * MetaProperty::createChoice(const QString &name, const QString &description,
+                                          ChoiceModel *choice, QObject *parent)
+{
+    if (!choice) {
+        return 0;
+    }
+
+    MetaProperty *returned = MetaProperty::create(name, String, ChoiceSubType, description, parent);
+    returned->d_ptr->choiceModel = choice;
+    returned->d_ptr->choiceModel->setParent(returned);
+    return returned;
 }
 
 QString MetaProperty::name() const
@@ -81,10 +121,28 @@ QString MetaProperty::name() const
     return d->name;
 }
 
-QMetaType::Type MetaProperty::type() const
+MetaProperty::Type MetaProperty::type() const
 {
     Q_D(const MetaProperty);
     return d->type;
+}
+
+MetaProperty::SubType MetaProperty::subType() const
+{
+    Q_D(const MetaProperty);
+    return d->subType;
+}
+
+QString MetaProperty::description() const
+{
+    Q_D(const MetaProperty);
+    return d->description;
+}
+
+ChoiceModel * MetaProperty::choiceModel() const
+{
+    Q_D(const MetaProperty);
+    return d->choiceModel;
 }
 
 bool MetaProperty::isCompatible(QMetaType::Type other) const

@@ -2,7 +2,8 @@ TEMPLATE = lib
 TARGET = phonebottime
 QT = core dbus qml
 
-INCLUDEPATH += ../../lib/core
+INCLUDEPATH += ../../lib/core \
+    ../../lib/meta
 
 CONFIG += plugin static
 

@@ -31,10 +31,35 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.phonebot 1.0
 
 Page {
     id: container
-    PageHeader {
-        title: "Phonebot"
+
+    SilicaFlickable {
+        anchors.fill: parent
+
+        Column {
+            width: parent.width
+
+            PageHeader {
+                title: "Phonebot"
+            }
+        }
+
+        RulesModel {
+            id: model
+        }
+
+        PullDownMenu {
+            MenuItem {
+                text: "Add rule"
+                onClicked: {
+                    var rule = model.createRule()
+                    pageStack.push(Qt.resolvedUrl("RuleDialog.qml"),
+                                   {model: model, rule: rule})
+                }
+            }
+        }
     }
 }

@@ -172,6 +172,18 @@ MetaComponent * MetaComponent::create(const QString &componentType, QObject *par
     return component;
 }
 
+QString MetaComponent::name() const
+{
+    Q_D(const MetaComponent);
+    return d->metaData->name();
+}
+
+QString MetaComponent::description() const
+{
+    Q_D(const MetaComponent);
+    return d->metaData->description();
+}
+
 QStringList MetaComponent::properties() const
 {
     Q_D(const MetaComponent);

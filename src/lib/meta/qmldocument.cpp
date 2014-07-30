@@ -35,9 +35,22 @@
 #include <QtCore/QDebug>
 #endif
 #include <QtCore/QStack>
+#include <QtCore/QTextStream>
 #include "qmljsengine_p.h"
 #include "qmljslexer_p.h"
 #include "qmljsparser_p.h"
+
+struct Error
+{
+    int line;
+    int column;
+    QString message;
+};
+
+static QString indent(int indentLevel)
+{
+    return QString("    ").repeated(indentLevel);
+}
 
 struct ImportStatementPrivate
 {
@@ -52,13 +65,41 @@ ImportStatement::ImportStatement()
 {
 }
 
-ImportStatement::ImportStatement(ImportStatementPrivate &dd)
-    : d_ptr(&dd)
+ImportStatement::~ImportStatement()
 {
 }
 
-ImportStatement::~ImportStatement()
+ImportStatement::Ptr ImportStatement::create(const QString &importUri, const QString &importFile,
+                                             const QString &version, const QString &importId)
 {
+    ImportStatement::Ptr object = ImportStatement::Ptr(new ImportStatement);
+    object->d_ptr->importUri = importUri;
+    object->d_ptr->importFile = importFile;
+    object->d_ptr->version = version;
+    object->d_ptr->importId = importId;
+    return object;
+}
+
+ImportStatement::Ptr ImportStatement::createImport(const QString &importUri,
+                                                   const QString &version,
+                                                   const QString &importId)
+{
+    ImportStatement::Ptr object = ImportStatement::Ptr(new ImportStatement);
+    object->d_ptr->importUri = importUri;
+    object->d_ptr->version = version;
+    object->d_ptr->importId = importId;
+    return object;
+}
+
+ImportStatement::Ptr ImportStatement::createFileImport(const QString &importFile,
+                                                       const QString &version,
+                                                       const QString &importId)
+{
+    ImportStatement::Ptr object = ImportStatement::Ptr(new ImportStatement);
+    object->d_ptr->importFile = importFile;
+    object->d_ptr->version = version;
+    object->d_ptr->importId = importId;
+    return object;
 }
 
 QString ImportStatement::importUri() const
@@ -67,10 +108,22 @@ QString ImportStatement::importUri() const
     return d->importUri;
 }
 
+void ImportStatement::setImportUri(const QString importUri)
+{
+    Q_D(ImportStatement);
+    d->importUri = importUri;
+}
+
 QString ImportStatement::importFile() const
 {
     Q_D(const ImportStatement);
     return d->importFile;
+}
+
+void ImportStatement::setImportFile(const QString importFile)
+{
+    Q_D(ImportStatement);
+    d->importFile = importFile;
 }
 
 QString ImportStatement::version() const
@@ -79,34 +132,44 @@ QString ImportStatement::version() const
     return d->version;
 }
 
+void ImportStatement::setVersion(const QString version)
+{
+    Q_D(ImportStatement);
+    d->version = version;
+}
+
 QString ImportStatement::importId() const
 {
     Q_D(const ImportStatement);
     return d->importId;
 }
 
-class CreatableImportStatement: public ImportStatement
-{
-public:
-    explicit CreatableImportStatement(const QString &importUri, const QString &importFile,
-                                      const QString &version, const QString &importId);
-private:
-    Q_DECLARE_PRIVATE(ImportStatement)
-};
-
-CreatableImportStatement::CreatableImportStatement(const QString &importUri,
-                                                   const QString &importFile,
-                                                   const QString &version,
-                                                   const QString &importId)
-    : ImportStatement(*(new ImportStatementPrivate))
+void ImportStatement::setImportId(const QString importId)
 {
     Q_D(ImportStatement);
-    d->importUri = importUri;
-    d->importFile = importFile;
-    d->version = version;
     d->importId = importId;
 }
 
+QString ImportStatement::toString() const
+{
+    Q_D(const ImportStatement);
+    QString out;
+    QTextStream s (&out);
+    s << "import ";
+    if (!d->importUri.isEmpty()) {
+        s << d->importUri;
+    } else {
+        s << "\"" << d->importFile << "\"";
+    }
+    if (!d->version.isEmpty()) {
+        s << " " << d->version;
+    }
+    if (!d->importId.isEmpty()) {
+        s << " as " << d->importId;
+    }
+
+    return out;
+}
 
 Expression::Expression()
 {
@@ -122,6 +185,34 @@ QString Expression::value() const
     return m_expression;
 }
 
+Reference::Reference()
+{
+}
+
+Reference::Reference(const QString &identifier, const QStringList &fieldMembers)
+    : m_identifier(identifier), m_fieldMembers(fieldMembers)
+{
+}
+
+QString Reference::identifier() const
+{
+    return m_identifier;
+}
+
+QStringList Reference::fieldMembers() const
+{
+    return m_fieldMembers;
+}
+
+QString Reference::value() const
+{
+    QString value = m_identifier;
+    foreach (const QString &identifier, m_fieldMembers) {
+        value.append(QString(".%1").arg(identifier));
+    }
+    return value;
+}
+
 // Subclass exposing a creator + d-pointer
 class CreatableQmlObject: public QmlObject
 {
@@ -129,7 +220,7 @@ public:
     typedef QSharedPointer<CreatableQmlObject> Ptr;
     typedef QSharedPointer<const CreatableQmlObject> ConstPtr;
     explicit CreatableQmlObject();
-    static CreatableQmlObject::Ptr create();
+    static CreatableQmlObject::Ptr create(const QString &type);
     static QmlObject::Ptr toObject(Ptr creatable);
     QmlObjectPrivate * d();
     const QmlObjectPrivate * d() const;
@@ -151,9 +242,11 @@ CreatableQmlObject::CreatableQmlObject()
 {
 }
 
-CreatableQmlObject::Ptr CreatableQmlObject::create()
+CreatableQmlObject::Ptr CreatableQmlObject::create(const QString &type)
 {
-    return CreatableQmlObject::Ptr(new CreatableQmlObject());
+    CreatableQmlObject::Ptr object = CreatableQmlObject::Ptr(new CreatableQmlObject());
+    object->d_ptr->type = type;
+    return object;
 }
 
 QmlObject::Ptr CreatableQmlObject::toObject(CreatableQmlObject::Ptr creatable)
@@ -187,6 +280,13 @@ QmlObject::~QmlObject()
 {
 }
 
+QmlObject::Ptr QmlObject::create(const QString &type)
+{
+    QmlObject::Ptr object = QmlObject::Ptr(new QmlObject());
+    object->d_ptr->type = type;
+    return object;
+}
+
 QString QmlObject::type() const
 {
     Q_D(const QmlObject);
@@ -197,6 +297,12 @@ QString QmlObject::id() const
 {
     Q_D(const QmlObject);
     return d->id;
+}
+
+void QmlObject::setId(const QString &id)
+{
+    Q_D(QmlObject);
+    d->id = id;
 }
 
 QStringList QmlObject::properties() const
@@ -217,10 +323,98 @@ QVariant QmlObject::property(const QString &key) const
     return d->properties.value(key);
 }
 
+void QmlObject::setProperties(const QVariantMap &properties)
+{
+    Q_D(QmlObject);
+    d->properties = properties;
+}
+
 QList<QmlObject::Ptr> QmlObject::children() const
 {
     Q_D(const QmlObject);
     return d->children;
+}
+
+void QmlObject::setChildren(const QList<QmlObject::Ptr> &children)
+{
+    Q_D(QmlObject);
+    d->children = children;
+}
+
+static QString formatProperty(const QString &key, const QVariant &value, int indentLevel)
+{
+    QString returned;
+    bool ok = true;
+    QTextStream ss (&returned);
+    ss << indent(indentLevel + 1);
+    if (!key.isEmpty()) {
+        ss << key << ": ";
+    }
+    switch (value.type()) {
+    case QMetaType::QString:
+        ss << "\"" << value.toString() << "\"";
+        break;
+    case QMetaType::Int:
+        ss << value.toInt();
+        break;
+    case QMetaType::Double:
+        ss << value.toDouble();
+        break;
+    case QMetaType::Bool:
+        ss << (value.toBool() ? "true" : "false");
+        break;
+    case QMetaType::QVariantList:
+    {
+        QStringList components;
+        foreach (const QVariant &variant, value.toList()) {
+            components.append(formatProperty(QString(), variant, indentLevel + 1));
+        }
+        ss << "[" << endl << components.join(",\n") << endl << indent(indentLevel + 1) << "]";
+        break;
+    }
+    default:
+        if (value.canConvert<QmlObject::Ptr>()) {
+            QmlObject::Ptr object = value.value<QmlObject::Ptr>();
+            if (!object.isNull()) {
+                ss << object->toString(indentLevel + 1).trimmed();
+            } else {
+                ok = false;
+            }
+        } else if (value.canConvert<Reference>()) {
+            ss << value.value<Reference>().value();
+        }
+        break;
+    }
+
+    if (!ok) {
+        return QString();
+    }
+    return returned;
+}
+
+QString QmlObject::toString(int indentLevel) const
+{
+    Q_D(const QmlObject);
+    QString out;
+    QTextStream s (&out);
+    s << d->type << " {" << endl;
+    if (!d->id.isEmpty()) {
+        s << indent(indentLevel + 1) << "id: " << d->id << endl;
+    }
+
+    for (QVariantMap::const_iterator i = d->properties.constBegin();
+         i != d->properties.constEnd(); ++i) {
+        QString property = formatProperty(i.key(), i.value(), indentLevel);
+        if (!property.isEmpty()) {
+            s << property << endl;
+        }
+    }
+
+    foreach (QmlObject::Ptr object, d->children) {
+        s << indent(indentLevel + 1) << object->toString(indentLevel + 1);
+    }
+    s << indent(indentLevel) << "}" << endl;
+    return out;
 }
 
 // Visitor
@@ -241,12 +435,18 @@ private:
     ExpressionBuffer() {}
 };
 
+// TODO: manage complex rules
 class QmlVisitor: protected QmlJS::AST::Visitor
 {
 public:
+    QmlDocument::ErrorType error;
+    QList<Error> errors;
+
     QmlObject::Ptr operator()(const QString &source, QList<ImportStatement::Ptr> &imports,
                               QmlJS::AST::Node *node)
     {
+        error = QmlDocument::NoError;
+        errors.clear();
         _imports = &imports;
         _imports->clear();
         _source = source;
@@ -277,6 +477,10 @@ protected:
     // Manage the import
     bool visit(QmlJS::AST::UiImport *ast)
     {
+        if (error != QmlDocument::NoError) {
+            return false;
+        }
+
         QString importUri;
         if (ast->importUri) {
             importUri = ast->importUri->name.toString();
@@ -289,9 +493,8 @@ protected:
         QString fileName = ast->fileName.toString();
         QString importId = ast->importId.toString();
 
-        ImportStatement::Ptr import
-                = ImportStatement::Ptr(new CreatableImportStatement(importUri, fileName, version,
-                                                                    importId));
+        ImportStatement::Ptr import = ImportStatement::create(importUri, fileName, version,
+                                                              importId);
         _imports->append(import);
         return true;
     }
@@ -299,6 +502,10 @@ protected:
     // Manage bindings
     bool visit(QmlJS::AST::UiScriptBinding *ast)
     {
+        if (error != QmlDocument::NoError) {
+            return false;
+        }
+
         Q_ASSERT(ast->qualifiedId);
         visitBindings(ast->qualifiedId);
         return true;
@@ -311,6 +518,10 @@ protected:
 
     bool visit(QmlJS::AST::ExpressionStatement *ast)
     {
+        if (error != QmlDocument::NoError) {
+            return false;
+        }
+
         Q_ASSERT(!_buffers.isEmpty());
         ExpressionBuffer::Ptr buffer = _buffers.top();
 
@@ -327,14 +538,66 @@ protected:
 
         // If we found an unparsable entry, we just put
         // the source
+        bool ok = true;
         if (buffer->buffer.count() != 1) {
+            ok = false;
+        } else {
+            QVariant first = buffer->buffer.first();
+            if (first.canConvert<Reference>()) {
+                Reference reference = first.value<Reference>();
+                if (reference.value() != buffer->source) {
+                    ok = false;
+#ifdef QMLDOCUMENT_DEBUG
+                    qDebug() << "Reference is" << reference.value() << "and source" << buffer->source;
+#endif
+                }
+            }
+        }
+
+
+        if (!ok) {
             buffer->buffer.clear();
             buffer->buffer.append(QVariant::fromValue(Expression(buffer->source)));
         }
     }
 
+    bool visit(QmlJS::AST::FieldMemberExpression *ast)
+    {
+        QString identifier;
+        QStringList fieldMembers;
+        QmlJS::AST::ExpressionNode *base = ast;
+        while (base) {
+            if (base->kind == QmlJS::AST::Node::Kind_FieldMemberExpression) {
+                QmlJS::AST::FieldMemberExpression *astBase = static_cast<QmlJS::AST::FieldMemberExpression *>(base);
+                fieldMembers.prepend(astBase->name.toString());
+                base = astBase->base;
+            } else if (base->kind == QmlJS::AST::Node::Kind_IdentifierExpression) {
+                QmlJS::AST::IdentifierExpression *astBase = static_cast<QmlJS::AST::IdentifierExpression *>(base);
+                identifier = astBase->name.toString();
+                base = 0;
+            } else {
+                base = 0;
+            }
+        }
+
+        Q_ASSERT(!identifier.isEmpty());
+        Q_ASSERT(!fieldMembers.isEmpty());
+        _buffers.top()->buffer.append(QVariant::fromValue(Reference(identifier, fieldMembers)));
+        return false;
+    }
+
+    bool visit(QmlJS::AST::IdentifierExpression *ast)
+    {
+        _buffers.top()->buffer.append(QVariant::fromValue(Reference(ast->name.toString())));
+        return true;
+    }
+
     bool visit(QmlJS::AST::NumericLiteral *ast)
     {
+        if (error != QmlDocument::NoError) {
+            return false;
+        }
+
         Q_ASSERT(!_bindings.isEmpty());
         _buffers.top()->buffer.append(ast->value);
         return true;
@@ -342,6 +605,10 @@ protected:
 
     bool visit(QmlJS::AST::StringLiteral *ast)
     {
+        if (error != QmlDocument::NoError) {
+            return false;
+        }
+
         Q_ASSERT(!_bindings.isEmpty());
         _buffers.top()->buffer.append(ast->value.toString());
         return true;
@@ -349,6 +616,10 @@ protected:
 
     bool visit(QmlJS::AST::TrueLiteral *)
     {
+        if (error != QmlDocument::NoError) {
+            return false;
+        }
+
         Q_ASSERT(!_bindings.isEmpty());
         _buffers.top()->buffer.append(QVariant(true));
         return true;
@@ -356,6 +627,10 @@ protected:
 
     bool visit(QmlJS::AST::FalseLiteral *)
     {
+        if (error != QmlDocument::NoError) {
+            return false;
+        }
+
         Q_ASSERT(!_bindings.isEmpty());
         _buffers.top()->buffer.append(QVariant(false));
         return true;
@@ -364,14 +639,17 @@ protected:
     // Manage object bindings
     bool visit(QmlJS::AST::UiObjectBinding *ast)
     {
+        if (error != QmlDocument::NoError) {
+            return false;
+        }
+
         Q_ASSERT(ast->qualifiedId);
         Q_ASSERT(ast->qualifiedTypeNameId);
         visitBindings(ast->qualifiedId);
 
         // Also push an object
-        CreatableQmlObject::Ptr object = CreatableQmlObject::create();
+        CreatableQmlObject::Ptr object = CreatableQmlObject::create(ast->qualifiedTypeNameId->name.toString());
         object->d()->parent = _current;
-        object->d()->type = ast->qualifiedTypeNameId->name.toString();;
         _current = object;
 
         // Directly insert the object inside the buffer
@@ -389,17 +667,30 @@ protected:
     // Component management
     bool visit(QmlJS::AST::UiObjectDefinition *ast)
     {
-        CreatableQmlObject::Ptr object = CreatableQmlObject::create();
+        if (error != QmlDocument::NoError) {
+            return false;
+        }
+
+        CreatableQmlObject::Ptr object = CreatableQmlObject::create(ast->qualifiedTypeNameId->name.toString());
         object->d()->parent = _current;
-        object->d()->type = ast->qualifiedTypeNameId->name.toString();
 
         _current = object;
         return true;
     }
 
-    void endVisit(QmlJS::AST::UiObjectDefinition *)
+    void endVisit(QmlJS::AST::UiObjectDefinition *ast)
     {
         if (_current->d()->parent.isNull()) {
+            // We are at root, let's check if the root is a Rule
+            if (_current->type() != "Rule") {
+                Error ruleError;
+                ruleError.column = ast->firstSourceLocation().startColumn;
+                ruleError.line = ast->firstSourceLocation().startLine;
+                ruleError.message = "Error: root component type is not Rule";
+                errors.append(ruleError);
+                error = QmlDocument::NoRuleError;
+            }
+
             return;
         }
 
@@ -429,9 +720,9 @@ private:
         Q_ASSERT(buffer->buffer.count() == 1);
 
         QVariant value = buffer->buffer.first();
-        if (binding == "id" && value.canConvert<Expression>()) {
-            Expression id = value.value<Expression>();
-            _current->d()->id = id.value();
+        if (binding == "id" && value.canConvert<Reference>()) {
+            Reference id = value.value<Reference>();
+            _current->setId(id.identifier());
         } else {
             _current->d()->properties.insert(binding, value);
         }
@@ -448,22 +739,83 @@ private:
     QStack<ExpressionBuffer::Ptr> _buffers;
 };
 
-
 // Document
-struct QmlDocumentPrivate
+struct QmlDocumentBasePrivate
 {
+    explicit QmlDocumentBasePrivate();
     QmlObject::Ptr rootObject;
-    QString fileName;
     QList<ImportStatement::Ptr> imports;
 };
 
+QmlDocumentBasePrivate::QmlDocumentBasePrivate()
+{
+}
+
+QmlDocumentBase::QmlDocumentBase()
+    : d_ptr(new QmlDocumentBasePrivate)
+{
+}
+
+QmlDocumentBase::QmlDocumentBase(QmlDocumentBasePrivate &dd)
+    : d_ptr(&dd)
+{
+}
+
+QmlDocumentBase::~QmlDocumentBase()
+{
+}
+
+QList<ImportStatement::Ptr> QmlDocumentBase::imports() const
+{
+    Q_D(const QmlDocumentBase);
+    return d->imports;
+}
+
+QmlObject::Ptr QmlDocumentBase::rootObject() const
+{
+    Q_D(const QmlDocumentBase);
+    return d->rootObject;
+}
+
+QString QmlDocumentBase::toString() const
+{
+    Q_D(const QmlDocumentBase);
+    QString out;
+    QTextStream s (&out);
+    foreach (ImportStatement::ConstPtr import, d->imports) {
+        s << import->toString() << endl;
+    }
+
+    s << endl;
+    s << d->rootObject->toString(0);
+    return out;
+}
+
+struct QmlDocumentPrivate: public QmlDocumentBasePrivate
+{
+    explicit QmlDocumentPrivate();
+    QString fileName;
+    QmlDocument::ErrorType error;
+    QString errorMessage;
+};
+
+QmlDocumentPrivate::QmlDocumentPrivate()
+    : QmlDocumentBasePrivate(), error(QmlDocument::NoError)
+{
+}
+
 QmlDocument::QmlDocument()
-    : d_ptr(new QmlDocumentPrivate)
+    : QmlDocumentBase(*(new QmlDocumentPrivate))
 {
 }
 
 QmlDocument::~QmlDocument()
 {
+}
+
+static QString formatError(int line, int column, const QString &error)
+{
+    return QString("l%1 c%2: %3\n").arg(QString::number(line), QString::number(column), error);
 }
 
 QmlDocument::Ptr QmlDocument::create(const QString &fileName)
@@ -477,7 +829,7 @@ QmlDocument::Ptr QmlDocument::create(const QString &fileName)
     file.close();
 
     QmlDocument::Ptr object = QmlDocument::Ptr(new QmlDocument());
-    object->d_ptr->fileName = fileName;
+    object->d_func()->fileName = fileName;
 
 
     QmlJS::Engine engine;
@@ -486,9 +838,39 @@ QmlDocument::Ptr QmlDocument::create(const QString &fileName)
     lexer.setCode(source, 1, true);
     parser.parse();
 
-    QmlVisitor visitor;
-    object->d_ptr->rootObject = visitor(source, object->d_ptr->imports, parser.rootNode());
+    const QList<QmlJS::DiagnosticMessage> diagnosticMessages = parser.diagnosticMessages();
+    if (diagnosticMessages.count() > 0) {
+        foreach (const QmlJS::DiagnosticMessage &message, diagnosticMessages) {
+            if (message.isError()) {
+                object->d_func()->error = QmlDocument::ParseError;
+                object->d_func()->errorMessage.append(formatError(message.loc.startLine,
+                                                                  message.loc.startColumn,
+                                                                  message.message));
+            }
+        }
+    }
+
+    if (object->d_func()->error == QmlDocument::NoError) {
+        QmlVisitor visitor;
+        object->d_func()->rootObject = visitor(source, object->d_func()->imports, parser.rootNode());
+        object->d_func()->error = visitor.error;
+
+        foreach (const Error &error, visitor.errors) {
+            object->d_func()->errorMessage.append(formatError(error.line, error.column, error.message));
+        }
+    }
+    object->d_func()->errorMessage = object->d_func()->errorMessage.trimmed();
     return object;
+}
+
+QmlDocumentBase::Ptr QmlDocument::toBase(Ptr object)
+{
+    return qSharedPointerCast<QmlDocumentBase>(object);
+}
+
+QmlDocumentBase::ConstPtr QmlDocument::toBase(ConstPtr object)
+{
+    return qSharedPointerCast<const QmlDocumentBase>(object);
 }
 
 QString QmlDocument::fileName() const
@@ -497,14 +879,57 @@ QString QmlDocument::fileName() const
     return d->fileName;
 }
 
-QList<ImportStatement::Ptr> QmlDocument::imports() const
+QmlDocument::ErrorType QmlDocument::error() const
 {
     Q_D(const QmlDocument);
-    return d->imports;
+    return d->error;
 }
 
-QmlObject::Ptr QmlDocument::rootObject() const
+QString QmlDocument::errorMessage() const
 {
     Q_D(const QmlDocument);
-    return d->rootObject;
+    return d->errorMessage;
+}
+
+WritableQmlDocument::WritableQmlDocument()
+    : QmlDocumentBase(*(new QmlDocumentPrivate))
+{
+}
+
+WritableQmlDocument::~WritableQmlDocument()
+{
+}
+
+WritableQmlDocument::Ptr WritableQmlDocument::create()
+{
+    WritableQmlDocument::Ptr object = WritableQmlDocument::Ptr(new WritableQmlDocument());
+    return object;
+}
+
+QmlDocumentBase::Ptr WritableQmlDocument::toBase(Ptr object)
+{
+    return qSharedPointerCast<QmlDocumentBase>(object);
+}
+
+QmlDocumentBase::ConstPtr WritableQmlDocument::toBase(ConstPtr object)
+{
+    return qSharedPointerCast<const QmlDocumentBase>(object);
+}
+
+void WritableQmlDocument::clearImports()
+{
+    Q_D(QmlDocumentBase);
+    d->imports.clear();
+}
+
+void WritableQmlDocument::addImport(ImportStatement::Ptr import)
+{
+    Q_D(QmlDocumentBase);
+    d->imports.append(import);
+}
+
+void WritableQmlDocument::setRootObject(QmlObject::Ptr rootObject)
+{
+    Q_D(QmlDocumentBase);
+    d->rootObject = rootObject;
 }

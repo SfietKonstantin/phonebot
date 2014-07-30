@@ -1,11 +1,15 @@
 TEMPLATE = app
 TARGET = tst_meta
 
-QT = core qml testlib
+QT = core dbus qml testlib
 
 INCLUDEPATH += ../../lib/core \
-    ../../lib/meta
-LIBS += -L../../lib/core -lphonebot \
+    ../../lib/meta \
+    ../../plugins/profile \
+    ../../plugins/time
+LIBS += -L../../plugins/profile -lphonebotprofile \
+    -L../../plugins/time -lphonebottime \
+    -L../../lib/core -lphonebot \
     -L../../lib/meta -lphonebotmeta
 
 SOURCES += tst_meta.cpp

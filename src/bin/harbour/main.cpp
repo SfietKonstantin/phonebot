@@ -39,7 +39,30 @@
 #include <QtGui/QGuiApplication>
 #include <QtQuick/QQuickView>
 #endif
+#include <QtCore/QtPlugin>
+#include <QtQml/qqml.h>
+#include "rulesmodel.h"
+#include "ruledefinition.h"
+#include "rulecomponentsmodel.h"
+#include "phonebothelper.h"
+#include "phonebotengine.h"
+#include "abstractmetadata.h"
 
+Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
+Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
+Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
+
+static const char *REASON = "Cannot be created";
+
+// Second, define the singleton type provider function (callback).
+static QObject *phonebothelper_singletontype_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine)
+
+    PhoneBotHelper *helper = new PhoneBotHelper();
+    return helper;
+}
 
 int main(int argc, char *argv[])
 {
@@ -49,6 +72,20 @@ int main(int argc, char *argv[])
     view->setSource(SailfishApp::pathTo("qml/main.qml"));
 #else
     QGuiApplication *app = new QGuiApplication(argc, argv);
+    PhoneBotEngine::registerTypes();
+    qmlRegisterType<RulesModel>("harbour.phonebot", 1, 0, "RulesModel");
+    qmlRegisterType<RuleComponentsModel>("harbour.phonebot", 1, 0, "RuleComponentsModel");
+    qmlRegisterUncreatableType<RuleDefinition>("harbour.phonebot", 1, 0, "RuleDefinition", REASON);
+    qmlRegisterUncreatableType<RuleDefinitionActionModel>("harbour.phonebot", 1, 0,
+                                                          "RuleDefinitionActionModel", REASON);
+    qmlRegisterUncreatableType<RuleComponentModel>("harbour.phonebot", 1, 0, "RuleComponentModel",
+                                                   REASON);
+    qmlRegisterUncreatableType<MetaProperty>("harbour.phonebot", 1, 0, "MetaProperty", REASON);
+    qmlRegisterUncreatableType<ChoiceModel>("harbour.phonebot", 1, 0, "ChoiceModel", REASON);
+//    qmlRegisterUncreatableType<MetaComponent>("harbour.phonebot", 1, 0, "MetaComponent", REASON);
+    qmlRegisterSingletonType<PhoneBotHelper>("harbour.phonebot", 1, 0, "PhoneBot",
+                                             phonebothelper_singletontype_provider);
+
     QQuickView *view = new QQuickView();
     view->setSource(QUrl("qrc:/qml/main.qml"));
 #endif

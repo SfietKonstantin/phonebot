@@ -3,5 +3,14 @@
         <file>qml/main.qml</file>
         <file>qml/MainPage.qml</file>
         <file>qml/Cover.qml</file>
+        <file>qml/RuleDialog.qml</file>
+        <file>qml/RuleButton.qml</file>
+        <file>qml/ComponentConfigDialog.qml</file>
+        <file>qml/ComponentsDialog.qml</file>
+        <file>qml/typesolver.js</file>
+        <file>qml/TimePicker.qml</file>
+        <file>qml/TypeField.qml</file>
+        <file>qml/DialogButton.qml</file>
+        <file>qml/ComboBox.qml</file>
     </qresource>
 </RCC>

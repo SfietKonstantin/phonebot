@@ -33,6 +33,7 @@
 #define ABSTRACTMETADATA_H
 
 #include <QtCore/QObject>
+#include "phonebotmeta.h"
 #include "metaproperty.h"
 
 class AbstractMetaDataPrivate;
@@ -40,10 +41,12 @@ class AbstractMetaData: public QObject
 {
     Q_OBJECT
 public:
-    explicit AbstractMetaData(QObject *parent = 0);
     virtual ~AbstractMetaData();
+    virtual QString name() const = 0;
+    virtual QString description() const = 0;
     MetaProperty * property(const QString &property) const;
 protected:
+    explicit AbstractMetaData(QObject *parent = 0);
     virtual MetaProperty * getProperty(const QString &property, QObject *parent = 0) const = 0;
     QScopedPointer<AbstractMetaDataPrivate> d_ptr;
 private:

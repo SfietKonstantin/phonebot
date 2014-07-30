@@ -51,5 +51,9 @@ Rectangle {
         id: someText
         text: "Test 2"
     }
+
+    Test {
+        test.anchors.left: test.anchors.right
+    }
 }
 

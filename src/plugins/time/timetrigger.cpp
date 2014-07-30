@@ -105,5 +105,29 @@ void TimeTrigger::setTime(const QTime &time)
     }
 }
 
+TimeTriggerMeta::TimeTriggerMeta(QObject *parent)
+    : AbstractMetaData(parent)
+{
+}
+
+QString TimeTriggerMeta::name() const
+{
+    return tr("Time");
+}
+
+QString TimeTriggerMeta::description() const
+{
+    return tr("This trigger will be triggered at a specific time.");
+}
+
+MetaProperty * TimeTriggerMeta::getProperty(const QString &property, QObject *parent) const
+{
+    if (property == "time") {
+        return MetaProperty::create(property, MetaProperty::Time, tr("Time of day to trigger"),
+                                    parent);
+    }
+    return 0;
+}
+
 #include "moc_timetrigger.cpp"
 

@@ -35,17 +35,31 @@
 #include <condition.h>
 #include <metacomponent.h>
 #include <phonebotmeta.h>
+#include <profileaction.h>
+#include <timetrigger.h>
+#include <phonebotengine.h>
+#include <metatypecache.h>
+
+Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
+Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
 
 class TestCondition: public Condition
 {
     Q_OBJECT
 public:
     explicit TestCondition(QObject *parent = 0);
+    bool isValid(Rule *rule);
 };
 
 TestCondition::TestCondition(QObject *parent)
     : Condition(parent)
 {
+}
+
+bool TestCondition::isValid(Rule *rule)
+{
+    Q_UNUSED(rule);
+    return false;
 }
 
 class TestCondition2: public Condition
@@ -54,11 +68,18 @@ class TestCondition2: public Condition
     PHONEBOT_METADATA(MetaTestCondition2)
 public:
     explicit TestCondition2(QObject *parent = 0);
+    bool isValid(Rule *rule);
 };
 
 TestCondition2::TestCondition2(QObject *parent)
     : Condition(parent)
 {
+}
+
+bool TestCondition2::isValid(Rule *rule)
+{
+    Q_UNUSED(rule);
+    return false;
 }
 
 class TestCondition3: public Condition
@@ -67,6 +88,7 @@ class TestCondition3: public Condition
     PHONEBOT_METADATA(TestCondition3) // Error: the metadata refers to itself
 public:
     explicit TestCondition3(QObject *parent = 0);
+    bool isValid(Rule *rule);
 };
 
 TestCondition3::TestCondition3(QObject *parent)
@@ -74,11 +96,19 @@ TestCondition3::TestCondition3(QObject *parent)
 {
 }
 
+bool TestCondition3::isValid(Rule *rule)
+{
+    Q_UNUSED(rule);
+    return false;
+}
+
 class MetaTestCondition4: public AbstractMetaData
 {
     Q_OBJECT
 public:
     Q_INVOKABLE explicit MetaTestCondition4(QObject *parent = 0);
+    QString name() const;
+    QString description() const;
 protected:
     MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
 };
@@ -90,10 +120,20 @@ MetaTestCondition4::MetaTestCondition4(QObject *parent)
 {
 }
 
+QString MetaTestCondition4::name() const
+{
+    return "No name";
+}
+
+QString MetaTestCondition4::description() const
+{
+    return "No description";
+}
+
 MetaProperty * MetaTestCondition4::getProperty(const QString &property, QObject *parent) const
 {
     if (property == "test") {
-        return MetaProperty::createBool(property, parent);
+        return MetaProperty::createBool(property, "test", parent);
     }
 
     return 0;
@@ -109,6 +149,7 @@ public:
     explicit TestCondition4(QObject *parent = 0);
     bool test() const;
     void setTest(bool test);
+    bool isValid(Rule *rule);
 signals:
     void testChanged();
 };
@@ -128,12 +169,20 @@ void TestCondition4::setTest(bool test)
     Q_UNUSED(test)
 }
 
+bool TestCondition4::isValid(Rule *rule)
+{
+    Q_UNUSED(rule);
+    return false;
+}
+
 class TstMeta : public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
     void initTestCase();
     void testMeta();
+    void testProfileMeta();
+    void testTimeMeta();
     void cleanupTestCase();
 };
 
@@ -144,26 +193,51 @@ void TstMeta::initTestCase()
     qmlRegisterType<TestCondition3>("org.SfietKonstantin.phonebot.tst_meta", 1, 0, "MyTestCondition3");
     qmlRegisterType<TestCondition4>("org.SfietKonstantin.phonebot.tst_meta", 1, 0, "MyTestCondition4");
     qRegisterMetaType<MetaTestCondition4 *>();
+    PhoneBotEngine::registerTypes();
 }
 
 void TstMeta::testMeta()
 {
-    MetaComponent *testConditionMeta = MetaComponent::create("MyTestCondition");
-    QVERIFY(!testConditionMeta);
+    MetaTypeCache cache;
 
-    MetaComponent *testCondition2Meta = MetaComponent::create("MyTestCondition2");
-    QVERIFY(!testCondition2Meta);
+    QVERIFY(!cache.metaData("MyTestCondition"));
+    QVERIFY(!cache.metaData("MyTestCondition2"));
+    QVERIFY(!cache.metaData("MyTestCondition3"));
 
-    MetaComponent *testCondition3Meta = MetaComponent::create("MyTestCondition3");
-    QVERIFY(!testCondition3Meta);
-
-    MetaComponent *testCondition4Meta = MetaComponent::create("MyTestCondition4");
+    AbstractMetaData *testCondition4Meta = cache.metaData("MyTestCondition4");
+    QStringList testCondition4Properties = cache.properties("MyTestCondition4");
     QVERIFY(testCondition4Meta);
-    QCOMPARE(testCondition4Meta->properties().count(), 1);
-    QCOMPARE(testCondition4Meta->properties().first(), QString("test"));
+    QCOMPARE(testCondition4Properties.count(), 1);
+    QCOMPARE(testCondition4Properties.first(), QString("test"));
     MetaProperty *property = testCondition4Meta->property("test");
     QVERIFY(property);
-    QCOMPARE(property->type(), QMetaType::Bool);
+    QCOMPARE(property->type(), MetaProperty::Bool);
+}
+
+void TstMeta::testProfileMeta()
+{
+    MetaTypeCache cache;
+    AbstractMetaData *profileActionMeta = cache.metaData("ProfileAction");
+    QStringList properties = cache.properties("ProfileAction");
+    QVERIFY(profileActionMeta);
+    QCOMPARE(properties.count(), 1);
+    QCOMPARE(properties.first(), QString("profile"));
+    MetaProperty *property = profileActionMeta->property("profile");
+    QVERIFY(property);
+    QCOMPARE(property->type(), MetaProperty::String);
+}
+
+void TstMeta::testTimeMeta()
+{
+    MetaTypeCache cache;
+    AbstractMetaData *timeTriggerMeta = cache.metaData("TimeTrigger");
+    QStringList properties = cache.properties("TimeTrigger");
+    QVERIFY(timeTriggerMeta);
+    QCOMPARE(properties.count(), 1);
+    QCOMPARE(properties.first(), QString("time"));
+    MetaProperty *property = timeTriggerMeta->property("time");
+    QVERIFY(property);
+    QCOMPARE(property->type(), MetaProperty::Time);
 }
 
 

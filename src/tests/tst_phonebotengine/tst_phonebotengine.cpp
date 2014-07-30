@@ -54,11 +54,18 @@ class DummyCondition: public Condition
     Q_OBJECT
 public:
     explicit DummyCondition(QObject *parent = 0);
+    bool isValid(Rule *rule);
 };
 
 DummyCondition::DummyCondition(QObject *parent)
     : Condition(parent)
 {
+}
+
+bool DummyCondition::isValid(Rule *rule)
+{
+    Q_UNUSED(rule)
+    return false;
 }
 
 class DummyAction: public Action

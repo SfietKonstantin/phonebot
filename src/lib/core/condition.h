@@ -35,13 +35,13 @@
 #include <QtCore/QObject>
 #include <QtQml/QQmlParserStatus>
 
+class Rule;
 class ConditionPrivate;
 class Condition: public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
-    Q_PROPERTY(bool valid READ isValid WRITE setValid NOTIFY validChanged)
 public:
     explicit Condition(QObject *parent = 0);
     virtual ~Condition();
@@ -49,10 +49,8 @@ public:
     void componentComplete();
     bool isEnabled() const;
     void setEnabled(bool enabled);
-    bool isValid() const;
-    void setValid(bool valid);
+    virtual bool isValid(Rule *rule) = 0;
 Q_SIGNALS:
-    void validChanged();
     void enabledChanged();
 protected:
     explicit Condition(ConditionPrivate &dd, QObject *parent);

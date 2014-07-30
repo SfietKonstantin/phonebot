@@ -32,6 +32,7 @@
 #include "profileaction.h"
 #include <action_p.h>
 #include <Profile>
+#include <choicemodel.h>
 
 class ProfileActionPrivate: public ActionPrivate
 {
@@ -73,4 +74,30 @@ bool ProfileAction::execute(Rule *rule)
     Q_D(ProfileAction);
     Q_UNUSED(rule);
     return d->profileObject->setActiveProfile(d->profile);
+}
+
+ProfileActionMeta::ProfileActionMeta(QObject *parent)
+    : AbstractMetaData(parent)
+{
+}
+
+QString ProfileActionMeta::name() const
+{
+    return tr("Profile");
+}
+
+QString ProfileActionMeta::description() const
+{
+    return tr("This action allows to change the profile when triggered.");
+}
+
+MetaProperty * ProfileActionMeta::getProperty(const QString &property, QObject *parent) const
+{
+    if (property == "profile") {
+        ChoiceModel *choiceModel = new ChoiceModel(parent);
+        choiceModel->addEntry(tr("Standard profile"), "ambience");
+        choiceModel->addEntry(tr("Silent profile"), "silent");
+        return MetaProperty::createChoice(property, tr("Profile to set"), choiceModel, parent);
+    }
+    return 0;
 }

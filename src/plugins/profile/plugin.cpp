@@ -41,6 +41,7 @@ public:
     void registerTypes()
     {
         qmlRegisterType<ProfileAction>("org.SfietKonstantin.phonebot.profile", 1, 0, "ProfileAction");
+        qRegisterMetaType<ProfileActionMeta *>();
     }
 };
 

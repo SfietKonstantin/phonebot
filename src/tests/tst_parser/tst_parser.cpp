@@ -39,6 +39,7 @@ class TstParser : public QObject
 private Q_SLOTS:
     void initTestCase();
     void parseRule();
+    void testDocument();
     void cleanupTestCase();
 };
 
@@ -97,21 +98,52 @@ void TstParser::parseRule()
     QCOMPARE(item->id(), QString("subTest"));
     QVERIFY(root->hasProperty("anchors.top"));
     QVariant anchorsTopProperty = root->property("anchors.top");
-    QVERIFY(anchorsTopProperty.canConvert<Expression>());
-    QCOMPARE(anchorsTopProperty.value<Expression>().value(), QString("parent.top"));
+    QVERIFY(anchorsTopProperty.canConvert<Reference>());
+    QCOMPARE(anchorsTopProperty.value<Reference>().value(), QString("parent.top"));
     QVERIFY(root->hasProperty("js"));
     QVariant jsProperty = root->property("js");
     QVERIFY(jsProperty.canConvert<Expression>());
     QCOMPARE(jsProperty.value<Expression>().value(), QString("new Date(1960, 1, 1)"));
 
     // Children
-    QCOMPARE(root->children().count(), 1);
+    QCOMPARE(root->children().count(), 2);
     QmlObject::Ptr child = root->children().first();
     QVERIFY(!child.isNull());
     QCOMPARE(child->type(), QString("Text"));
     QCOMPARE(child->properties().count(), 1);
     QVERIFY(child->hasProperty("text"));
     QCOMPARE(child->property("text").toString(), QString("Test 2"));
+
+    child = root->children()[1];
+    QCOMPARE(child->type(), QString("Test"));
+    QCOMPARE(child->properties().count(), 1);
+    QVERIFY(child->hasProperty("test.anchors.left"));
+    QVariant testAnchorsLeft = child->property("test.anchors.left");
+    QVERIFY(testAnchorsLeft.canConvert<Reference>());
+    QCOMPARE(testAnchorsLeft.value<Reference>().value(), QString("test.anchors.right"));
+}
+
+void TstParser::testDocument()
+{
+    QmlObject::Ptr root = QmlObject::create("Test");
+    root->setId("test");
+
+    QVariantMap properties;
+    QVariantList intList;
+    intList << 1 << 2 << 3 << 4;
+    properties.insert("intList", intList);
+    QString string = "My test string";
+    properties.insert("string", string);
+    root->setProperties(properties);
+    qWarning() << root->toString(0);
+
+    QmlObject::Ptr superRoot = QmlObject::create("Super");
+    QVariantMap superProperties;
+    QVariantList objectList;
+    objectList << QVariant::fromValue(root);
+    superProperties.insert("objectList", objectList);
+    superRoot->setProperties(superProperties);
+    qWarning() << superRoot->toString(0);
 }
 
 void TstParser::cleanupTestCase()
