@@ -1,2 +1,2 @@
 TEMPLATE = subdirs
-SUBDIRS = core meta
+SUBDIRS = core meta daemon config

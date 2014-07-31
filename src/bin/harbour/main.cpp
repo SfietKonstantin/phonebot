@@ -54,7 +54,6 @@ Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
 
 static const char *REASON = "Cannot be created";
 
-// Second, define the singleton type provider function (callback).
 static QObject *phonebothelper_singletontype_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
     Q_UNUSED(engine)
@@ -82,7 +81,6 @@ int main(int argc, char *argv[])
                                                    REASON);
     qmlRegisterUncreatableType<MetaProperty>("harbour.phonebot", 1, 0, "MetaProperty", REASON);
     qmlRegisterUncreatableType<ChoiceModel>("harbour.phonebot", 1, 0, "ChoiceModel", REASON);
-//    qmlRegisterUncreatableType<MetaComponent>("harbour.phonebot", 1, 0, "MetaComponent", REASON);
     qmlRegisterSingletonType<PhoneBotHelper>("harbour.phonebot", 1, 0, "PhoneBot",
                                              phonebothelper_singletontype_provider);
 

@@ -48,7 +48,7 @@ public:
     QString componentError(const QUrl &url) const;
     Rule * rule(const QUrl &url) const;
     QString ruleError(const QUrl &url) const;
-public Q_SLOTS:
+public:
     void start();
     void stop();
 Q_SIGNALS:

@@ -1,3 +1,7 @@
+# Independant plugin used to parse
+# rule QML format and get metadata
+# from components
+
 TEMPLATE = lib
 TARGET = phonebotmeta
 

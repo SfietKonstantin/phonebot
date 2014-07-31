@@ -11,36 +11,18 @@ QT = core gui qml quick dbus
 }
 
 INCLUDEPATH += ../../lib/core \
-    ../../lib/meta
+    ../../lib/meta \
+    ../../lib/config
 LIBS += -L../../plugins/debug -lphonebotdebug \
     -L../../plugins/profile -lphonebotprofile \
     -L../../plugins/time -lphonebottime \
+    -L../../lib/config -lphonebotconfig \
     -L../../lib/meta -lphonebotmeta \
     -L../../lib/core -lphonebot
 
-HEADERS += \
-    rulesmodel.h \
-    ruledefinition.h \
-    rulepropertiesvaluesmapper.h \
-    componentdefinition.h \
-    rulecomponentmodel.h \
-    rulecomponentmodel_p.h \
-    rulecomponentsmodel.h \
-    rulecomponentsmodel_p.h \
-    phonebothelper.h \
-    ruledefinitionactionmodel.h \
-    ruledefinitionactionmodel_p.h
 
 SOURCES += \
-    main.cpp \
-    rulesmodel.cpp \
-    ruledefinition.cpp \
-    rulepropertiesvaluesmapper.cpp \
-    componentdefinition.cpp \
-    rulecomponentmodel.cpp \
-    rulecomponentsmodel.cpp \
-    phonebothelper.cpp \
-    ruledefinitionactionmodel.cpp
+    main.cpp
 
 OTHER_FILES += qml/main.qml \
     qml/Cover.qml \

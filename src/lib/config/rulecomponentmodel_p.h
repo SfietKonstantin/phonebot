@@ -29,21 +29,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef RULEPROPERTIESVALUESMAPPER_H
-#define RULEPROPERTIESVALUESMAPPER_H
+#ifndef RULECOMPONENTMODEL_P_H
+#define RULECOMPONENTMODEL_P_H
 
-#include <QtCore/QObject>
+#include "rulecomponentmodel.h"
+#include <metaproperty.h>
+#include <abstractmetadata.h>
 
-class RulePropertiesValuesMapper : public QObject
+struct RuleComponentModelData
 {
-    Q_OBJECT
-public:
-    explicit RulePropertiesValuesMapper(QObject *parent = 0);
-
-signals:
-
-public slots:
-
+    ~RuleComponentModelData();
+    MetaProperty *type;
+    QVariant value;
 };
 
-#endif // RULEPROPERTIESVALUESMAPPER_H
+class RuleComponentModelPrivate
+{
+public:
+    explicit RuleComponentModelPrivate(RuleComponentModel *q);
+    virtual ~RuleComponentModelPrivate();
+    QString type;
+    AbstractMetaData *metaData;
+protected:
+    void clear();
+    void appendData(const QList<RuleComponentModelData *> &data);
+    RuleComponentModel * const q_ptr;
+private:
+    QList<RuleComponentModelData *> m_data;
+    Q_DECLARE_PUBLIC(RuleComponentModel)
+};
+
+#endif // RULECOMPONENTMODEL_P_H

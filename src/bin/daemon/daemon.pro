@@ -9,20 +9,18 @@ QT = core dbus qml
     PKGCONFIG += keepalive
 }
 
-INCLUDEPATH += ../../lib/core
+INCLUDEPATH += ../../lib/core \
+    ../../lib/daemon
 
 LIBS += -L../../plugins/debug -lphonebotdebug \
     -L../../plugins/profile -lphonebotprofile \
     -L../../plugins/time -lphonebottime \
+    -L../../lib/daemon -lphonebotdaemon \
     -L../../lib/meta -lphonebotmeta \
     -L../../lib/core -lphonebot
 
-HEADERS = \
-    enginemanager.h
-
 SOURCES = \
-    main.cpp \
-    enginemanager.cpp
+    main.cpp
 
 !CONFIG(harbour) {
     target.path = /usr/bin

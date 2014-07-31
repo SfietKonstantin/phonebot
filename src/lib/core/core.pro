@@ -1,3 +1,6 @@
+# Independant plugin used to create rules
+# and engine
+
 TEMPLATE = lib
 TARGET = phonebot
 

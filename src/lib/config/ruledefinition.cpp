@@ -39,75 +39,146 @@
 
 Q_GLOBAL_STATIC(MetaTypeCache, cache)
 
+class RuleDefinitionPrivate
+{
+public:
+    explicit RuleDefinitionPrivate(RuleDefinition *q);
+    void saveComponent(PhoneBotHelper::ComponentType type);
+    QString name;
+
+    QMap<PhoneBotHelper::ComponentType, RuleComponentModel *> components;
+    QMap<PhoneBotHelper::ComponentType, RuleComponentModel *> tempComponents;
+    RuleDefinitionActionModel *actions;
+protected:
+    RuleDefinition * const q_ptr;
+private:
+    Q_DECLARE_PUBLIC(RuleDefinition)
+};
+
+RuleDefinitionPrivate::RuleDefinitionPrivate(RuleDefinition *q)
+    : actions (0), q_ptr(q)
+{
+}
+
+void RuleDefinitionPrivate::saveComponent(PhoneBotHelper::ComponentType type)
+{
+    Q_Q(RuleDefinition);
+    if (!tempComponents.contains(type)) {
+        return;
+    }
+
+    RuleComponentModel *component = components.value(type);
+    RuleComponentModel *newComponent = tempComponents.value(type);
+    if (component != newComponent) {
+        if (component) {
+            component->deleteLater();
+        }
+        components.insert(type, newComponent);
+        tempComponents.remove(type);
+
+        switch (type) {
+        case PhoneBotHelper::Trigger:
+            emit q->triggerChanged();
+            break;
+        case PhoneBotHelper::Condition:
+            emit q->conditionChanged();
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+
 RuleDefinition::RuleDefinition(QObject *parent)
-    : QObject(parent), m_actions(new RuleDefinitionActionModel(this))
+    : QObject(parent), d_ptr(new RuleDefinitionPrivate(this))
+{
+    Q_D(RuleDefinition);
+    d->actions = new RuleDefinitionActionModel(this);
+}
+
+RuleDefinition::~RuleDefinition()
 {
 }
 
 QString RuleDefinition::name() const
 {
-    return m_name;
+    Q_D(const RuleDefinition);
+    return d->name;
 }
 
 void RuleDefinition::setName(const QString &name)
 {
-    if (m_name != name) {
-        m_name = name;
+    Q_D(RuleDefinition);
+    if (d->name != name) {
+        d->name = name;
         emit nameChanged();
     }
 }
 
 RuleComponentModel * RuleDefinition::trigger() const
 {
-    return m_components.value(PhoneBotHelper::Trigger);
+    Q_D(const RuleDefinition);
+    return d->components.value(PhoneBotHelper::Trigger);
+}
+
+RuleComponentModel * RuleDefinition::condition() const
+{
+    Q_D(const RuleDefinition);
+    return d->components.value(PhoneBotHelper::Condition);
 }
 
 RuleDefinitionActionModel * RuleDefinition::actions() const
 {
-    return m_actions;
+    Q_D(const RuleDefinition);
+    return d->actions;
 }
 
 RuleComponentModel * RuleDefinition::createTempComponent(int type, int index, const QString &component)
 {
+    Q_D(RuleDefinition);
     Q_UNUSED(index)
     PhoneBotHelper::ComponentType componentType = static_cast<PhoneBotHelper::ComponentType>(type);
-    if (m_tempComponents.contains(componentType)) {
-        m_tempComponents.value(componentType)->deleteLater();
-        m_tempComponents.remove(componentType);
+    if (d->tempComponents.contains(componentType)) {
+        d->tempComponents.value(componentType)->deleteLater();
+        d->tempComponents.remove(componentType);
     }
 
     RuleComponentModel *componentModel = RuleComponentModel::create(component, this);
-    m_tempComponents.insert(static_cast<PhoneBotHelper::ComponentType>(type), componentModel);
+    d->tempComponents.insert(static_cast<PhoneBotHelper::ComponentType>(type), componentModel);
     return componentModel;
 }
 
 RuleComponentModel * RuleDefinition::createTempClonedComponent(int type, int index)
 {
+    Q_D(RuleDefinition);
     Q_UNUSED(index)
     PhoneBotHelper::ComponentType componentType = static_cast<PhoneBotHelper::ComponentType>(type);
-    if (m_tempComponents.contains(componentType)) {
-        m_tempComponents.value(componentType)->deleteLater();
-        m_tempComponents.remove(componentType);
+    if (d->tempComponents.contains(componentType)) {
+        d->tempComponents.value(componentType)->deleteLater();
+        d->tempComponents.remove(componentType);
     }
-    RuleComponentModel *other = m_components.value(componentType);
+    RuleComponentModel *other = d->components.value(componentType);
     if (other) {
-        m_tempComponents.insert(componentType, RuleComponentModel::clone(other, this));
+        d->tempComponents.insert(componentType, RuleComponentModel::clone(other, this));
     }
-    return m_tempComponents.value(componentType);
+    return d->tempComponents.value(componentType);
 }
 
 void RuleDefinition::saveComponent(int index)
 {
+    Q_D(RuleDefinition);
     Q_UNUSED(index)
-    saveComponent(PhoneBotHelper::Trigger);
-    saveComponent(PhoneBotHelper::Condition);
+    d->saveComponent(PhoneBotHelper::Trigger);
+    d->saveComponent(PhoneBotHelper::Condition);
 }
 
 void RuleDefinition::discardComponent(int index)
 {
+    Q_D(RuleDefinition);
     Q_UNUSED(index)
-    qDeleteAll(m_tempComponents);
-    m_tempComponents.clear();
+    qDeleteAll(d->tempComponents);
+    d->tempComponents.clear();
 }
 
 static QmlObject::Ptr convertComponentModelToObject(RuleComponentModel *componentModel,
@@ -157,6 +228,7 @@ static QmlObject::Ptr convertComponentModelToObject(RuleComponentModel *componen
 
 QmlDocumentBase::Ptr RuleDefinition::toDocument() const
 {
+    Q_D(const RuleDefinition);
     WritableQmlDocument::Ptr doc = WritableQmlDocument::create();
     QmlObject::Ptr root = QmlObject::create("Rule");
     QSet<ImportStatement::Ptr> imports;
@@ -164,19 +236,19 @@ QmlDocumentBase::Ptr RuleDefinition::toDocument() const
     QList<QmlObject::Ptr> mappers;
     QVariantMap properties;
 
-    if (!m_name.trimmed().isEmpty()) {
-        properties.insert("name", m_name);
+    if (!d->name.trimmed().isEmpty()) {
+        properties.insert("name", d->name);
     }
 
     // Trigger
-    QmlObject::Ptr trigger = convertComponentModelToObject(m_components.value(PhoneBotHelper::Trigger),
+    QmlObject::Ptr trigger = convertComponentModelToObject(d->components.value(PhoneBotHelper::Trigger),
                                                            imports, mappers);
     if (!trigger.isNull()) {
         properties.insert("trigger", QVariant::fromValue(trigger));
     }
 
     // Condition
-    QmlObject::Ptr condition = convertComponentModelToObject(m_components.value(PhoneBotHelper::Condition),
+    QmlObject::Ptr condition = convertComponentModelToObject(d->components.value(PhoneBotHelper::Condition),
                                                              imports, mappers);
     if (!condition.isNull()) {
         properties.insert("condition", QVariant::fromValue(trigger));
@@ -184,8 +256,8 @@ QmlDocumentBase::Ptr RuleDefinition::toDocument() const
 
     // Actions
     QVariantList actions;
-    for (int i = 0; i < m_actions->count(); ++i) {
-        RuleComponentModel *component = m_actions->data(m_actions->index(i), RuleDefinitionActionModel::Component).value<RuleComponentModel *>();
+    for (int i = 0; i < d->actions->count(); ++i) {
+        RuleComponentModel *component = d->actions->data(d->actions->index(i), RuleDefinitionActionModel::Component).value<RuleComponentModel *>();
         QmlObject::Ptr action = convertComponentModelToObject(component, imports, mappers);
         if (!action.isNull()) {
             actions.append(QVariant::fromValue(action));
@@ -214,32 +286,4 @@ QmlDocumentBase::Ptr RuleDefinition::toDocument() const
     qDebug() << doc->toString();
 
     return WritableQmlDocument::toBase(doc);
-}
-
-void RuleDefinition::saveComponent(PhoneBotHelper::ComponentType type)
-{
-    if (!m_tempComponents.contains(type)) {
-        return;
-    }
-
-    RuleComponentModel *component = m_components.value(type);
-    RuleComponentModel *newComponent = m_tempComponents.value(type);
-    if (component != newComponent) {
-        if (component) {
-            component->deleteLater();
-        }
-        m_components.insert(type, newComponent);
-        m_tempComponents.remove(type);
-
-        switch (type) {
-        case PhoneBotHelper::Trigger:
-            emit triggerChanged();
-            break;
-        case PhoneBotHelper::Condition:
-            emit conditionChanged();
-            break;
-        default:
-            break;
-        }
-    }
 }

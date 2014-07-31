@@ -29,13 +29,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "componentdefinition.h"
+#ifndef RULEDEFINITION_H
+#define RULEDEFINITION_H
 
-ComponentDefinition::ComponentDefinition(QObject *parent) :
-    QObject(parent)
-{
-}
+#include <QtCore/QObject>
+#include <qmldocument.h>
+#include "phonebothelper.h"
+#include "rulecomponentmodel.h"
+#include "ruledefinitionactionmodel.h"
 
-ComponentDefinition::~ComponentDefinition()
+class RuleDefinitionPrivate;
+class RuleDefinition : public QObject
 {
-}
+    Q_OBJECT
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(RuleComponentModel * trigger READ trigger NOTIFY triggerChanged)
+    Q_PROPERTY(RuleComponentModel * condition READ condition NOTIFY conditionChanged)
+    Q_PROPERTY(RuleDefinitionActionModel * actions READ actions CONSTANT)
+public:
+    explicit RuleDefinition(QObject *parent = 0);
+    virtual ~RuleDefinition();
+    QString name() const;
+    void setName(const QString &name);
+    RuleComponentModel * trigger() const;
+    RuleComponentModel * condition() const;
+    RuleDefinitionActionModel * actions() const;
+    Q_INVOKABLE RuleComponentModel * createTempComponent(int type, int index, const QString &component);
+    Q_INVOKABLE RuleComponentModel * createTempClonedComponent(int type, int index);
+    QmlDocumentBase::Ptr toDocument() const;
+Q_SIGNALS:
+    void nameChanged();
+    void triggerChanged();
+    void conditionChanged();
+public Q_SLOTS:
+    void saveComponent(int index);
+    void discardComponent(int index);
+protected:
+    QScopedPointer<RuleDefinitionPrivate> d_ptr;
+private:
+    Q_DECLARE_PRIVATE(RuleDefinition)
+};
+
+#endif // RULEDEFINITION_H

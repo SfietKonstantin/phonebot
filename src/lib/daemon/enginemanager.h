@@ -29,9 +29,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "rulepropertiesvaluesmapper.h"
+#ifndef ENGINEMANAGER_H
+#define ENGINEMANAGER_H
 
-RulePropertiesValuesMapper::RulePropertiesValuesMapper(QObject *parent) :
-    QObject(parent)
+#include <QtCore/QObject>
+#include <QtCore/QSet>
+#include <phonebotengine.h>
+
+class EngineManagerPrivate;
+class EngineManager : public QObject
 {
-}
+    Q_OBJECT
+    Q_PROPERTY(bool running READ isRunning NOTIFY runningChanged)
+    Q_PROPERTY(QStringList rules READ rules NOTIFY rulesChanged)
+public:
+    explicit EngineManager(QObject *parent = 0);
+    virtual ~EngineManager();
+    bool isRunning() const;
+    QStringList rules() const;
+public Q_SLOTS:
+    void reloadEngine();
+    void stop();
+Q_SIGNALS:
+    void runningChanged();
+    void rulesChanged();
+public Q_SLOTS: // For DBus
+    bool IsRunning() const;
+    QStringList Rules() const;
+    void ReloadEngine();
+    void Stop();
+protected:
+    QScopedPointer<EngineManagerPrivate> d_ptr;
+private:
+    Q_PRIVATE_SLOT(d_func(), void slotComponentLoadingFinished(const QUrl &url, bool ok))
+    Q_DECLARE_PRIVATE(EngineManager)
+};
+
+#endif // ENGINEMANAGER_H

@@ -61,19 +61,6 @@ void RuleComponentModelPrivate::clear()
     }
 }
 
-void RuleComponentModelPrivate::prependData(const QList<RuleComponentModelData *> &data)
-{
-    Q_Q(RuleComponentModel);
-    if (data.count() > 0) {
-        q->beginInsertRows(QModelIndex(), 0, data.count() - 1);
-        QList<RuleComponentModelData *> oldData = m_data;
-        m_data = data;
-        m_data.append(oldData);
-        emit q->countChanged();
-        q->endInsertRows();
-    }
-}
-
 void RuleComponentModelPrivate::appendData(const QList<RuleComponentModelData *> &data)
 {
     Q_Q(RuleComponentModel);
