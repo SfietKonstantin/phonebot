@@ -81,18 +81,11 @@ Dialog {
                 TypeField {
                     type: model.type
                     value: model.value
+                    Component.onCompleted: console.debug(">>> " + model.value)
                     component: container.component
                     index: model.index
                     stack: pageStack
                 }
-
-//                RuleButton {
-//                    adaptSize: false
-//                    text: model.type.description
-//                    secondaryText: PhoneBot.convert(model.type.type, model.value)
-//                    onClicked: TypeSolver.openSelector(model.type.type, pageStack,
-//                                                       container.component, model.index)
-//                }
             }
         }
     }

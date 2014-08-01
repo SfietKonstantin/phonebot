@@ -179,6 +179,18 @@ RuleComponentModel * RuleDefinitionActionModel::createTempClonedComponent(int ty
     return d->tempComponents.value(index);
 }
 
+RuleDefinitionActionModel * RuleDefinitionActionModel::clone(const RuleDefinitionActionModel *other,
+                                                             QObject *parent)
+{
+    RuleDefinitionActionModel *cloned = new RuleDefinitionActionModel(parent);
+    foreach (RuleDefinitionActionModelData *item, other->d_ptr->m_data) {
+        RuleDefinitionActionModelData *clonedItem = new RuleDefinitionActionModelData;
+        clonedItem->component = RuleComponentModel::clone(item->component, cloned);
+        cloned->d_ptr->m_data.append(clonedItem);
+    }
+    return cloned;
+}
+
 void RuleDefinitionActionModel::saveComponent(int row)
 {
     Q_D(RuleDefinitionActionModel);

@@ -32,21 +32,24 @@
 #include "rulesmodel.h"
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
-#include <QtCore/QDir>
-#include <QtCore/QStandardPaths>
 #include <qmldocument.h>
+#include <metaproperty.h>
 #include "ruledefinition.h"
 
-static const char *RULE_FILE = "rule.qml";
+static const char *SERVICE = "org.SfietKonstantin.phonebot";
+static const char *PATH = "/";
 
 struct RulesModelData
 {
+    QString path;
     RuleDefinition *definition;
 };
 
-RulesModel::RulesModel(QObject *parent) :
-    QAbstractListModel(parent)
+RulesModel::RulesModel(QObject *parent)
+    : QAbstractListModel(parent)
+    , m_proxy(new OrgSfietKonstantinPhonebotInterface(SERVICE, PATH, QDBusConnection::sessionBus(), this))
 {
+    reload();
 }
 
 RulesModel::~RulesModel()
@@ -58,7 +61,7 @@ QHash<int, QByteArray> RulesModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles.insert(NameRole, "name");
-    roles.insert(DefinitionRole, "definition");
+    roles.insert(RuleRole, "rule");
     return roles;
 }
 
@@ -80,7 +83,7 @@ QVariant RulesModel::data(const QModelIndex &index, int role) const
     case NameRole:
         return data->definition->name();
         break;
-    case DefinitionRole:
+    case RuleRole:
         return QVariant::fromValue(data->definition);
         break;
     default:
@@ -99,6 +102,50 @@ RuleDefinition * RulesModel::createRule()
     return new RuleDefinition(this);
 }
 
+RuleDefinition * RulesModel::createClonedRule(RuleDefinition *other)
+{
+    if (!other) {
+        return 0;
+    }
+
+    return RuleDefinition::clone(other, this);
+}
+
+static void populateRuleComponentModel(RuleComponentModel *component, QmlObject::Ptr object,
+                                       const QMap<QString, QmlObject::Ptr> &mappers)
+{
+    if (!component) {
+        return;
+    }
+
+    for (int i = 0; i < component->count(); ++i) {
+        QVariant type = component->data(component->index(i), RuleComponentModel::Type);
+        MetaProperty *meta = type.value<MetaProperty *>();
+        if (meta) {
+            QString key = meta->name();
+            if (object->hasProperty(key)) {
+                // TODO: migrate to MetaProperty
+                QVariant value = object->property(key);
+                if (value.canConvert<Reference>()) {
+                    Reference reference = value.value<Reference>();
+                    if (mappers.contains(reference.identifier())) {
+                        // Check mapper
+                        QmlObject::Ptr mapper = mappers.value(reference.identifier());
+                        if (mapper->type() == "TimeMapper") {
+                            int hour = mapper->property("hour").toInt();
+                            int minute = mapper->property("minute").toInt();
+                            QTime time = QTime(hour, minute);
+                            component->setValue(i, QVariant(time));
+                        }
+                    }
+                } else {
+                    component->setValue(i, value);
+                }
+            }
+        }
+    }
+}
+
 void RulesModel::reload()
 {
     if (!m_data.isEmpty()) {
@@ -108,61 +155,76 @@ void RulesModel::reload()
         endRemoveRows();
     }
 
-    // We check every folder inside .config/<org>/<app>/
-    // and see if there is a "rule.qml" inside
-    QString configRoot = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
-    configRoot.append(QString("/%1/%2/").arg(QCoreApplication::instance()->organizationName(),
-                                             QCoreApplication::instance()->applicationName()));
-    qDebug() << "Using" << configRoot << "to search rules";
-    QDir dir (configRoot);
-    foreach (const QString &subdirPath, dir.entryList(QDir::Dirs)) {
-        QDir subdir (dir);
-        if (!subdir.cd(subdirPath)) {
-            continue;
-        }
-        if (subdir.exists(RULE_FILE)) {
-            QString rule = subdir.absoluteFilePath(RULE_FILE);
-            qDebug() << "Rule found:" << rule;
+    QStringList rules = m_proxy->Rules();
+    foreach (const QString &rule, rules) {
+        // Parse rule
+        QmlDocument::Ptr doc = QmlDocument::create(rule);
 
-            // Parse rule
-            QmlDocument::Ptr doc = QmlDocument::create(rule);
-            if (doc->error() == QmlDocument::NoError) {
-                QmlObject::Ptr root = doc->rootObject();
-                QString name = root->property("name").toString();
-                QString triggerType;
-                if (root->hasProperty("trigger")) {
-                    QmlObject::Ptr trigger = root->property("trigger").value<QmlObject::Ptr>();
-                    if (!trigger.isNull()) {
-                        triggerType = trigger->type();
-                        // Parse other properties (values)
+        if (doc->error() == QmlDocument::NoError) {
+            RuleDefinition *ruleDefinition = new RuleDefinition(this);
+            QmlObject::Ptr root = doc->rootObject();
+
+            // 1. Get a list of mappers
+            QMap<QString, QmlObject::Ptr> mappers;
+            if (root->hasProperty("mappers")) {
+                QVariantList mappersVariant = root->property("mappers").toList();
+                foreach (const QVariant &mapperVariant, mappersVariant) {
+                    if (mapperVariant.canConvert<QmlObject::Ptr>()) {
+                        QmlObject::Ptr mapper = mapperVariant.value<QmlObject::Ptr>();
+                        mappers.insert(mapper->id(), mapper);
                     }
                 }
-
-                QString conditionType;
-                if (root->hasProperty("condition")) {
-                    QmlObject::Ptr condition = root->property("condition").value<QmlObject::Ptr>();
-                    if (!condition.isNull()) {
-                        conditionType = condition->type();
-                        // Parse other properties (values)
-                    }
-                }
-
-                RuleDefinition *ruleDefinition = new RuleDefinition(this);
-                ruleDefinition->setName(name);
-//                MetaComponent *triggerMeta = MetaComponent::create(triggerType, this);
-//                if (triggerMeta) {
-//                    ruleDefinition->setTrigger(triggerMeta);
-//                }
-
-//                MetaComponent *conditionMeta = MetaComponent::create(conditionType, this);
-//                if (conditionMeta) {
-//                    ruleDefinition->setTrigger(conditionMeta);
-//                }
-
-                RulesModelData *data = new RulesModelData;
-                data->definition = ruleDefinition;
-                m_data.append(data);
             }
+
+
+            // 2. Name
+            QString name = root->property("name").toString();
+
+            // 3. Trigger and condition
+            QString triggerType;
+            if (root->hasProperty("trigger")) {
+                QmlObject::Ptr trigger = root->property("trigger").value<QmlObject::Ptr>();
+                if (!trigger.isNull()) {
+                    triggerType = trigger->type();
+                    RuleComponentModel *triggerComponent = ruleDefinition->createTempComponent(PhoneBotHelper::Trigger, -1, triggerType);
+                    populateRuleComponentModel(triggerComponent, trigger, mappers);
+                }
+            }
+
+            QString conditionType;
+            if (root->hasProperty("condition")) {
+                QmlObject::Ptr condition = root->property("condition").value<QmlObject::Ptr>();
+                if (!condition.isNull()) {
+                    conditionType = condition->type();
+                    RuleComponentModel *conditionComponent = ruleDefinition->createTempComponent(PhoneBotHelper::Condition, -1, conditionType);
+                    populateRuleComponentModel(conditionComponent, condition, mappers);
+                }
+            }
+
+            ruleDefinition->saveComponent(-1);
+            ruleDefinition->setName(name);
+
+            // 4. Actions
+            if (root->hasProperty("actions")) {
+                QVariantList actionsVariant = root->property("actions").toList();
+                RuleDefinitionActionModel *actions = ruleDefinition->actions();
+                foreach (const QVariant &actionVariant, actionsVariant) {
+                    if (actionVariant.canConvert<QmlObject::Ptr>()) {
+                        int index = actions->count();
+                        QmlObject::Ptr action = actionVariant.value<QmlObject::Ptr>();
+                        RuleComponentModel *actionModel = actions->createTempComponent(PhoneBotHelper::Action,
+                                                                                       index, action->type());
+                        populateRuleComponentModel(actionModel, action, mappers);
+                        actions->saveComponent(index);
+                    }
+                }
+            }
+
+            // 5. Save everything
+            RulesModelData *data = new RulesModelData;
+            data->path = rule;
+            data->definition = ruleDefinition;
+            m_data.append(data);
         }
     }
 
@@ -171,18 +233,21 @@ void RulesModel::reload()
     endInsertRows();
 }
 
-bool RulesModel::pushRule(RuleDefinition *rule)
+bool RulesModel::pushRule(int index, RuleDefinition *rule)
 {
-    rule->toDocument();
+    if (index < 0 || index > rowCount() + 1) {
+        return false;
+    }
 
-    beginInsertRows(QModelIndex(), m_data.count() - 1, m_data.count());
-    RulesModelData *data = new RulesModelData;
-    data->definition = rule;
-    m_data.append(data);
-    emit countChanged();
-    endInsertRows();
+    QString qml = rule->toDocument()->toString();
+    if (index < rowCount()) {
+        RulesModelData *item = m_data.at(index);
+        m_proxy->EditRule(item->path, qml);
+    } else {
+        m_proxy->AddRule(qml);
+    }
 
-    // TODO: check and save rule
+    reload();
     return true;
 }
 

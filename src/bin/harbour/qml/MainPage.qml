@@ -36,10 +36,14 @@ import harbour.phonebot 1.0
 Page {
     id: container
 
-    SilicaFlickable {
+    RulesModel {
+        id: rulesModel
+    }
+    SilicaListView {
         anchors.fill: parent
+        model: rulesModel
 
-        Column {
+        header: Column {
             width: parent.width
 
             PageHeader {
@@ -47,17 +51,22 @@ Page {
             }
         }
 
-        RulesModel {
-            id: model
+        delegate: RuleButton {
+            text: model.name == "" ? qsTr("Noname rule %1").arg(model.index + 1) : model.name
+            onClicked: {
+                var rule = rulesModel.createClonedRule(model.rule)
+                pageStack.push(Qt.resolvedUrl("RuleDialog.qml"),
+                               {model: rulesModel, index: model.index, rule: rule})
+            }
         }
 
         PullDownMenu {
             MenuItem {
                 text: "Add rule"
                 onClicked: {
-                    var rule = model.createRule()
+                    var rule = rulesModel.createRule()
                     pageStack.push(Qt.resolvedUrl("RuleDialog.qml"),
-                                   {model: model, rule: rule})
+                                   {model: rulesModel, index: rulesModel.count, rule: rule})
                 }
             }
         }

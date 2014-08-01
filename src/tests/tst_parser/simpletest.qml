@@ -55,5 +55,8 @@ Rectangle {
     Test {
         test.anchors.left: test.anchors.right
     }
+
+    property var array
+    array: [1, 2, 3]
 }
 

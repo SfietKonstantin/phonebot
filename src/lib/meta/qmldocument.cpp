@@ -341,6 +341,7 @@ void QmlObject::setChildren(const QList<QmlObject::Ptr> &children)
     d->children = children;
 }
 
+// TODO: migrate to MetaProperty
 static QString formatProperty(const QString &key, const QVariant &value, int indentLevel)
 {
     QString returned;
@@ -431,8 +432,9 @@ struct ExpressionBuffer
     QmlObject::Ptr object;
     QString source;
     QVariantList buffer;
+    bool isArray;
 private:
-    ExpressionBuffer() {}
+    ExpressionBuffer() : isArray(false) {}
 };
 
 // TODO: manage complex rules
@@ -636,6 +638,30 @@ protected:
         return true;
     }
 
+    // Arrays
+    bool visit(QmlJS::AST::UiArrayBinding *ast)
+    {
+        if (error != QmlDocument::NoError) {
+            return false;
+        }
+
+        Q_ASSERT(ast->qualifiedId);
+        visitBindings(ast->qualifiedId);
+
+        // Push a second buffer for list
+        ExpressionBuffer::Ptr buffer = ExpressionBuffer::create();
+        buffer->isArray = true;
+        _buffers.push(buffer);
+        return true;
+    }
+
+    void endVisit(QmlJS::AST::UiArrayBinding *)
+    {
+        // Pop the first buffer and aggregate in the new buffer
+        _buffers.top()->buffer.append(QVariant(_buffers.pop()->buffer));
+        endVisitBindings();
+    }
+
     // Manage object bindings
     bool visit(QmlJS::AST::UiObjectBinding *ast)
     {
@@ -694,7 +720,15 @@ protected:
             return;
         }
 
-        _current->d()->parent->d()->children.append(_current);
+        bool inArray = false;
+        if (!_buffers.isEmpty()) {
+            inArray = _buffers.top()->isArray;
+        }
+        if (!inArray) {
+            _current->d()->parent->d()->children.append(_current);
+        } else {
+            _buffers.top()->buffer.append(QVariant::fromValue(CreatableQmlObject::toObject(_current)));
+        }
         _current = _current->d()->parent;
     }
 
@@ -737,6 +771,7 @@ private:
     CreatableQmlObject::Ptr _current;
     // Expression buffer, filled when needed (evaluating JS or binding)
     QStack<ExpressionBuffer::Ptr> _buffers;
+
 };
 
 // Document

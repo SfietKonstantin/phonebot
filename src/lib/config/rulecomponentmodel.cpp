@@ -175,7 +175,7 @@ RuleComponentModel * RuleComponentModel::create(const QString &type, QObject *pa
     return component;
 }
 
-RuleComponentModel * RuleComponentModel::clone(RuleComponentModel *other, QObject *parent)
+RuleComponentModel * RuleComponentModel::clone(const RuleComponentModel *other, QObject *parent)
 {
     RuleComponentModel *cloned = new RuleComponentModel(parent);
     cloned->d_ptr->type = other->d_ptr->type;

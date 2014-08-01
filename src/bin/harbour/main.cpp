@@ -41,12 +41,13 @@
 #endif
 #include <QtCore/QtPlugin>
 #include <QtQml/qqml.h>
-#include "rulesmodel.h"
-#include "ruledefinition.h"
-#include "rulecomponentsmodel.h"
-#include "phonebothelper.h"
-#include "phonebotengine.h"
-#include "abstractmetadata.h"
+#include <rulesmodel.h>
+#include <ruledefinition.h>
+#include <rulecomponentsmodel.h>
+#include <phonebothelper.h>
+#include <phonebotengine.h>
+#include <abstractmetadata.h>
+#include <enginemanager.h>
 
 Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
 Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
@@ -72,6 +73,9 @@ int main(int argc, char *argv[])
 #else
     QGuiApplication *app = new QGuiApplication(argc, argv);
     PhoneBotEngine::registerTypes();
+    EngineManager *manager = new EngineManager();
+    manager->reloadEngine();
+
     qmlRegisterType<RulesModel>("harbour.phonebot", 1, 0, "RulesModel");
     qmlRegisterType<RuleComponentsModel>("harbour.phonebot", 1, 0, "RuleComponentsModel");
     qmlRegisterUncreatableType<RuleDefinition>("harbour.phonebot", 1, 0, "RuleDefinition", REASON);
@@ -89,6 +93,7 @@ int main(int argc, char *argv[])
 #endif
     view->show();
     int result = app->exec();
+    manager->deleteLater();
     delete view;
     delete app;
     return result;

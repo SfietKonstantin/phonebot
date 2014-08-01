@@ -36,9 +36,10 @@ import harbour.phonebot 1.0
 Dialog {
     id: container
     property bool add: true
+    property int index: -1
     property QtObject model
     property QtObject rule
-    onAccepted: model.pushRule(rule)
+    onAccepted: model.pushRule(index, rule)
     onRejected: model.discardRule(rule)
 
     SilicaFlickable {

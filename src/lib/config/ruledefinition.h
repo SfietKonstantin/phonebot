@@ -56,6 +56,7 @@ public:
     RuleDefinitionActionModel * actions() const;
     Q_INVOKABLE RuleComponentModel * createTempComponent(int type, int index, const QString &component);
     Q_INVOKABLE RuleComponentModel * createTempClonedComponent(int type, int index);
+    static RuleDefinition * clone(const RuleDefinition *other, QObject *parent = 0);
     QmlDocumentBase::Ptr toDocument() const;
 Q_SIGNALS:
     void nameChanged();

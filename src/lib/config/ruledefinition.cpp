@@ -204,7 +204,7 @@ static QmlObject::Ptr convertComponentModelToObject(RuleComponentModel *componen
 
             if (type->type() == MetaProperty::Time) {
                 // Insert time linker (TODO)
-                QmlObject::Ptr timeMapper = QmlObject::create("Mapper");
+                QmlObject::Ptr timeMapper = QmlObject::create("TimeMapper");
                 QVariantMap timeProperties;
                 QTime valueTime = value.toTime();
                 timeProperties.insert("hour", valueTime.hour());
@@ -224,6 +224,32 @@ static QmlObject::Ptr convertComponentModelToObject(RuleComponentModel *componen
     }
     object->setProperties(properties);
     return object;
+}
+
+RuleDefinition * RuleDefinition::clone(const RuleDefinition *other, QObject *parent)
+{
+    RuleDefinition *cloned = new RuleDefinition(parent);
+    cloned->d_ptr->name = other->d_ptr->name;
+    if (other->d_ptr->components.contains(PhoneBotHelper::Trigger)) {
+        RuleComponentModel *trigger = other->d_ptr->components.value(PhoneBotHelper::Trigger);
+        if (trigger) {
+            cloned->d_ptr->components.insert(PhoneBotHelper::Trigger, trigger->clone(trigger, cloned));
+        } else {
+            cloned->d_ptr->components.insert(PhoneBotHelper::Trigger, 0);
+        }
+    }
+
+    if (other->d_ptr->components.contains(PhoneBotHelper::Condition)) {
+        RuleComponentModel *condition = other->d_ptr->components.value(PhoneBotHelper::Condition);
+        if (condition) {
+            cloned->d_ptr->components.insert(PhoneBotHelper::Condition, condition->clone(condition, cloned));
+        } else {
+            cloned->d_ptr->components.insert(PhoneBotHelper::Condition, 0);
+        }
+    }
+
+    cloned->d_ptr->actions = RuleDefinitionActionModel::clone(other->d_ptr->actions, cloned);
+    return cloned;
 }
 
 QmlDocumentBase::Ptr RuleDefinition::toDocument() const
@@ -283,7 +309,5 @@ QmlDocumentBase::Ptr RuleDefinition::toDocument() const
         doc->addImport(import);
     }
     doc->setRootObject(root);
-    qDebug() << doc->toString();
-
     return WritableQmlDocument::toBase(doc);
 }

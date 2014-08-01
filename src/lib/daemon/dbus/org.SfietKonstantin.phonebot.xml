@@ -9,5 +9,18 @@
         </method>
         <method name="ReloadEngine" />
         <method name="Stop" />
+        <method name="AddRule">
+            <arg name="rule" type="s" direction="in" />
+            <arg name="ok" type="b" direction="out" />
+        </method>
+        <method name="RemoveRule">
+            <arg name="path" type="s" direction="in" />
+            <arg name="ok" type="b" direction="out" />
+        </method>
+        <method name="EditRule">
+            <arg name="path" type="s" direction="in" />
+            <arg name="rule" type="s" direction="in" />
+            <arg name="ok" type="b" direction="out" />
+        </method>
     </interface>
 </node>

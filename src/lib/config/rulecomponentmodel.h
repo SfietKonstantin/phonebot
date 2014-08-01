@@ -57,7 +57,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     static RuleComponentModel * create(const QString &type, QObject *parent = 0);
-    static RuleComponentModel * clone(RuleComponentModel *other, QObject *parent = 0);
+    static RuleComponentModel * clone(const RuleComponentModel *other, QObject *parent = 0);
 Q_SIGNALS:
     void countChanged();
 public Q_SLOTS:

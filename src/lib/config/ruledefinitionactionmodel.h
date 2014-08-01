@@ -52,6 +52,8 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     Q_INVOKABLE RuleComponentModel * createTempComponent(int type, int index, const QString &component);
     Q_INVOKABLE RuleComponentModel * createTempClonedComponent(int type, int index);
+    static RuleDefinitionActionModel * clone(const RuleDefinitionActionModel *other,
+                                             QObject *parent = 0);
 Q_SIGNALS:
     void countChanged();
 public Q_SLOTS:

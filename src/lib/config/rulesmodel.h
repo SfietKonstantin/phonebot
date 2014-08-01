@@ -34,31 +34,34 @@
 
 #include <QtCore/QAbstractListModel>
 #include "ruledefinition.h"
+#include "proxy.h"
 
 class RulesModelData;
 class RulesModel : public QAbstractListModel
 {
-   Q_OBJECT
-   Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_OBJECT
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
 public:
-   enum Roles {
-       NameRole,
-       DefinitionRole
-   };
-   explicit RulesModel(QObject *parent = 0);
-   virtual ~RulesModel();
-   QHash<int, QByteArray> roleNames() const;
-   int rowCount(const QModelIndex &parent = QModelIndex()) const;
-   QVariant data(const QModelIndex &index, int role) const;
-   int count() const;
-   Q_INVOKABLE RuleDefinition * createRule();
+    enum Roles {
+        NameRole,
+        RuleRole
+    };
+    explicit RulesModel(QObject *parent = 0);
+    virtual ~RulesModel();
+    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    int count() const;
+    Q_INVOKABLE RuleDefinition * createRule();
+    Q_INVOKABLE RuleDefinition * createClonedRule(RuleDefinition *other);
 signals:
-   void countChanged();
+    void countChanged();
 public slots:
-   void reload();
-   bool pushRule(RuleDefinition *rule);
-   void discardRule(RuleDefinition *rule) const;
+    void reload();
+    bool pushRule(int index, RuleDefinition *rule);
+    void discardRule(RuleDefinition *rule) const;
 private:
+    OrgSfietKonstantinPhonebotInterface *m_proxy;
     QList<RulesModelData *> m_data;
 };
 

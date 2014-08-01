@@ -47,6 +47,9 @@ public:
     virtual ~EngineManager();
     bool isRunning() const;
     QStringList rules() const;
+    bool addRule(const QString &rule);
+    bool removeRule(const QString &path);
+    bool editRule(const QString &path, const QString &rule);
 public Q_SLOTS:
     void reloadEngine();
     void stop();
@@ -58,6 +61,9 @@ public Q_SLOTS: // For DBus
     QStringList Rules() const;
     void ReloadEngine();
     void Stop();
+    bool AddRule(const QString &rule);
+    bool RemoveRule(const QString &path);
+    bool EditRule(const QString &path, const QString &rule);
 protected:
     QScopedPointer<EngineManagerPrivate> d_ptr;
 private:

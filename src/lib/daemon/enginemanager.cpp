@@ -33,6 +33,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <QtCore/QStandardPaths>
 #include "adaptor.h"
 
@@ -40,6 +41,7 @@ static const char *SERVICE = "org.SfietKonstantin.phonebot";
 static const char *ROOT = "/";
 
 static const char *RULE_FILE = "rule.qml";
+static const char *DIR_FORMAT = "rule_%1";
 
 class EngineManagerPrivate
 {
@@ -130,6 +132,97 @@ QStringList EngineManager::rules() const
     return d->rules;
 }
 
+static QString generateDirName(int index)
+{
+    QString indexStr = QString::number(index);
+    int nZeros = qMax(5 - indexStr.count(), 0);
+    QString number = QString("0").repeated(nZeros);
+    number.append(indexStr);
+    return QString(DIR_FORMAT).arg(number);
+}
+
+bool EngineManager::addRule(const QString &rule)
+{
+    QString configRoot = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+    configRoot.append(QString("/%1/%2/").arg(QCoreApplication::instance()->organizationName(),
+                                             QCoreApplication::instance()->applicationName()));
+    QDir dir (configRoot);
+    QStringList dirs = dir.entryList(QDir::Dirs);
+    QSet<QString> dirsSet = dirs.toSet();
+
+    int index = 0;
+    QString dirName = generateDirName(index);
+    while (dirsSet.contains(dirName)) {
+        ++ index;
+        dirName = generateDirName(index);
+    }
+
+    if (!dir.mkdir(dirName)) {
+        qWarning() << "Failed to create directory for new rule";
+        return false;
+    }
+
+    if (!dir.cd(dirName)) {
+        qWarning() << "Failed to enter in created directory for new rule";
+        return false;
+    }
+
+    QFile file (dir.absoluteFilePath(RULE_FILE));
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning() << "Failed to open file to write new rule";
+        return false;
+    }
+
+    file.write(rule.toLocal8Bit());
+    file.close();
+
+    reloadEngine();
+    return true;
+}
+
+bool EngineManager::removeRule(const QString &path)
+{
+    QFileInfo info (path);
+    if (!info.exists()) {
+        return false;
+    }
+
+    if (!info.isFile()) {
+        return false;
+    }
+
+    QDir folder = info.absoluteDir();
+    if (!folder.remove(info.fileName())) {
+        return false;
+    }
+
+    if (folder.entryList(QDir::AllEntries | QDir::System |QDir::NoDotAndDotDot).isEmpty()) {
+        return folder.removeRecursively();
+    }
+    reloadEngine();
+    return true;
+}
+
+bool EngineManager::editRule(const QString &path, const QString &rule)
+{
+    QFileInfo info (path);
+    if (!info.exists()) {
+        return false;
+    }
+
+    QFile file (path);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning() << "Failed to open file to edit rule";
+        return false;
+    }
+
+    file.write(rule.toLocal8Bit());
+    file.close();
+
+    reloadEngine();
+    return true;
+}
+
 void EngineManager::reloadEngine()
 {
     Q_D(EngineManager);
@@ -197,6 +290,21 @@ void EngineManager::ReloadEngine()
 void EngineManager::Stop()
 {
     return stop();
+}
+
+bool EngineManager::AddRule(const QString &rule)
+{
+    return addRule(rule);
+}
+
+bool EngineManager::RemoveRule(const QString &path)
+{
+    return removeRule(path);
+}
+
+bool EngineManager::EditRule(const QString &path, const QString &rule)
+{
+    return editRule(path, rule);
 }
 
 #include "moc_enginemanager.cpp"

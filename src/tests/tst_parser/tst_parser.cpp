@@ -82,7 +82,7 @@ void TstParser::parseRule()
 
     QmlObject::Ptr root = document->rootObject();
     QVERIFY(!root.isNull());
-    QCOMPARE(root->properties().count(), 5);
+    QCOMPARE(root->properties().count(), 6);
     QCOMPARE(root->type(), QString("Rectangle"));
     QCOMPARE(root->id(), QString("test"));
 
@@ -104,6 +104,7 @@ void TstParser::parseRule()
     QVariant jsProperty = root->property("js");
     QVERIFY(jsProperty.canConvert<Expression>());
     QCOMPARE(jsProperty.value<Expression>().value(), QString("new Date(1960, 1, 1)"));
+    QVERIFY(root->hasProperty("array"));
 
     // Children
     QCOMPARE(root->children().count(), 2);
