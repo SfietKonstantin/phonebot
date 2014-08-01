@@ -60,6 +60,7 @@ public slots:
     void reload();
     bool pushRule(int index, RuleDefinition *rule);
     void discardRule(RuleDefinition *rule) const;
+    void removeRule(int index);
 private:
     OrgSfietKonstantinPhonebotInterface *m_proxy;
     QList<RulesModelData *> m_data;

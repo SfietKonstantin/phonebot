@@ -52,11 +52,24 @@ Page {
         }
 
         delegate: RuleButton {
+            id: rule
+            function removeRule() {
+                rulesModel.removeRule(model.index)
+            }
             text: model.name == "" ? qsTr("Noname rule %1").arg(model.index + 1) : model.name
             onClicked: {
                 var rule = rulesModel.createClonedRule(model.rule)
                 pageStack.push(Qt.resolvedUrl("RuleDialog.qml"),
                                {model: rulesModel, index: model.index, rule: rule})
+            }
+            onPressAndHold: {
+                rule.showMenu()
+            }
+            menu: ContextMenu {
+                MenuItem {
+                    text: qsTr("Remove rule")
+                    onClicked: rule.remorseAction(qsTr("Removing rule"), removeRule)
+                }
             }
         }
 

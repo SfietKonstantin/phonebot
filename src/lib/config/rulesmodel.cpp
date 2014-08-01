@@ -255,3 +255,14 @@ void RulesModel::discardRule(RuleDefinition *rule) const
 {
     rule->deleteLater();
 }
+
+void RulesModel::removeRule(int index)
+{
+    if (index < 0 || index >= rowCount()) {
+        return;
+    }
+
+    RulesModelData *item = m_data.at(index);
+    m_proxy->RemoveRule(item->path);
+    reload();
+}
