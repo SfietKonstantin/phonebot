@@ -122,5 +122,7 @@ Dialog {
                                            index: container.rule.actions.count})
             }
         }
+
+        VerticalScrollDecorator {}
     }
 }

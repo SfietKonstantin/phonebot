@@ -75,6 +75,24 @@ QString PhoneBotHelper::selectComponent(ComponentType type)
     }
 }
 
+QString PhoneBotHelper::noComponentAvailable(ComponentType type)
+{
+    switch (type) {
+    case Trigger:
+        return tr("No trigger available");
+        break;
+    case Condition:
+        return tr("No condition available");
+        break;
+    case Action:
+        return tr("No action available");
+        break;
+    default:
+        return QString();
+        break;
+    }
+}
+
 QString PhoneBotHelper::convert(int type, const QVariant &value)
 {
     if (value.isNull()) {

@@ -36,9 +36,28 @@ import harbour.phonebot 1.0
 Page {
     id: container
 
+    function addNew() {
+        var rule = rulesModel.createRule()
+        window.activate()
+        pageStack.push(Qt.resolvedUrl("RuleDialog.qml"),
+                       {model: rulesModel, index: rulesModel.count, rule: rule})
+    }
+
     RulesModel {
         id: rulesModel
     }
+
+    Component {
+        id: cover
+        CoverPage {
+            onAddNew: container.addNew()
+            rulesCount: rulesModel.count
+        }
+    }
+
+
+    Component.onCompleted: window.cover = cover
+
     SilicaListView {
         anchors.fill: parent
         model: rulesModel
@@ -76,12 +95,16 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: "Add rule"
-                onClicked: {
-                    var rule = rulesModel.createRule()
-                    pageStack.push(Qt.resolvedUrl("RuleDialog.qml"),
-                                   {model: rulesModel, index: rulesModel.count, rule: rule})
-                }
+                onClicked: container.addNew()
             }
         }
+
+        ViewPlaceholder {
+            text: qsTr("No rule configured")
+            hintText: qsTr("Add a rule using the pulley menu")
+            enabled: rulesModel.count == 0
+        }
+
+        VerticalScrollDecorator {}
     }
 }

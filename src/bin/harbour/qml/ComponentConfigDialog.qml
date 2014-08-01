@@ -81,12 +81,13 @@ Dialog {
                 TypeField {
                     type: model.type
                     value: model.value
-                    Component.onCompleted: console.debug(">>> " + model.value)
                     component: container.component
                     index: model.index
                     stack: pageStack
                 }
             }
         }
+
+        VerticalScrollDecorator {}
     }
 }

@@ -2,7 +2,7 @@
     <qresource prefix="/">
         <file>qml/main.qml</file>
         <file>qml/MainPage.qml</file>
-        <file>qml/Cover.qml</file>
+        <file>qml/CoverPage.qml</file>
         <file>qml/RuleDialog.qml</file>
         <file>qml/RuleButton.qml</file>
         <file>qml/ComponentConfigDialog.qml</file>

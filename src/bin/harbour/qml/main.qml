@@ -34,6 +34,5 @@ import Sailfish.Silica 1.0
 
 ApplicationWindow {
     id: window
-    cover: Component { Cover {} }
     initialPage: Component { MainPage {} }
 }

@@ -29,7 +29,7 @@ SOURCES += \
     main.cpp
 
 OTHER_FILES += qml/main.qml \
-    qml/Cover.qml \
+    qml/CoverPage.qml \
     qml/MainPage.qml \
     qml/RuleDialog.qml \
     qml/RuleButton.qml \

@@ -157,19 +157,22 @@ bool EngineManager::addRule(const QString &rule)
         dirName = generateDirName(index);
     }
 
-    if (!dir.mkdir(dirName)) {
+    if (!dir.mkpath(dirName)) {
         qWarning() << "Failed to create directory for new rule";
+        qWarning() << "Creating directory" << dirName << "in" << dir.absolutePath();
         return false;
     }
 
     if (!dir.cd(dirName)) {
         qWarning() << "Failed to enter in created directory for new rule";
+        qWarning() << "Enter in" << dirName << "from" << dir.absolutePath();
         return false;
     }
 
     QFile file (dir.absoluteFilePath(RULE_FILE));
     if (!file.open(QIODevice::WriteOnly)) {
         qWarning() << "Failed to open file to write new rule";
+        qWarning() << "File:" << dir.absoluteFilePath(RULE_FILE);
         return false;
     }
 
@@ -196,11 +199,12 @@ bool EngineManager::removeRule(const QString &path)
         return false;
     }
 
+    bool ok = true;
     if (folder.entryList(QDir::AllEntries | QDir::System |QDir::NoDotAndDotDot).isEmpty()) {
-        return folder.removeRecursively();
+        ok = folder.removeRecursively();
     }
     reloadEngine();
-    return true;
+    return ok;
 }
 
 bool EngineManager::editRule(const QString &path, const QString &rule)

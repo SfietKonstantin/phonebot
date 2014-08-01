@@ -86,5 +86,12 @@ Page {
                 pageStack.pop()
             }
         }
+
+        ViewPlaceholder {
+            text: PhoneBot.noComponentAvailable(container.type)
+            enabled: model.count == 0
+        }
+
+        VerticalScrollDecorator {}
     }
 }

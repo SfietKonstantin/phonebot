@@ -49,6 +49,7 @@ public:
     explicit PhoneBotHelper(QObject *parent = 0);
     Q_INVOKABLE static QString componentName(ComponentType type);
     Q_INVOKABLE static QString selectComponent(ComponentType type);
+    Q_INVOKABLE static QString noComponentAvailable(ComponentType type);
     Q_INVOKABLE static QString convert(int type, const QVariant &value);
 };
 

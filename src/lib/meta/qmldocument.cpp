@@ -658,7 +658,8 @@ protected:
     void endVisit(QmlJS::AST::UiArrayBinding *)
     {
         // Pop the first buffer and aggregate in the new buffer
-        _buffers.top()->buffer.append(QVariant(_buffers.pop()->buffer));
+        QVariantList buffers = _buffers.pop()->buffer;
+        _buffers.top()->buffer.append(QVariant(buffers));
         endVisitBindings();
     }
 

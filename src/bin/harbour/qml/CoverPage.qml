@@ -33,6 +33,39 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 CoverBackground {
+    id: container
+    anchors.fill: parent
+    property int rulesCount
+    signal addNew()
+
+    Column {
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
+        anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
+        spacing: Theme.paddingSmall
+
+        Label {
+            anchors.left: parent.left; anchors.right: parent.right
+            color: Theme.primaryColor
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+            text: qsTr("Phonebot is running")
+        }
+
+        Label {
+            anchors.left: parent.left; anchors.right: parent.right
+            color: Theme.secondaryColor
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+            font.pixelSize: Theme.fontSizeSmall
+            text: qsTr("%n rules", "", container.rulesCount)
+        }
+    }
+
+    CoverActionList {
+        CoverAction {
+            iconSource: "image://theme/icon-cover-new"
+            onTriggered: container.addNew()
+        }
+    }
 }
-
-

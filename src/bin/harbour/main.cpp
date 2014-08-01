@@ -71,7 +71,6 @@ int main(int argc, char *argv[])
     QGuiApplication *app = SailfishApp::application(argc, argv);
 #else
     QGuiApplication *app = new QGuiApplication(argc, argv);
-
 #endif
 
     // Register types
