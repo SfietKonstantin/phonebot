@@ -14,6 +14,7 @@ INCLUDEPATH += ../../lib/core \
     ../../lib/meta \
     ../../lib/config \
     ../../lib/daemon
+LIBS += -lrt
 LIBS += -L../../plugins/debug -lphonebotdebug \
     -L../../plugins/profile -lphonebotprofile \
     -L../../plugins/time -lphonebottime \
@@ -21,6 +22,7 @@ LIBS += -L../../plugins/debug -lphonebotdebug \
     -L../../lib/daemon -lphonebotdaemon \
     -L../../lib/meta -lphonebotmeta \
     -L../../lib/core -lphonebot
+
 
 
 SOURCES += \
@@ -39,5 +41,17 @@ OTHER_FILES += qml/main.qml \
     qml/DialogButton.qml \
     qml/ComboBox.qml
 
+target.path = /usr/bin
+    
+desktop.path = /usr/share/applications
+desktop.files = harbour-phonebot.desktop
+
+icon.path = /usr/share/icons/hicolor/86x86/apps/
+icon.files = harbour-phonebot.png
+
+qml.path = /usr/share/harbour-phonebot/qml
+qml.files = $$OTHER_FILES
+
+INSTALLS += target desktop icon qml
 
 

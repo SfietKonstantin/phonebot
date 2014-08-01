@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
-SUBDIRS = daemon
+!CONFIG(harbour): SUBDIRS += daemon
 CONFIG(harbour): SUBDIRS += harbour

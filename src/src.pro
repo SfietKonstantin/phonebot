@@ -1,6 +1,10 @@
 TEMPLATE = subdirs
-SUBDIRS = lib plugins bin tests
+SUBDIRS = lib plugins bin
 
 plugins.depends = lib
 bin.depends = lib plugins
-tests.depends = lib plugins
+
+!CONFIG(harbour): {
+    SUBDIRS += tests
+    tests.depends = lib plugins
+}

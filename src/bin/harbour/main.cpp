@@ -35,10 +35,9 @@
 
 #ifndef DESKTOP
 #include <sailfishapp.h>
-#else
+#endif
 #include <QtGui/QGuiApplication>
 #include <QtQuick/QQuickView>
-#endif
 #include <QtCore/QtPlugin>
 #include <QtQml/qqml.h>
 #include <rulesmodel.h>
@@ -66,16 +65,17 @@ static QObject *phonebothelper_singletontype_provider(QQmlEngine *engine, QJSEng
 
 int main(int argc, char *argv[])
 {
+
+    // App
 #ifndef DESKTOP
     QGuiApplication *app = SailfishApp::application(argc, argv);
-    QQuickView *view = SailfishApp::createView();
-    view->setSource(SailfishApp::pathTo("qml/main.qml"));
 #else
     QGuiApplication *app = new QGuiApplication(argc, argv);
-    PhoneBotEngine::registerTypes();
-    EngineManager *manager = new EngineManager();
-    manager->reloadEngine();
 
+#endif
+
+    // Register types
+    PhoneBotEngine::registerTypes();
     qmlRegisterType<RulesModel>("harbour.phonebot", 1, 0, "RulesModel");
     qmlRegisterType<RuleComponentsModel>("harbour.phonebot", 1, 0, "RuleComponentsModel");
     qmlRegisterUncreatableType<RuleDefinition>("harbour.phonebot", 1, 0, "RuleDefinition", REASON);
@@ -87,7 +87,14 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<ChoiceModel>("harbour.phonebot", 1, 0, "ChoiceModel", REASON);
     qmlRegisterSingletonType<PhoneBotHelper>("harbour.phonebot", 1, 0, "PhoneBot",
                                              phonebothelper_singletontype_provider);
+    EngineManager *manager = new EngineManager();
+    manager->reloadEngine();
 
+    // View
+#ifndef DESKTOP
+    QQuickView *view = SailfishApp::createView();
+    view->setSource(SailfishApp::pathTo("qml/main.qml"));
+#else
     QQuickView *view = new QQuickView();
     view->setSource(QUrl("qrc:/qml/main.qml"));
 #endif
