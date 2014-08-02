@@ -110,6 +110,7 @@ public:
     Q_INVOKABLE explicit MetaTestCondition4(QObject *parent = 0);
     QString name() const;
     QString description() const;
+    QString summary(const QVariantMap &properties) const;
 protected:
     MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
 };
@@ -129,6 +130,12 @@ QString MetaTestCondition4::name() const
 QString MetaTestCondition4::description() const
 {
     return "No description";
+}
+
+QString MetaTestCondition4::summary(const QVariantMap &properties) const
+{
+    Q_UNUSED(properties);
+    return "No summary";
 }
 
 MetaProperty * MetaTestCondition4::getProperty(const QString &property, QObject *parent) const

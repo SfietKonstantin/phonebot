@@ -122,6 +122,19 @@ QString RuleComponentModel::description() const
     return d->metaData->description();
 }
 
+QString RuleComponentModel::summary() const
+{
+    Q_D(const RuleComponentModel);
+    if (!d->metaData) {
+        return QString();
+    }
+    QVariantMap properties;
+    foreach (RuleComponentModelData *item, d->m_data) {
+        properties.insert(item->type->name(), item->value);
+    }
+    return d->metaData->summary(properties);
+}
+
 int RuleComponentModel::count() const
 {
     return rowCount();
@@ -201,4 +214,5 @@ void RuleComponentModel::setValue(int row, const QVariant &value)
 
     d->m_data[row]->value = value;
     emit dataChanged(index(row), index(row));
+    emit summaryChanged();
 }

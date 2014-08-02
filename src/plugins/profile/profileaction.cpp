@@ -34,6 +34,10 @@
 #include <Profile>
 #include <choicemodel.h>
 
+static const char *PROFILE_KEY = "profile";
+static const char *STANDARD_PROFILE_KEY = "ambience";
+static const char *SILENT_PROFILE_KEY = "silent";
+
 class ProfileActionPrivate: public ActionPrivate
 {
 public:
@@ -91,12 +95,24 @@ QString ProfileActionMeta::description() const
     return tr("This action allows to change the profile when triggered.");
 }
 
+QString ProfileActionMeta::summary(const QVariantMap &properties) const
+{
+    QString profile = properties.value(PROFILE_KEY).toString();
+    if (profile == STANDARD_PROFILE_KEY) {
+        return tr("Switch profile to standard");
+    }
+    if (profile == SILENT_PROFILE_KEY) {
+        return tr("Switch profile to silent");
+    }
+    return name();
+}
+
 MetaProperty * ProfileActionMeta::getProperty(const QString &property, QObject *parent) const
 {
-    if (property == "profile") {
+    if (property == PROFILE_KEY) {
         ChoiceModel *choiceModel = new ChoiceModel(parent);
-        choiceModel->addEntry(tr("Standard profile"), "ambience");
-        choiceModel->addEntry(tr("Silent profile"), "silent");
+        choiceModel->addEntry(tr("Standard profile"), STANDARD_PROFILE_KEY);
+        choiceModel->addEntry(tr("Silent profile"), SILENT_PROFILE_KEY);
         return MetaProperty::createChoice(property, tr("Profile to set"), choiceModel, parent);
     }
     return 0;

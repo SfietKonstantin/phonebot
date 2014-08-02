@@ -37,6 +37,7 @@ CoverBackground {
     anchors.fill: parent
     property int rulesCount
     signal addNew()
+    property alias actionsEnabled: actions.enabled
 
     Column {
         anchors.verticalCenter: parent.verticalCenter
@@ -63,6 +64,7 @@ CoverBackground {
     }
 
     CoverActionList {
+        id: actions
         CoverAction {
             iconSource: "image://theme/icon-cover-new"
             onTriggered: container.addNew()

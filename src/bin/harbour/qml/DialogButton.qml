@@ -41,7 +41,7 @@ RuleButton {
     property QtObject component
     property int index
     property var stack
-    adaptSize: false
+    wrap: false
     width: parent.width
     text: container.type.description
     secondaryText: PhoneBot.convert(container.type.type, container.value)

@@ -138,6 +138,16 @@ QVariant RuleDefinitionActionModel::data(const QModelIndex &index, int role) con
     }
 }
 
+RuleComponentModel * RuleDefinitionActionModel::getComponent(int index) const
+{
+    Q_D(const RuleDefinitionActionModel);
+    if (index < 0 || index > rowCount() + 1) {
+        return 0;
+    }
+
+    return d->m_data.value(index)->component;
+}
+
 RuleComponentModel * RuleDefinitionActionModel::createTempComponent(int type, int index, const QString &component)
 {
     Q_D(RuleDefinitionActionModel);

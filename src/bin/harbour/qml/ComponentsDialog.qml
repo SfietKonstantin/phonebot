@@ -49,36 +49,10 @@ Page {
         header: PageHeader {
             title: PhoneBot.componentName(model.type)
         }
-        delegate: BackgroundItem {
+        delegate: RuleButton {
             id: item
-            implicitHeight: Math.max(column.height + 2 * Theme.paddingMedium, Theme.itemSizeSmall)
-
-            Column {
-                id: column
-                anchors.verticalCenter: parent.verticalCenter
-                width: parent.width
-                spacing: Theme.paddingSmall
-
-                Label {
-                    anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-                    anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
-                    text: model.name
-                    color: !item.pressed || model.type == container.component ? Theme.primaryColor
-                                                                              : Theme.highlightColor
-                    wrapMode: Text.WordWrap
-                }
-
-                Label {
-                    anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-                    anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
-                    visible: text != ""
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: !item.pressed || model.type == container.component ? Theme.secondaryColor
-                                                                              : Theme.secondaryHighlightColor
-                    text: model.description
-                    wrapMode: Text.WordWrap
-                }
-            }
+            text: model.name
+            secondaryText: model.description
 
             onClicked: {
                 container.component = model.type

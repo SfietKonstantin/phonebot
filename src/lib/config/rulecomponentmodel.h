@@ -41,6 +41,7 @@ class RuleComponentModel: public QAbstractListModel
     Q_PROPERTY(QString type READ type CONSTANT)
     Q_PROPERTY(QString name READ name CONSTANT)
     Q_PROPERTY(QString description READ description CONSTANT)
+    Q_PROPERTY(QString summary READ summary NOTIFY summaryChanged)
     Q_PROPERTY(int count READ count NOTIFY countChanged)
 public:
     enum Role {
@@ -53,12 +54,14 @@ public:
     QString type() const;
     QString name() const;
     QString description() const;
+    QString summary() const;
     int count() const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     static RuleComponentModel * create(const QString &type, QObject *parent = 0);
     static RuleComponentModel * clone(const RuleComponentModel *other, QObject *parent = 0);
 Q_SIGNALS:
+    void summaryChanged();
     void countChanged();
 public Q_SLOTS:
     void setValue(int row, const QVariant &value);

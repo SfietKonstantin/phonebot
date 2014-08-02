@@ -50,6 +50,7 @@ public:
     int count() const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    Q_INVOKABLE RuleComponentModel * getComponent(int index) const;
     Q_INVOKABLE RuleComponentModel * createTempComponent(int type, int index, const QString &component);
     Q_INVOKABLE RuleComponentModel * createTempClonedComponent(int type, int index);
     static RuleDefinitionActionModel * clone(const RuleDefinitionActionModel *other,

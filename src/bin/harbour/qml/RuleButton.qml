@@ -36,9 +36,8 @@ ListItem {
     id: container
     property alias text: primary.text
     property alias secondaryText: secondary.text
-    property bool adaptSize: false
-    implicitHeight: adaptSize ? Math.max(column.height + 2 * Theme.paddingMedium, Theme.itemSizeSmall)
-                              : Theme.itemSizeSmall
+    property bool wrap: true
+    contentHeight: Math.max(column.height + 2 * Theme.paddingMedium, Theme.itemSizeSmall)
 
     Column {
         id: column
@@ -47,22 +46,22 @@ ListItem {
         spacing: Theme.paddingSmall
         Label {
             id: primary
-            anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-            anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
+            anchors.left: parent.left; anchors.leftMargin: Theme.paddingLarge
+            anchors.right: parent.right; anchors.rightMargin: Theme.paddingLarge
             color: !container.pressed ? Theme.primaryColor : Theme.highlightColor
-            wrapMode: container.adaptSize ? Text.WordWrap : Text.NoWrap
-            truncationMode: container.adaptSize ? TruncationModel.None : TruncationMode.Fade
+            wrapMode: container.wrap ? Text.WordWrap : Text.NoWrap
+            truncationMode: container.wrap ? TruncationModel.None : TruncationMode.Fade
         }
 
         Label {
             id: secondary
             visible: text != ""
-            anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-            anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
+            anchors.left: parent.left; anchors.leftMargin: Theme.paddingLarge
+            anchors.right: parent.right; anchors.rightMargin: Theme.paddingLarge
             font.pixelSize: Theme.fontSizeSmall
             color: !container.pressed ? Theme.secondaryColor : Theme.secondaryHighlightColor
-            wrapMode: container.adaptSize ? Text.WordWrap : Text.NoWrap
-            truncationMode: container.adaptSize ? TruncationModel.None : TruncationMode.Fade
+            wrapMode: container.wrap ? Text.WordWrap : Text.NoWrap
+            truncationMode: container.wrap ? TruncationModel.None : TruncationMode.Fade
         }
     }
 }

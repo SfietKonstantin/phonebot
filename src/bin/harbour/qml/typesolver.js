@@ -37,9 +37,9 @@ function getSource(type, subType) {
     case PhoneBot.MetaProperty.String:
         switch (subType) {
         case PhoneBot.MetaProperty.ChoiceSubType:
-            return Qt.resolvedUrl("TextField.qml")
-        default:
             return Qt.resolvedUrl("ComboBox.qml")
+        default:
+            return Qt.resolvedUrl("TextField.qml")
         }
     case PhoneBot.MetaProperty.Int:
         return Qt.resolvedUrl("IntField.qml")

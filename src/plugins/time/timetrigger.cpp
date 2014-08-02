@@ -35,6 +35,7 @@
 #include <QtCore/QDebug>
 #include "declarativebackgroundactivity.h"
 
+static const char *TIME_KEY = "time";
 static const int DELTA = 75000;
 
 class TimeTriggerPrivate: public TriggerPrivate
@@ -120,9 +121,18 @@ QString TimeTriggerMeta::description() const
     return tr("This trigger will be triggered at a specific time.");
 }
 
+QString TimeTriggerMeta::summary(const QVariantMap &properties) const
+{
+    QTime time = properties.value(TIME_KEY).toTime();
+    if (time.isValid()) {
+        return tr("When it is %1").arg(time.toString(tr("hh:mm")));
+    }
+    return name();
+}
+
 MetaProperty * TimeTriggerMeta::getProperty(const QString &property, QObject *parent) const
 {
-    if (property == "time") {
+    if (property == TIME_KEY) {
         return MetaProperty::create(property, MetaProperty::Time, tr("Time of day to trigger"),
                                     parent);
     }

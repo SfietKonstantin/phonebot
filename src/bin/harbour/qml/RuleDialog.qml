@@ -65,7 +65,7 @@ Dialog {
 
             RuleButton {
                 text: qsTr("Trigger")
-                secondaryText: container.rule != null ? (container.rule.trigger != null ? container.rule.trigger.name : "") : ""
+                secondaryText: container.rule != null ? (container.rule.trigger != null ? container.rule.trigger.summary : "") : ""
                 enabled: container.rule != null
                 onClicked: pageStack.push(Qt.resolvedUrl("ComponentConfigDialog.qml"),
                                           {acceptDestination: container,
@@ -74,7 +74,7 @@ Dialog {
             }
             RuleButton {
                 text: qsTr("Condition")
-                secondaryText: container.rule != null ? (container.rule.condition != null ? container.rule.condition.name : "") : ""
+                secondaryText: container.rule != null ? (container.rule.condition != null ? container.rule.condition.summary : "") : ""
                 enabled: container.rule != null
                 onClicked: pageStack.push(Qt.resolvedUrl("ComponentConfigDialog.qml"),
                                           {acceptDestination: container,
@@ -95,7 +95,7 @@ Dialog {
                         animateRemoval(action)
                     }
                     text: qsTr("Action %n", "", index + 1)
-                    secondaryText: model.component != null ? model.component.name : ""
+                    secondaryText: model.component != null ? model.component.summary : ""
                     onClicked: pageStack.push(Qt.resolvedUrl("ComponentConfigDialog.qml"),
                                               {acceptDestination: container,
                                                rule: container.rule.actions,

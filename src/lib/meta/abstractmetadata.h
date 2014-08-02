@@ -44,6 +44,7 @@ public:
     virtual ~AbstractMetaData();
     virtual QString name() const = 0;
     virtual QString description() const = 0;
+    virtual QString summary(const QVariantMap &properties) const = 0;
     MetaProperty * property(const QString &property) const;
 protected:
     explicit AbstractMetaData(QObject *parent = 0);

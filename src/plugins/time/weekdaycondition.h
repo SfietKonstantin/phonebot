@@ -83,6 +83,7 @@ public:
     Q_INVOKABLE explicit WeekDayConditionMeta(QObject * parent = 0);
     QString name() const;
     QString description() const;
+    QString summary(const QVariantMap &properties) const;
 protected:
     MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
 };

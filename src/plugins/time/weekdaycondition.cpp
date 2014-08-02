@@ -32,24 +32,76 @@
 #include "weekdaycondition.h"
 #include <condition_p.h>
 #include <QtCore/QDate>
+#include <QtCore/QSet>
+#include <QtCore/QStringList>
+
+static const char *ONMONDAY_KEY = "onMonday";
+static const char *ONTUESDAY_KEY = "onTuesday";
+static const char *ONWEDNESDAY_KEY = "onWednesday";
+static const char *ONTHURSDAY_KEY = "onThursday";
+static const char *ONFRIDAY_KEY = "onFriday";
+static const char *ONSATURDAY_KEY = "onSaturday";
+static const char *ONSUNDAY_KEY = "onSunday";
+
+static const char *keyFromDay(int day)
+{
+    switch(day) {
+    case 1:
+        return ONMONDAY_KEY;
+        break;
+    case 2:
+        return ONTUESDAY_KEY;
+        break;
+    case 3:
+        return ONWEDNESDAY_KEY;
+        break;
+    case 4:
+        return ONTHURSDAY_KEY;
+        break;
+    case 5:
+        return ONFRIDAY_KEY;
+        break;
+    case 6:
+        return ONSATURDAY_KEY;
+        break;
+    case 7:
+        return ONSUNDAY_KEY;
+        break;
+    default:
+        return 0;
+        break;
+    }
+}
 
 class WeekDayConditionPrivate: public ConditionPrivate
 {
 public:
     WeekDayConditionPrivate(WeekDayCondition *q);
-    bool onMonday;
-    bool onTuesday;
-    bool onWednesday;
-    bool onThursday;
-    bool onFriday;
-    bool onSaturday;
-    bool onSunday;
+    bool setDay(int day, bool checked);
+    QSet<int> checkedDays;
 };
 
 WeekDayConditionPrivate::WeekDayConditionPrivate(WeekDayCondition *q)
-    : ConditionPrivate(q), onMonday(false), onTuesday(false), onWednesday(false), onThursday(false)
-    , onFriday(false), onSaturday(false), onSunday(false)
+    : ConditionPrivate(q)
 {
+}
+
+bool WeekDayConditionPrivate::setDay(int day, bool checked)
+{
+    if (day < 1 || day > 7) {
+        return false;
+    }
+
+    bool current = checkedDays.contains(day);
+    if (current != checked) {
+        if (checked) {
+            checkedDays.insert(day);
+        } else {
+            checkedDays.remove(day);
+        }
+        return true;
+    }
+    return false;
 }
 
 WeekDayCondition::WeekDayCondition(QObject *parent) :
@@ -60,14 +112,13 @@ WeekDayCondition::WeekDayCondition(QObject *parent) :
 bool WeekDayCondition::isOnMonday() const
 {
     Q_D(const WeekDayCondition);
-    return d->onMonday;
+    return d->checkedDays.contains(1);
 }
 
 void WeekDayCondition::setOnMonday(bool onMonday)
 {
     Q_D(WeekDayCondition);
-    if (d->onMonday != onMonday) {
-        d->onMonday = onMonday;
+    if (d->setDay(1, onMonday)) {
         emit onMondayChanged();
     }
 }
@@ -75,14 +126,13 @@ void WeekDayCondition::setOnMonday(bool onMonday)
 bool WeekDayCondition::isOnTuesday() const
 {
     Q_D(const WeekDayCondition);
-    return d->onTuesday;
+    return d->checkedDays.contains(2);
 }
 
 void WeekDayCondition::setOnTuesday(bool onTuesday)
 {
     Q_D(WeekDayCondition);
-    if (d->onTuesday != onTuesday) {
-        d->onTuesday = onTuesday;
+    if (d->setDay(2, onTuesday)) {
         emit onTuesdayChanged();
     }
 }
@@ -90,14 +140,13 @@ void WeekDayCondition::setOnTuesday(bool onTuesday)
 bool WeekDayCondition::isOnWednesday() const
 {
     Q_D(const WeekDayCondition);
-    return d->onWednesday;
+    return d->checkedDays.contains(3);
 }
 
 void WeekDayCondition::setOnWednesday(bool onWednesday)
 {
     Q_D(WeekDayCondition);
-    if (d->onWednesday != onWednesday) {
-        d->onWednesday = onWednesday;
+    if (d->setDay(3, onWednesday)) {
         emit onWednesdayChanged();
     }
 }
@@ -105,14 +154,13 @@ void WeekDayCondition::setOnWednesday(bool onWednesday)
 bool WeekDayCondition::isOnThursday() const
 {
     Q_D(const WeekDayCondition);
-    return d->onThursday;
+    return d->checkedDays.contains(4);
 }
 
 void WeekDayCondition::setOnThursday(bool onThursday)
 {
     Q_D(WeekDayCondition);
-    if (d->onThursday != onThursday) {
-        d->onThursday = onThursday;
+    if (d->setDay(4, onThursday)) {
         emit onThursdayChanged();
     }
 }
@@ -120,14 +168,13 @@ void WeekDayCondition::setOnThursday(bool onThursday)
 bool WeekDayCondition::isOnFriday() const
 {
     Q_D(const WeekDayCondition);
-    return d->onFriday;
+    return d->checkedDays.contains(5);
 }
 
 void WeekDayCondition::setOnFriday(bool onFriday)
 {
     Q_D(WeekDayCondition);
-    if (d->onFriday != onFriday) {
-        d->onFriday = onFriday;
+    if (d->setDay(5, onFriday)) {
         emit onFridayChanged();
     }
 }
@@ -135,14 +182,13 @@ void WeekDayCondition::setOnFriday(bool onFriday)
 bool WeekDayCondition::isOnSaturday() const
 {
     Q_D(const WeekDayCondition);
-    return d->onSaturday;
+    return d->checkedDays.contains(6);
 }
 
 void WeekDayCondition::setOnSaturday(bool onSaturday)
 {
     Q_D(WeekDayCondition);
-    if (d->onSaturday != onSaturday) {
-        d->onSaturday = onSaturday;
+    if (d->setDay(6, onSaturday)) {
         emit onSaturdayChanged();
     }
 }
@@ -150,14 +196,13 @@ void WeekDayCondition::setOnSaturday(bool onSaturday)
 bool WeekDayCondition::isOnSunday() const
 {
     Q_D(const WeekDayCondition);
-    return d->onSunday;
+    return d->checkedDays.contains(7);
 }
 
 void WeekDayCondition::setOnSunday(bool onSunday)
 {
     Q_D(WeekDayCondition);
-    if (d->onSunday != onSunday) {
-        d->onSunday = onSunday;
+    if (d->setDay(7, onSunday)) {
         emit onSundayChanged();
     }
 }
@@ -167,29 +212,7 @@ bool WeekDayCondition::isValid(Rule *rule)
     Q_D(WeekDayCondition);
     Q_UNUSED(rule);
     int day = QDate::currentDate().dayOfWeek();
-    if (day == 1 && d->onMonday) {
-        return true;
-    }
-    if (day == 2 && d->onTuesday) {
-        return true;
-    }
-    if (day == 3 && d->onWednesday) {
-        return true;
-    }
-    if (day == 4 && d->onThursday) {
-        return true;
-    }
-    if (day == 5 && d->onFriday) {
-        return true;
-    }
-    if (day == 6 && d->onSaturday) {
-        return true;
-    }
-    if (day == 7 && d->onSunday) {
-        return true;
-    }
-
-    return false;
+    return d->checkedDays.contains(day);
 }
 
 WeekDayConditionMeta::WeekDayConditionMeta(QObject *parent)
@@ -207,27 +230,44 @@ QString WeekDayConditionMeta::description() const
     return tr("This condition will check if today matches a given set of day of week.");
 }
 
+QString WeekDayConditionMeta::summary(const QVariantMap &properties) const
+{
+    QStringList days;
+    for (int i = 1; i <= 7; ++i) {
+        bool checked = properties.value(keyFromDay(i)).toBool();
+        if (checked) {
+            days.append(QDate::shortDayName(i));
+        }
+    }
+
+    if (days.isEmpty()) {
+        return name();
+    }
+
+    return tr("On %1").arg(days.join(tr(", ")));
+}
+
 MetaProperty * WeekDayConditionMeta::getProperty(const QString &property, QObject *parent) const
 {
-    if (property == "onMonday") {
+    if (property == ONMONDAY_KEY) {
         return MetaProperty::createBool(property, tr("Monday"), parent);
     }
-    if (property == "onTuesday") {
+    if (property == ONTUESDAY_KEY) {
         return MetaProperty::createBool(property, tr("Tuesday"), parent);
     }
-    if (property == "onWednesday") {
+    if (property == ONWEDNESDAY_KEY) {
         return MetaProperty::createBool(property, tr("Wednesday"), parent);
     }
-    if (property == "onThursday") {
+    if (property == ONTHURSDAY_KEY) {
         return MetaProperty::createBool(property, tr("Thursday"), parent);
     }
-    if (property == "onFriday") {
+    if (property == ONFRIDAY_KEY) {
         return MetaProperty::createBool(property, tr("Friday"), parent);
     }
-    if (property == "onSaturday") {
+    if (property == ONSATURDAY_KEY) {
         return MetaProperty::createBool(property, tr("Saturday"), parent);
     }
-    if (property == "onSunday") {
+    if (property == ONSUNDAY_KEY) {
         return MetaProperty::createBool(property, tr("Sunday"), parent);
     }
     return 0;

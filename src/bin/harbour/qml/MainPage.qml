@@ -35,6 +35,7 @@ import harbour.phonebot 1.0
 
 Page {
     id: container
+    property bool actionsEnabled: false
 
     function addNew() {
         var rule = rulesModel.createRule()
@@ -52,9 +53,17 @@ Page {
         CoverPage {
             onAddNew: container.addNew()
             rulesCount: rulesModel.count
+            actionsEnabled: container.actionsEnabled
         }
     }
 
+    onStatusChanged: {
+        if (status == PageStatus.Activating) {
+            container.actionsEnabled = true
+        } else if (status == PageStatus.Deactivating) {
+            container.actionsEnabled = false
+        }
+    }
 
     Component.onCompleted: window.cover = cover
 
@@ -72,10 +81,30 @@ Page {
 
         delegate: RuleButton {
             id: rule
+            wrap: true
             function removeRule() {
                 rulesModel.removeRule(model.index)
             }
+            function formatRuleSecondary() {
+                if (!model.rule.trigger || model.rule.actions.count == 0) {
+                    return ""
+                }
+
+                var text = model.rule.trigger.summary + "\n"
+                if (model.rule.condition) {
+                    text += model.rule.condition.summary + "\n"
+                }
+
+                for (var i = 0; i < model.rule.actions.count; i++) {
+                    text += model.rule.actions.getComponent(i).summary + "\n"
+                }
+                text = text.trim()
+
+                return text
+            }
+
             text: model.name == "" ? qsTr("Noname rule %1").arg(model.index + 1) : model.name
+            secondaryText: formatRuleSecondary()
             onClicked: {
                 var rule = rulesModel.createClonedRule(model.rule)
                 pageStack.push(Qt.resolvedUrl("RuleDialog.qml"),
