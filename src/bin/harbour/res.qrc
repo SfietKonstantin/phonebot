@@ -12,5 +12,9 @@
         <file>qml/TypeField.qml</file>
         <file>qml/DialogButton.qml</file>
         <file>qml/ComboBox.qml</file>
+        <file>qml/Switch.qml</file>
+        <file>qml/TextField.qml</file>
+        <file>qml/IntField.qml</file>
+        <file>qml/DoubleField.qml</file>
     </qresource>
 </RCC>

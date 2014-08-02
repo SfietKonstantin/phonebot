@@ -39,7 +39,11 @@ OTHER_FILES += qml/main.qml \
     qml/TimePicker.qml \
     qml/TypeField.qml \
     qml/DialogButton.qml \
-    qml/ComboBox.qml
+    qml/ComboBox.qml \
+    qml/Switch.qml \
+    qml/TextField.qml \
+    qml/IntField.qml \
+    qml/DoubleField.qml
 
 target.path = /usr/bin
     

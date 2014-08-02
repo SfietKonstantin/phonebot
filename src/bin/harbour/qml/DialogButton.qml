@@ -42,6 +42,7 @@ RuleButton {
     property int index
     property var stack
     adaptSize: false
+    width: parent.width
     text: container.type.description
     secondaryText: PhoneBot.convert(container.type.type, container.value)
     onClicked: TypeSolver.openSelector(container.type.type, container.type.subType,

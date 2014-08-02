@@ -37,6 +37,7 @@
 #include <phonebotmeta.h>
 #include <profileaction.h>
 #include <timetrigger.h>
+#include <weekdaycondition.h>
 #include <phonebotengine.h>
 #include <metatypecache.h>
 
@@ -238,6 +239,40 @@ void TstMeta::testTimeMeta()
     MetaProperty *property = timeTriggerMeta->property("time");
     QVERIFY(property);
     QCOMPARE(property->type(), MetaProperty::Time);
+
+    AbstractMetaData *weekDayConditionMeta = cache.metaData("WeekDayCondition");
+    properties = cache.properties("WeekDayCondition");
+    QVERIFY(weekDayConditionMeta);
+    QCOMPARE(properties.count(), 7);
+    QVERIFY(properties.contains("onMonday"));
+    QVERIFY(properties.contains("onTuesday"));
+    QVERIFY(properties.contains("onWednesday"));
+    QVERIFY(properties.contains("onThursday"));
+    QVERIFY(properties.contains("onFriday"));
+    QVERIFY(properties.contains("onSaturday"));
+    QVERIFY(properties.contains("onSunday"));
+
+    property = weekDayConditionMeta->property("onMonday");
+    QVERIFY(property);
+    QCOMPARE(property->type(), MetaProperty::Bool);
+    property = weekDayConditionMeta->property("onTuesday");
+    QVERIFY(property);
+    QCOMPARE(property->type(), MetaProperty::Bool);
+    property = weekDayConditionMeta->property("onWednesday");
+    QVERIFY(property);
+    QCOMPARE(property->type(), MetaProperty::Bool);
+    property = weekDayConditionMeta->property("onThursday");
+    QVERIFY(property);
+    QCOMPARE(property->type(), MetaProperty::Bool);
+    property = weekDayConditionMeta->property("onFriday");
+    QVERIFY(property);
+    QCOMPARE(property->type(), MetaProperty::Bool);
+    property = weekDayConditionMeta->property("onSaturday");
+    QVERIFY(property);
+    QCOMPARE(property->type(), MetaProperty::Bool);
+    property = weekDayConditionMeta->property("onSunday");
+    QVERIFY(property);
+    QCOMPARE(property->type(), MetaProperty::Bool);
 }
 
 

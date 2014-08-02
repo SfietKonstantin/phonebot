@@ -35,7 +35,7 @@ import "typesolver.js" as TypeSolver
 
 Item {
     id: container
-    width: parent.width
+    width: parent ? parent.width : 0
     height: item ? item.height : 0
     property QtObject type
     property var value

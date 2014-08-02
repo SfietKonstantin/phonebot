@@ -79,7 +79,7 @@ Page {
             onClicked: {
                 var rule = rulesModel.createClonedRule(model.rule)
                 pageStack.push(Qt.resolvedUrl("RuleDialog.qml"),
-                               {model: rulesModel, index: model.index, rule: rule})
+                               {model: rulesModel, index: model.index, rule: rule, add: false})
             }
             onPressAndHold: {
                 rule.showMenu()

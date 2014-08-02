@@ -37,11 +37,19 @@ function getSource(type, subType) {
     case PhoneBot.MetaProperty.String:
         switch (subType) {
         case PhoneBot.MetaProperty.ChoiceSubType:
+            return Qt.resolvedUrl("TextField.qml")
+        default:
             return Qt.resolvedUrl("ComboBox.qml")
         }
+    case PhoneBot.MetaProperty.Int:
+        return Qt.resolvedUrl("IntField.qml")
+    case PhoneBot.MetaProperty.Double:
+        return Qt.resolvedUrl("DoubleField.qml")
+    case PhoneBot.MetaProperty.Bool:
+        return Qt.resolvedUrl("Switch.qml")
+    default:
+        return Qt.resolvedUrl("DialogButton.qml")
     }
-
-    return Qt.resolvedUrl("DialogButton.qml")
 }
 
 function openSelector(type, subType, stack, component, index) {

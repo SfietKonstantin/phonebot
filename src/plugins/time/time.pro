@@ -7,10 +7,12 @@ INCLUDEPATH += ../../lib/core \
 
 CONFIG += plugin static
 
-HEADERS = timetrigger.h
+HEADERS = timetrigger.h \
+    weekdaycondition.h
 
 SOURCES = plugin.cpp \
-    timetrigger.cpp
+    timetrigger.cpp \
+    weekdaycondition.cpp
 
 include(nemo-keepalive-plugin.pri)
 CONFIG(harbour) {

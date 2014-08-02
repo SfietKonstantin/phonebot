@@ -29,23 +29,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <phonebotextensionplugin.h>
-#include <QtQml/qqml.h>
-#include "timetrigger.h"
-#include "weekdaycondition.h"
+import QtQuick 2.0
+import Sailfish.Silica 1.0
 
-class PhoneBotTimePlugin: public PhoneBotExtensionPlugin
-{
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.SfietKonstantin.phonebot.PhoneBotExtensionInterface")
-public:
-    void registerTypes()
-    {
-        qmlRegisterType<TimeTrigger>("org.SfietKonstantin.phonebot.time", 1, 0, "TimeTrigger");
-        qRegisterMetaType<TimeTriggerMeta *>();
-        qmlRegisterType<WeekDayCondition>("org.SfietKonstantin.phonebot.time", 1, 0, "WeekDayCondition");
-        qRegisterMetaType<WeekDayConditionMeta *>();
+Item {
+    id: container
+    property QtObject type
+    property var value
+    property QtObject component
+    property int index
+    property var stack
+    width: parent.width
+    height: childrenRect.height
+
+    TextField {
+        id: field
+        width: parent.width
+        placeholderText: container.type.description
+        label: container.type.description
+        onTextChanged: component.setValue(container.index, field.text)
     }
-};
 
-#include "plugin.moc"
+    Component.onCompleted: {
+        field.text = (container.value == undefined ? "" : container.value)
+    }
+}

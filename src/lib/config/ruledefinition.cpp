@@ -202,20 +202,29 @@ static QmlObject::Ptr convertComponentModelToObject(RuleComponentModel *componen
             QVariant value = componentModel->data(componentModel->index(i),
                                                   RuleComponentModel::Value);
 
+            // Workaround for null QVariant
+            if (type->type() == MetaProperty::Bool) {
+                if (value.isNull()) {
+                    value = QVariant(false);
+                }
+            }
+
             if (type->type() == MetaProperty::Time) {
                 // Insert time linker (TODO)
                 QmlObject::Ptr timeMapper = QmlObject::create("TimeMapper");
                 QVariantMap timeProperties;
                 QTime valueTime = value.toTime();
-                timeProperties.insert("hour", valueTime.hour());
-                timeProperties.insert("minute", valueTime.minute());
-                timeMapper->setProperties(timeProperties);
-                QString id = QString("mapper%1").arg(mappers.count());
-                timeMapper->setId(id);
-                mappers.append(timeMapper);
-                QStringList fieldValues;
-                fieldValues.append("value");
-                properties.insert(type->name(), QVariant::fromValue(Reference(id, fieldValues)));
+                if (valueTime.isValid()) {
+                    timeProperties.insert("hour", valueTime.hour());
+                    timeProperties.insert("minute", valueTime.minute());
+                    timeMapper->setProperties(timeProperties);
+                    QString id = QString("mapper%1").arg(mappers.count());
+                    timeMapper->setId(id);
+                    mappers.append(timeMapper);
+                    QStringList fieldValues;
+                    fieldValues.append("value");
+                    properties.insert(type->name(), QVariant::fromValue(Reference(id, fieldValues)));
+                }
             } else {
                 // Insert key value
                 properties.insert(type->name(), value);
@@ -277,7 +286,7 @@ QmlDocumentBase::Ptr RuleDefinition::toDocument() const
     QmlObject::Ptr condition = convertComponentModelToObject(d->components.value(PhoneBotHelper::Condition),
                                                              imports, mappers);
     if (!condition.isNull()) {
-        properties.insert("condition", QVariant::fromValue(trigger));
+        properties.insert("condition", QVariant::fromValue(condition));
     }
 
     // Actions

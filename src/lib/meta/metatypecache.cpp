@@ -296,9 +296,12 @@ void MetaTypeCachePrivate::populateCacheForType(const QQmlType *type, const QStr
     AbstractMetaData *castedMeta = qobject_cast<AbstractMetaData *>(meta);
     Q_ASSERT(castedMeta);
 
-    QSet<QString> properties;
+    QStringList properties;
     for (int i = componentMeta->propertyOffset(); i < componentMeta->propertyCount(); ++i) {
-        properties.insert(componentMeta->property(i).name());
+        QString property = componentMeta->property(i).name();
+        if (!properties.contains(property)) {
+            properties.append(property);
+        }
     }
 
     QStringList removedProperties;
@@ -309,15 +312,12 @@ void MetaTypeCachePrivate::populateCacheForType(const QQmlType *type, const QStr
     }
 
     foreach (const QString &property, removedProperties) {
-        properties.remove(property);
+        properties.removeAll(property);
     }
-
-    QStringList propertiesList = properties.toList();
-    std::sort(propertiesList.begin(), propertiesList.end());
 
     MetaTypeCacheItem *item = new MetaTypeCacheItem(componentMeta);
     item->metaData = castedMeta;
-    item->properties = propertiesList;
+    item->properties = properties;
     item->module = module;
     item->majorVersion = majorVersion;
     item->minorVersion = minorVersion;
