@@ -232,12 +232,24 @@ QString WeekDayConditionMeta::description() const
 
 QString WeekDayConditionMeta::summary(const QVariantMap &properties) const
 {
+    QSet<int> checkedDays;
+
     QStringList days;
     for (int i = 1; i <= 7; ++i) {
         bool checked = properties.value(keyFromDay(i)).toBool();
         if (checked) {
             days.append(QDate::shortDayName(i));
+            checkedDays.insert(i);
         }
+    }
+
+    if (checkedDays.count() == 5 && checkedDays.contains(1) && checkedDays.contains(2)
+        && checkedDays.contains(3) && checkedDays.contains(4) && checkedDays.contains(5)) {
+        return tr("On working days");
+    }
+
+    if (checkedDays.count() == 2 && checkedDays.contains(6) && checkedDays.contains(7)) {
+        return tr("On week-ends");
     }
 
     if (days.isEmpty()) {
