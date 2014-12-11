@@ -3,7 +3,8 @@ TARGET = phonebotprofile
 QT = core dbus
 
 INCLUDEPATH += ../../lib/core \
-    ../../lib/meta
+    ../../lib/meta \
+    ../../lib/nemomw
 
 CONFIG += plugin static
 
@@ -12,9 +13,4 @@ HEADERS = profileaction.h
 SOURCES = plugin.cpp \
     profileaction.cpp
 
-CONFIG(harbour) {
-    include(libprofile-qt.pri)
-} else {
-    QMAKE_CXXFLAGS += -I/usr/include/profile-qt5
-}
-
+include(../../3rdparty/libnemomw/profile/profile-include.pri)

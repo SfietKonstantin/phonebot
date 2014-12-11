@@ -1,6 +1,3 @@
-[submodule "src/3rdparty/libprofile-qt"]
-	path = src/3rdparty/libprofile-qt
-	url = https://github.com/nemomobile/libprofile-qt.git
 [submodule "src/3rdparty/libnemomw"]
 	path = src/3rdparty/libnemomw
 	url = https://github.com/SfietKonstantin/libnemomw.git

@@ -10,11 +10,12 @@ QT = core gui qml quick dbus
     RESOURCES += res.qrc
 }
 
+include(../../lib/nemomw/nemomw-deps.pri)
+
 INCLUDEPATH += ../../lib/core \
     ../../lib/meta \
     ../../lib/config \
     ../../lib/daemon
-LIBS += -lrt
 LIBS += -L../../plugins/debug -lphonebotdebug \
     -L../../plugins/profile -lphonebotprofile \
     -L../../plugins/time -lphonebottime \

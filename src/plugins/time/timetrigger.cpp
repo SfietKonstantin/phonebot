@@ -33,7 +33,7 @@
 #include "trigger_p.h"
 #include <QtCore/QDate>
 #include <QtCore/QDebug>
-#include <KeepAlive>
+#include <BackgroundJob>
 
 static const char *TIME_KEY = "time";
 static const int DELTA = 75000;
@@ -45,7 +45,7 @@ public:
     void slotTriggered();
     QTime time;
     QDate lastEmission;
-    DeclarativeBackgroundJob *backgroundJob;
+    BackgroundJob *backgroundJob;
 private:
     Q_DECLARE_PUBLIC(TimeTrigger)
 };

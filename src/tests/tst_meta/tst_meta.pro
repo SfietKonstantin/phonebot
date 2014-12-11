@@ -3,11 +3,7 @@ TARGET = tst_meta
 
 QT = core dbus qml testlib
 
-!CONFIG(harbour) {
-    QMAKE_LFLAGS += -lprofile-qt5
-    CONFIG += link_pkgconfig
-    PKGCONFIG += keepalive
-}
+include(../../lib/nemomw/nemomw-deps.pri)
 
 INCLUDEPATH += ../../lib/core \
     ../../lib/meta \

@@ -3,11 +3,7 @@ TARGET = phonebotd
 
 QT = core dbus qml
 
-!CONFIG(harbour) {
-    QMAKE_LFLAGS += -lprofile-qt5
-    CONFIG += link_pkgconfig
-    PKGCONFIG += keepalive
-}
+include(../../lib/nemomw/nemomw-deps.pri)
 
 INCLUDEPATH += ../../lib/core \
     ../../lib/daemon
@@ -15,6 +11,7 @@ INCLUDEPATH += ../../lib/core \
 LIBS += -L../../plugins/debug -lphonebotdebug \
     -L../../plugins/profile -lphonebotprofile \
     -L../../plugins/time -lphonebottime \
+    -L../../lib/nemomw -lnemomw \
     -L../../lib/daemon -lphonebotdaemon \
     -L../../lib/meta -lphonebotmeta \
     -L../../lib/core -lphonebot
