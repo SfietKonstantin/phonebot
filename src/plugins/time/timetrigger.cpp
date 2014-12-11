@@ -33,7 +33,7 @@
 #include "trigger_p.h"
 #include <QtCore/QDate>
 #include <QtCore/QDebug>
-#include "declarativebackgroundactivity.h"
+#include <KeepAlive>
 
 static const char *TIME_KEY = "time";
 static const int DELTA = 75000;

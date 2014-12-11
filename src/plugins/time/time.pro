@@ -1,9 +1,10 @@
 TEMPLATE = lib
 TARGET = phonebottime
-QT = core dbus qml
+QT = core qml
 
 INCLUDEPATH += ../../lib/core \
-    ../../lib/meta
+    ../../lib/meta \
+    ../../lib/nemomw
 
 CONFIG += plugin static
 
@@ -14,12 +15,7 @@ SOURCES = plugin.cpp \
     timetrigger.cpp \
     weekdaycondition.cpp
 
-include(nemo-keepalive-plugin.pri)
-CONFIG(harbour) {
-    include(nemo-keepalive.pri)
-} else {
-    CONFIG += build_pkgconfig
-    PKGCONFIG += keepalive
-}
+include(../../3rdparty/libnemomw/keepalive/keepalive-include.pri)
+
 
 
