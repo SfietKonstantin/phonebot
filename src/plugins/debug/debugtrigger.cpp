@@ -88,9 +88,8 @@ bool DebugTriggerPrivate::registerToBus()
     }
 
     // Register this object
-    registeredPath = path;
-    connection.registerObject(path, q);
-    return true;
+    registeredPath = path.trimmed();
+    return connection.registerObject(registeredPath, q);
 }
 
 void DebugTriggerPrivate::unregisterFromBus()

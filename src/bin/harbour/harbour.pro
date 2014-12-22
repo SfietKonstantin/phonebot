@@ -19,6 +19,7 @@ INCLUDEPATH += ../../lib/core \
 LIBS += -L../../plugins/debug -lphonebotdebug \
     -L../../plugins/profile -lphonebotprofile \
     -L../../plugins/time -lphonebottime \
+    -L../../plugins/connman -lphonebotconnman \
     -L../../lib/nemomw -lnemomw \
     -L../../lib/config -lphonebotconfig \
     -L../../lib/daemon -lphonebotdaemon \

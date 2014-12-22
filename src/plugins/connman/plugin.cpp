@@ -29,25 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QtPlugin>
-#include "enginemanager.h"
+#include <phonebotextensionplugin.h>
+#include <QtQml/qqml.h>
+#include "dataswitchaction.h"
 
-Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
-Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
-Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
-Q_IMPORT_PLUGIN(PhoneBotConnmanPlugin)
-
-int main(int argc, char **argv)
+class PhoneBotConnmanPlugin: public PhoneBotExtensionPlugin
 {
-    QCoreApplication app (argc, argv);
-    app.setOrganizationName("phonebot");
-    app.setApplicationName("phonebotd");
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org.SfietKonstantin.phonebot.PhoneBotExtensionInterface")
+public:
+    void registerTypes()
+    {
+        qmlRegisterType<DataSwitchAction>("org.SfietKonstantin.phonebot.connman", 1, 0, "DataSwitchAction");
+        qRegisterMetaType<DataSwitchActionMeta *>();
+//        qmlRegisterType<WeekDayCondition>("org.SfietKonstantin.phonebot.time", 1, 0, "WeekDayCondition");
+//        qRegisterMetaType<WeekDayConditionMeta *>();
+    }
+};
 
-    EngineManager manager;
-    manager.reloadEngine();
-
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, &manager, &EngineManager::stop);
-
-    return app.exec();
-}
+#include "plugin.moc"

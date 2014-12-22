@@ -29,25 +29,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QtPlugin>
-#include "enginemanager.h"
+#ifndef DATASWITCHACTION_H
+#define DATASWITCHACTION_H
 
-Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
-Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
-Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
-Q_IMPORT_PLUGIN(PhoneBotConnmanPlugin)
+#include <action.h>
+#include <abstractmetadata.h>
 
-int main(int argc, char **argv)
+class DataSwitchActionPrivate;
+class DataSwitchAction : public Action
 {
-    QCoreApplication app (argc, argv);
-    app.setOrganizationName("phonebot");
-    app.setApplicationName("phonebotd");
+    Q_OBJECT
+    Q_PROPERTY(bool enable READ enable WRITE setEnable NOTIFY enableChanged)
+    PHONEBOT_METADATA(DataSwitchActionMeta)
+public:
+    explicit DataSwitchAction(QObject *parent = 0);
+    virtual ~DataSwitchAction();
+    bool enable() const;
+    void setEnable(bool enable);
+    bool execute(Rule *rule);
+Q_SIGNALS:
+    void enableChanged();
+private:
+    Q_DECLARE_PRIVATE(DataSwitchAction)
+    Q_PRIVATE_SLOT(d_func(), void slotServicesListChanged(const QStringList &))
+};
 
-    EngineManager manager;
-    manager.reloadEngine();
+class DataSwitchActionMeta: public AbstractMetaData
+{
+    Q_OBJECT
+public:
+    Q_INVOKABLE explicit DataSwitchActionMeta(QObject * parent = 0);
+    QString name() const;
+    QString description() const;
+    QString summary(const QVariantMap &properties) const;
+protected:
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
+};
 
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, &manager, &EngineManager::stop);
-
-    return app.exec();
-}
+#endif // DATASWITCHACTION_H

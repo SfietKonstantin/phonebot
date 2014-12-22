@@ -51,6 +51,7 @@
 Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
 Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
 Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
+Q_IMPORT_PLUGIN(PhoneBotConnmanPlugin)
 
 static const char *REASON = "Cannot be created";
 
