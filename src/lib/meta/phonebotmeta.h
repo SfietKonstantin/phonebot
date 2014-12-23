@@ -40,5 +40,10 @@
 // (like a Trigger, Condition or Action),
 // to get the class holding metadata
 #define PHONEBOT_METADATA(MetaClass) Q_CLASSINFO("meta", #MetaClass)
+// To be insert inside a QObject derived class
+// (like a Trigger, Condition or Action),
+// to notify that this class have no metadata
+// to be loaded
+#define PHONEBOT_NO_METADATA Q_CLASSINFO("meta", "NO_METADATA")
 
 #endif // PHONEBOTMETA_H

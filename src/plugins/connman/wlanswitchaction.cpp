@@ -29,123 +29,119 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "dataswitchaction.h"
+#include "wlanswitchaction.h"
 #include "action_p.h"
 #include <NetworkManagerFactory>
 #include <NetworkManager>
-#include <NetworkService>
+#include <NetworkTechnology>
 
 static const char *ENABLE_KEY = "enable";
 
-class DataSwitchActionPrivate: public ActionPrivate
+class WlanSwitchActionPrivate: public ActionPrivate
 {
 public:
-    explicit DataSwitchActionPrivate(Action *q);
-    void slotServicesListChanged(const QStringList &servicesList);
+    explicit WlanSwitchActionPrivate(Action *q);
+    void slotTechnologiesChanged();
     bool enable;
-    NetworkManager *networkManager;
-    NetworkService *networkService;
+    NetworkTechnology *wifiTechnology;
 private:
-    Q_DECLARE_PUBLIC(DataSwitchAction)
+    Q_DECLARE_PUBLIC(WlanSwitchAction)
 };
 
-DataSwitchActionPrivate::DataSwitchActionPrivate(Action *q)
+WlanSwitchActionPrivate::WlanSwitchActionPrivate(Action *q)
     : ActionPrivate(q)
     , enable(false)
-    , networkManager(0)
-    , networkService(0)
+    , wifiTechnology(0)
 {
 }
 
-void DataSwitchActionPrivate::slotServicesListChanged(const QStringList &servicesList)
+void WlanSwitchActionPrivate::slotTechnologiesChanged()
 {
-    Q_UNUSED(servicesList);
-    QStringList list = networkManager->servicesList("cellular");
-    if (list.count() == 1) {
-        networkService->setPath(list.first());
-    } else {
-        networkService->setPath(QString());;
-    }
+    wifiTechnology->setPath(NetworkManagerFactory::createInstance()->technologyPathForType("wifi"));
 }
 
-DataSwitchAction::DataSwitchAction(QObject *parent)
-    : Action(*(new DataSwitchActionPrivate(this)), parent)
+WlanSwitchAction::WlanSwitchAction(QObject *parent)
+    : Action(*(new WlanSwitchActionPrivate(this)), parent)
 {
-    Q_D(DataSwitchAction);
-    d->networkManager = NetworkManagerFactory::createInstance();
-    d->networkService = new NetworkService(this);
-    connect(d->networkManager, SIGNAL(servicesListChanged(const QStringList&)),
-            this, SLOT(slotServicesListChanged(const QStringList &)));
+    Q_D(WlanSwitchAction);
+    NetworkManager *networkManager = NetworkManagerFactory::createInstance();
+    d->wifiTechnology = new NetworkTechnology(this);
+    d->wifiTechnology->setPath(networkManager->technologyPathForType("wifi"));
+    connect(networkManager, SIGNAL(technologiesChanged()), this, SLOT(slotTechnologiesChanged()));
+    connect(networkManager, SIGNAL(technologiesEnabledChanged()), this, SLOT(slotTechnologiesChanged()));
 }
 
-DataSwitchAction::~DataSwitchAction()
+WlanSwitchAction::~WlanSwitchAction()
 {
-    Q_D(DataSwitchAction);
-    d->networkService->deleteLater();
 }
 
-bool DataSwitchAction::enable() const
+bool WlanSwitchAction::enable() const
 {
-    Q_D(const DataSwitchAction);
+    Q_D(const WlanSwitchAction);
     return d->enable;
 }
 
-void DataSwitchAction::setEnable(bool enable)
+void WlanSwitchAction::setEnable(bool enable)
 {
-    Q_D(DataSwitchAction);
+    Q_D(WlanSwitchAction);
     if (d->enable != enable) {
         d->enable = enable;
         emit enableChanged();
     }
 }
 
-bool DataSwitchAction::execute(Rule *rule)
+bool WlanSwitchAction::execute(Rule *rule)
 {
     Q_UNUSED(rule);
-    Q_D(DataSwitchAction);
-    if (d->networkService->path().isEmpty()) {
+    Q_D(WlanSwitchAction);
+    qDebug() << d->wifiTechnology->path();
+    if (d->wifiTechnology->path().isEmpty()) {
         return false;
     }
 
-    if (!d->networkService->favorite()) {
+    qDebug() << d->wifiTechnology->tethering();
+    qDebug() << d->wifiTechnology->powered();
+    // Don't interrupt tethering
+    if (d->wifiTechnology->tethering()) {
         return false;
     }
 
-    d->networkService->setAutoConnect(d->enable);
+    d->wifiTechnology->setPowered(d->enable);
     return true;
 }
 
-DataSwitchActionMeta::DataSwitchActionMeta(QObject *parent)
+WlanSwitchActionMeta::WlanSwitchActionMeta(QObject *parent)
     : AbstractMetaData(parent)
 {
 }
 
-QString DataSwitchActionMeta::name() const
+QString WlanSwitchActionMeta::name() const
 {
-    return tr("Data switch");
+    return tr("WLAN switch");
 }
 
-QString DataSwitchActionMeta::description() const
+QString WlanSwitchActionMeta::description() const
 {
-    return tr("This action allows to enable / disable data.");
+    return tr("This action allows to enable / disable WLAN.");
 }
 
-QString DataSwitchActionMeta::summary(const QVariantMap &properties) const
+QString WlanSwitchActionMeta::summary(const QVariantMap &properties) const
 {
     bool enable = properties.value(ENABLE_KEY).toBool();
     if (enable) {
-        return tr("Enable data");
+        return tr("Enable WLAN");
     } else {
-        return tr("Disable data");
+        return tr("Disable WLAN");
     }
 }
 
-MetaProperty * DataSwitchActionMeta::getProperty(const QString &property, QObject *parent) const
+MetaProperty * WlanSwitchActionMeta::getProperty(const QString &property, QObject *parent) const
 {
     if (property == ENABLE_KEY) {
-        return MetaProperty::create(property, MetaProperty::Bool, tr("Switch data"), parent);
+        return MetaProperty::create(property, MetaProperty::Bool, tr("Switch WLAN"), parent);
     }
     return 0;
 }
 
-#include "moc_dataswitchaction.cpp"
+#include "moc_wlanswitchaction.cpp"
+

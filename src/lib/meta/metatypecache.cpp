@@ -43,6 +43,8 @@ static const char *ACTION_META = "Action";
 static const char *JSCONDITION_META  ="JsCondition";
 static const char *JSACTION_META  ="JsAction";
 
+static const char *NO_METADATA_MACRO = "NO_METADATA";
+
 struct SortingMetaDataInfo
 {
     QString type;
@@ -256,6 +258,10 @@ void MetaTypeCachePrivate::populateCacheForType(const QQmlType *type, const QStr
 
     QMetaClassInfo metaClassInfo = componentMeta->classInfo(metaClassInfoIndex);
     QByteArray metaNameByteArray (metaClassInfo.value());
+    if (metaNameByteArray == NO_METADATA_MACRO) {
+        return;
+    }
+
     metaNameByteArray.append("*");
     const char *metaName = QMetaObject::normalizedType(metaNameByteArray).constData();
 

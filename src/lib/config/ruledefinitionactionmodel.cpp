@@ -194,8 +194,11 @@ RuleDefinitionActionModel * RuleDefinitionActionModel::clone(const RuleDefinitio
 {
     RuleDefinitionActionModel *cloned = new RuleDefinitionActionModel(parent);
     foreach (RuleDefinitionActionModelData *item, other->d_ptr->m_data) {
-        RuleDefinitionActionModelData *clonedItem = new RuleDefinitionActionModelData;
-        clonedItem->component = RuleComponentModel::clone(item->component, cloned);
+        RuleDefinitionActionModelData *clonedItem = 0;
+        if (item) {
+            clonedItem = new RuleDefinitionActionModelData;
+            clonedItem->component = RuleComponentModel::clone(item->component, cloned);
+        }
         cloned->d_ptr->m_data.append(clonedItem);
     }
     return cloned;

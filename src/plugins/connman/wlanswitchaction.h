@@ -29,42 +29,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef RULESMODEL_H
-#define RULESMODEL_H
+#ifndef WLANSWITCHACTION_H
+#define WLANSWITCHACTION_H
 
-#include <QtCore/QAbstractListModel>
-#include "ruledefinition.h"
-#include "proxy.h"
+#include <action.h>
+#include <abstractmetadata.h>
 
-class RulesModelData;
-class RulesModel : public QAbstractListModel
+class WlanSwitchActionPrivate;
+class WlanSwitchAction : public Action
 {
     Q_OBJECT
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_PROPERTY(bool enable READ enable WRITE setEnable NOTIFY enableChanged)
+    PHONEBOT_METADATA(WlanSwitchActionMeta)
 public:
-    enum Roles {
-        NameRole,
-        RuleRole,
-        ValidRole
-    };
-    explicit RulesModel(QObject *parent = 0);
-    virtual ~RulesModel();
-    QHash<int, QByteArray> roleNames() const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    int count() const;
-    Q_INVOKABLE RuleDefinition * createRule();
-    Q_INVOKABLE RuleDefinition * createClonedRule(RuleDefinition *other);
-signals:
-    void countChanged();
-public slots:
-    void reload();
-    bool pushRule(int index, RuleDefinition *rule);
-    void discardRule(RuleDefinition *rule) const;
-    void removeRule(int index);
+    explicit WlanSwitchAction(QObject *parent = 0);
+    virtual ~WlanSwitchAction();
+    bool enable() const;
+    void setEnable(bool enable);
+    bool execute(Rule *rule);
+Q_SIGNALS:
+    void enableChanged();
 private:
-    OrgSfietKonstantinPhonebotInterface *m_proxy;
-    QList<RulesModelData *> m_data;
+    Q_DECLARE_PRIVATE(WlanSwitchAction)
+    Q_PRIVATE_SLOT(d_func(), void slotTechnologiesChanged())
 };
 
-#endif // RULESMODEL_H
+class WlanSwitchActionMeta: public AbstractMetaData
+{
+    Q_OBJECT
+public:
+    Q_INVOKABLE explicit WlanSwitchActionMeta(QObject * parent = 0);
+    QString name() const;
+    QString description() const;
+    QString summary(const QVariantMap &properties) const;
+protected:
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
+};
+
+#endif // WLANSWITCHACTION_H

@@ -43,6 +43,7 @@ struct RulesModelData
 {
     QString path;
     RuleDefinition *definition;
+    bool valid;
 };
 
 RulesModel::RulesModel(QObject *parent)
@@ -62,6 +63,7 @@ QHash<int, QByteArray> RulesModel::roleNames() const
     QHash<int, QByteArray> roles;
     roles.insert(NameRole, "name");
     roles.insert(RuleRole, "rule");
+    roles.insert(ValidRole, "valid");
     return roles;
 }
 
@@ -85,6 +87,9 @@ QVariant RulesModel::data(const QModelIndex &index, int role) const
         break;
     case RuleRole:
         return QVariant::fromValue(data->definition);
+        break;
+    case ValidRole:
+        return QVariant::fromValue(data->valid);
         break;
     default:
         return QVariant();
@@ -157,6 +162,8 @@ void RulesModel::reload()
 
     QStringList rules = m_proxy->Rules();
     foreach (const QString &rule, rules) {
+        bool valid = true;
+
         // Parse rule
         QmlDocument::Ptr doc = QmlDocument::create(rule);
 
@@ -188,6 +195,7 @@ void RulesModel::reload()
                     triggerType = trigger->type();
                     RuleComponentModel *triggerComponent = ruleDefinition->createTempComponent(PhoneBotHelper::Trigger, -1, triggerType);
                     populateRuleComponentModel(triggerComponent, trigger, mappers);
+                    valid = triggerComponent;
                 }
             }
 
@@ -198,6 +206,7 @@ void RulesModel::reload()
                     conditionType = condition->type();
                     RuleComponentModel *conditionComponent = ruleDefinition->createTempComponent(PhoneBotHelper::Condition, -1, conditionType);
                     populateRuleComponentModel(conditionComponent, condition, mappers);
+                    valid = valid && conditionComponent;
                 }
             }
 
@@ -216,6 +225,7 @@ void RulesModel::reload()
                                                                                        index, action->type());
                         populateRuleComponentModel(actionModel, action, mappers);
                         actions->saveComponent(index);
+                        valid = valid && actionModel;
                     }
                 }
             }
@@ -224,6 +234,7 @@ void RulesModel::reload()
             RulesModelData *data = new RulesModelData;
             data->path = rule;
             data->definition = ruleDefinition;
+            data->valid = valid;
             m_data.append(data);
         }
     }

@@ -50,7 +50,7 @@ ListItem {
             anchors.right: parent.right; anchors.rightMargin: Theme.paddingLarge
             color: !container.pressed ? Theme.primaryColor : Theme.highlightColor
             wrapMode: container.wrap ? Text.WordWrap : Text.NoWrap
-            truncationMode: container.wrap ? TruncationModel.None : TruncationMode.Fade
+            truncationMode: container.wrap ? TruncationMode.None : TruncationMode.Fade
         }
 
         Label {
@@ -61,7 +61,7 @@ ListItem {
             font.pixelSize: Theme.fontSizeSmall
             color: !container.pressed ? Theme.secondaryColor : Theme.secondaryHighlightColor
             wrapMode: container.wrap ? Text.WordWrap : Text.NoWrap
-            truncationMode: container.wrap ? TruncationModel.None : TruncationMode.Fade
+            truncationMode: container.wrap ? TruncationMode.None : TruncationMode.Fade
         }
     }
 }

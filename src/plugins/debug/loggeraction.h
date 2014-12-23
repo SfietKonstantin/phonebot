@@ -33,10 +33,12 @@
 #define LOGGERACTION_H
 
 #include <action.h>
+#include <phonebotmeta.h>
 
 class LoggerAction : public Action
 {
     Q_OBJECT
+    PHONEBOT_NO_METADATA
 public:
     explicit LoggerAction(QObject *parent = 0);
     bool execute(Rule *rule);

@@ -140,8 +140,8 @@ void RuleComponentsModel::setType(PhoneBotHelper::ComponentType type)
             item->name = meta->name();
             item->description = meta->description();
             items.append(item);
-            d->appendData(items);
         }
+        d->appendData(items);
     }
 }
 

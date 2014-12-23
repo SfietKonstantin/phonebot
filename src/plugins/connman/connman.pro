@@ -8,10 +8,12 @@ INCLUDEPATH += ../../lib/core \
 
 CONFIG += plugin static
 
-HEADERS += dataswitchaction.h
+HEADERS += dataswitchaction.h \
+    wlanswitchaction.h
 
 SOURCES = plugin.cpp \
-    dataswitchaction.cpp
+    dataswitchaction.cpp \
+    wlanswitchaction.cpp
 
 include(../../3rdparty/libnemomw/connman/connman-include.pri)
 

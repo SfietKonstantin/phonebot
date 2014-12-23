@@ -72,6 +72,8 @@ int main(int argc, char *argv[])
     QGuiApplication *app = SailfishApp::application(argc, argv);
 #else
     QGuiApplication *app = new QGuiApplication(argc, argv);
+    app->setOrganizationName("harbour-phonebot");
+    app->setApplicationName("harbour-phonebot");
 #endif
 
     // Register types

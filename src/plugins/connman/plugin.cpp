@@ -32,6 +32,7 @@
 #include <phonebotextensionplugin.h>
 #include <QtQml/qqml.h>
 #include "dataswitchaction.h"
+#include "wlanswitchaction.h"
 
 class PhoneBotConnmanPlugin: public PhoneBotExtensionPlugin
 {
@@ -42,8 +43,8 @@ public:
     {
         qmlRegisterType<DataSwitchAction>("org.SfietKonstantin.phonebot.connman", 1, 0, "DataSwitchAction");
         qRegisterMetaType<DataSwitchActionMeta *>();
-//        qmlRegisterType<WeekDayCondition>("org.SfietKonstantin.phonebot.time", 1, 0, "WeekDayCondition");
-//        qRegisterMetaType<WeekDayConditionMeta *>();
+        qmlRegisterType<WlanSwitchAction>("org.SfietKonstantin.phonebot.connman", 1, 0, "WlanSwitchAction");
+        qRegisterMetaType<WlanSwitchActionMeta *>();
     }
 };
 

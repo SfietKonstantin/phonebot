@@ -33,12 +33,14 @@
 #define DEBUGTRIGGER_H
 
 #include <trigger.h>
+#include <phonebotmeta.h>
 
 class DebugTriggerPrivate;
 class DebugTrigger : public Trigger
 {
     Q_OBJECT
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
+    PHONEBOT_NO_METADATA
 public:
     explicit DebugTrigger(QObject *parent = 0);
     virtual ~DebugTrigger();

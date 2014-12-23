@@ -106,9 +106,13 @@ Page {
             text: model.name == "" ? qsTr("Noname rule %1").arg(model.index + 1) : model.name
             secondaryText: formatRuleSecondary()
             onClicked: {
-                var rule = rulesModel.createClonedRule(model.rule)
-                pageStack.push(Qt.resolvedUrl("RuleDialog.qml"),
-                               {model: rulesModel, index: model.index, rule: rule, add: false})
+                if (model.valid) {
+                    var rule = rulesModel.createClonedRule(model.rule)
+                    pageStack.push(Qt.resolvedUrl("RuleDialog.qml"),
+                                   {model: rulesModel, index: model.index, rule: rule, add: false})
+                } else {
+                    // TODO: display a page full of code ?
+                }
             }
             onPressAndHold: {
                 rule.showMenu()

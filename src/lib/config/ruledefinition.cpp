@@ -74,7 +74,6 @@ void RuleDefinitionPrivate::saveComponent(PhoneBotHelper::ComponentType type)
             component->deleteLater();
         }
         components.insert(type, newComponent);
-        tempComponents.remove(type);
 
         switch (type) {
         case PhoneBotHelper::Trigger:
@@ -87,6 +86,7 @@ void RuleDefinitionPrivate::saveComponent(PhoneBotHelper::ComponentType type)
             break;
         }
     }
+    tempComponents.remove(type);
 }
 
 
