@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Zeta Sagittarii <zeta@sagittarii.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,26 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QtPlugin>
-#include "enginemanager.h"
+#include <phonebotextensionplugin.h>
+#include <QtQml/qqml.h>
+#include "ambienceaction.h"
 
-Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
-Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
-Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
-Q_IMPORT_PLUGIN(PhoneBotConnmanPlugin)
-Q_IMPORT_PLUGIN(PhoneBotAmbiencePlugin)
-
-int main(int argc, char **argv)
+class PhoneBotAmbiencePlugin: public PhoneBotExtensionPlugin
 {
-    QCoreApplication app (argc, argv);
-    app.setOrganizationName("phonebot");
-    app.setApplicationName("phonebotd");
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org.SfietKonstantin.phonebot.PhoneBotExtensionInterface")
+public:
+    void registerTypes()
+    {
+        qmlRegisterType<AmbienceAction>("org.SfietKonstantin.phonebot.ambience", 1, 0, "AmbienceAction");
+    }
+};
 
-    EngineManager manager;
-    manager.reloadEngine();
-
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, &manager, &EngineManager::stop);
-
-    return app.exec();
-}
+#include "plugin.moc"

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Zeta Sagittarii <zeta@sagittarii.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,26 +29,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QtPlugin>
-#include "enginemanager.h"
+#ifndef AMBIANCEACTION_H
+#define AMBIANCEACTION_H
 
-Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
-Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
-Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
-Q_IMPORT_PLUGIN(PhoneBotConnmanPlugin)
-Q_IMPORT_PLUGIN(PhoneBotAmbiencePlugin)
+#include <action.h>
+#include <abstractmetadata.h>
 
-int main(int argc, char **argv)
+class AmbienceActionPrivate;
+class AmbienceAction : public Action
 {
-    QCoreApplication app (argc, argv);
-    app.setOrganizationName("phonebot");
-    app.setApplicationName("phonebotd");
+    Q_OBJECT
+    Q_PROPERTY(QString ambience READ ambience WRITE setAmbience NOTIFY ambienceChanged)
 
-    EngineManager manager;
-    manager.reloadEngine();
+public:
+    explicit AmbienceAction(QObject *parent = 0);
+    virtual ~AmbienceAction();
+    QString ambience() const;
+    void setAmbience(const QString &ambience);
+    bool execute(Rule *rule);
+Q_SIGNALS:
+    void ambienceChanged();
+private:
+    Q_DECLARE_PRIVATE(AmbienceAction)
+};
 
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, &manager, &EngineManager::stop);
-
-    return app.exec();
-}
+#endif // AMBIANCEACTION_H

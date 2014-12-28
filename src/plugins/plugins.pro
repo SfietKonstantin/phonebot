@@ -1,2 +1,2 @@
 TEMPLATE = subdirs
-SUBDIRS = debug profile time connman
+SUBDIRS = debug profile time connman ambience
