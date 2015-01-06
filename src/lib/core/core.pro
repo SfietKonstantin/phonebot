@@ -24,8 +24,7 @@ HEADERS = rule.h \
     jscondition.h \
     abstractmapper.h \
     abstractmapper_p.h \
-    timemapper.h \
-    basetype.h
+    timemapper.h
 
 SOURCES = rule.cpp \
     trigger.cpp \

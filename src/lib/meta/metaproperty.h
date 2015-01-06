@@ -35,7 +35,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QMetaType>
-#include <basetype.h>
 #include "choicemodel.h"
 
 class MetaPropertyPrivate;
@@ -51,11 +50,11 @@ class MetaProperty: public QObject
     Q_ENUMS(SubType)
 public:
     enum Type {
-        String = StringType,
-        Int = IntType,
-        Double = DoubleType,
-        Bool = BoolType,
-        Time = TimeType
+        String = QMetaType::QString,
+        Int = QMetaType::Int,
+        Double = QMetaType::Double,
+        Bool = QMetaType::Bool,
+        Time = QMetaType::QTime
     };
     enum SubType {
         NoSubType,

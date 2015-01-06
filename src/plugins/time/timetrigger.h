@@ -52,6 +52,7 @@ Q_SIGNALS:
 private:
     Q_DECLARE_PRIVATE(TimeTrigger)
     Q_PRIVATE_SLOT(d_func(), void slotTriggered())
+    Q_PRIVATE_SLOT(d_func(), void slotTimerTriggered())
 };
 
 class TimeTriggerMeta: public AbstractMetaData

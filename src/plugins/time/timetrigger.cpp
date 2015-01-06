@@ -33,43 +33,63 @@
 #include "trigger_p.h"
 #include <QtCore/QDate>
 #include <QtCore/QDebug>
+#include <QtCore/QTimer>
 #include <BackgroundJob>
 
 static const char *TIME_KEY = "time";
-static const int DELTA = 75000;
+static const int DELTA = 600000; // 10 minutes in msecs
+static const int PRECISE_TIMER_INTERVAL = 6000; // 6 secs in msecs
+static const int PRECISE_DELTA = 5000; // 10 secs in msecs
 
 class TimeTriggerPrivate: public TriggerPrivate
 {
 public:
     explicit TimeTriggerPrivate(Trigger *q);
     void slotTriggered();
+    void slotTimerTriggered();
     QTime time;
     QDate lastEmission;
     BackgroundJob *backgroundJob;
+    QTimer *timer;
 private:
     Q_DECLARE_PUBLIC(TimeTrigger)
 };
 
 TimeTriggerPrivate::TimeTriggerPrivate(Trigger *q)
-    : TriggerPrivate(q), backgroundJob(0)
+    : TriggerPrivate(q), backgroundJob(0), timer(0)
 {
 }
 
 void TimeTriggerPrivate::slotTriggered()
 {
-    Q_Q(TimeTrigger);
     backgroundJob->begin();
+    qDebug() << "Wake up time" << QTime::currentTime();
 
-    int delta = QTime::currentTime().msecsTo(time);
-    if (delta <= DELTA && delta > -DELTA) {
+    // If we need to be triggered (not last emission, timer not active
+    // and delta < 10 min, we start the timer, and don't finish the job
+    if (!timer->isActive() && lastEmission != QDate::currentDate()) {
+        int delta = QTime::currentTime().msecsTo(time);
+        if (delta >= 0 && delta < DELTA) {
+            timer->start();
+            return;
+        }
+    }
+    backgroundJob->finished();
+}
+
+void TimeTriggerPrivate::slotTimerTriggered()
+{
+    Q_Q(TimeTrigger);
+    int delta = time.msecsTo(QTime::currentTime());
+    if (delta >= -PRECISE_DELTA && delta < PRECISE_DELTA) {
         if (lastEmission != QDate::currentDate()) {
             lastEmission = QDate::currentDate(); // Ensure that the signal is emitted once per day
             qDebug() << "Triggered time:" << QTime::currentTime();
+            timer->stop();
             emit q->triggered();
+            backgroundJob->finished();
         }
     }
-
-    backgroundJob->finished();
 }
 
 TimeTrigger::~TimeTrigger()
@@ -85,9 +105,14 @@ TimeTrigger::TimeTrigger(QObject *parent) :
     d->backgroundJob = new DeclarativeBackgroundJob(this);
     d->backgroundJob->classBegin();
     d->backgroundJob->componentComplete();
-    d->backgroundJob->setFrequency(DeclarativeBackgroundJob::TwoAndHalfMinutes);
+    d->backgroundJob->setFrequency(DeclarativeBackgroundJob::TenMinutes);
     connect(d->backgroundJob, SIGNAL(triggered()), this, SLOT(slotTriggered()));
     d->backgroundJob->setEnabled(true);
+
+    d->timer = new QTimer(this);
+    d->timer->setSingleShot(false);
+    d->timer->setInterval(PRECISE_TIMER_INTERVAL);
+    connect(d->timer, SIGNAL(timeout()), this, SLOT(slotTimerTriggered()));
 }
 
 QTime TimeTrigger::time() const
