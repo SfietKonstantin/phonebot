@@ -31,7 +31,6 @@
 
 #include "ambienceaction.h"
 #include <action_p.h>
-#include <choicemodel.h>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusInterface>
 
@@ -44,9 +43,7 @@ class AmbienceActionPrivate: public ActionPrivate
 {
 public:
     explicit AmbienceActionPrivate(Action *q);
-
     bool setActiveAmbience(QString ambience);
-
     QString ambience;
 };
 
@@ -57,16 +54,13 @@ AmbienceActionPrivate::AmbienceActionPrivate(Action *q)
 
 bool AmbienceActionPrivate::setActiveAmbience(QString ambience)
 {
-    QDBusConnection connection = QDBusConnection::sessionBus();
-
-    QDBusInterface interface (DBUS_SERVICE, DBUS_PATH, DBUS_INTERFACE, connection);
+    QDBusInterface interface (DBUS_SERVICE, DBUS_PATH, DBUS_INTERFACE, QDBusConnection::sessionBus());
 
     // Call the ambience change method, with the path of the desired ambience (format = "file:///xxxxx")
     QDBusMessage result = interface.call(DBUS_METHOD_NAME, ambience);
 
-    if (result.type() == QDBusMessage::ErrorMessage)
-    {
-        qDebug() << __FUNCTION__ << "result.type() == QDBusMessage::ErrorMessage";
+    if (result.type() == QDBusMessage::ErrorMessage) {
+        qDebug() << "Calling ambienced returned error:" << result.errorName() << result.errorMessage();
         return false;
     }
 
