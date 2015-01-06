@@ -2,6 +2,7 @@ TEMPLATE = app
 TARGET = tst_parser
 
 QT = core qml testlib
+CONFIG += c++11
 
 include(../../config.pri)
 

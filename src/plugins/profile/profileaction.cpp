@@ -73,10 +73,11 @@ void ProfileAction::setProfile(const QString &profile)
     }
 }
 
-bool ProfileAction::execute(Rule *rule)
+bool ProfileAction::execute(Rule *rule, QString &error)
 {
     Q_D(ProfileAction);
     Q_UNUSED(rule);
+    Q_UNUSED(error);
     return d->profileObject->setActiveProfile(d->profile);
 }
 

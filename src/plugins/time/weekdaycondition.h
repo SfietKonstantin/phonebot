@@ -63,7 +63,7 @@ public:
     void setOnSaturday(bool onSaturday);
     bool isOnSunday() const;
     void setOnSunday(bool onSunday);
-    bool isValid(Rule *rule);
+    bool isValid(Rule *rule) const override;
 Q_SIGNALS:
     void onMondayChanged();
     void onTuesdayChanged();
@@ -81,11 +81,11 @@ class WeekDayConditionMeta: public AbstractMetaData
     Q_OBJECT
 public:
     Q_INVOKABLE explicit WeekDayConditionMeta(QObject * parent = 0);
-    QString name() const;
-    QString description() const;
-    QString summary(const QVariantMap &properties) const;
+    QString name() const override;
+    QString description() const override;
+    QString summary(const QVariantMap &properties) const override;
 protected:
-    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const override;
 };
 
 #endif // WEEKDAYCONDITION_H

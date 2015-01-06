@@ -44,7 +44,7 @@ public:
     explicit JsCondition(QObject *parent = 0);
     QJSValue condition() const;
     void setCondition(const QJSValue &condition);
-    bool isValid(Rule *rule) override;
+    bool isValid(Rule *rule) const override;
 Q_SIGNALS:
     void conditionChanged();
 private:

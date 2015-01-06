@@ -29,21 +29,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef ABSTRACTMAPPER_P_H
-#define ABSTRACTMAPPER_P_H
+#ifndef ILOGGER
+#define ILOGGER
 
-#include <QtCore/QVariant>
-
-class AbstractMapper;
-class AbstractMapperPrivate
+class ILogger
 {
 public:
-    explicit AbstractMapperPrivate(AbstractMapper *q);
-    QVariant value;
-protected:
-    AbstractMapper * const q_ptr;
-private:
-    Q_DECLARE_PUBLIC(AbstractMapper)
+
 };
 
-#endif // ABSTRACTMAPPER_P_H
+#endif // ILOGGER
+

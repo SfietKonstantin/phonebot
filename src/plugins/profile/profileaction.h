@@ -45,7 +45,7 @@ public:
     explicit ProfileAction(QObject *parent = 0);
     QString profile() const;
     void setProfile(const QString &profile);
-    bool execute(Rule *rule);
+    bool execute(Rule *rule, QString &error) override;
 Q_SIGNALS:
     void profileChanged();
 private:
@@ -57,11 +57,11 @@ class ProfileActionMeta: public AbstractMetaData
     Q_OBJECT
 public:
     Q_INVOKABLE explicit ProfileActionMeta(QObject * parent = 0);
-    QString name() const;
-    QString description() const;
-    QString summary(const QVariantMap &properties) const;
+    QString name() const override;
+    QString description() const override;
+    QString summary(const QVariantMap &properties) const override;
 protected:
-    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const override;
 };
 
 #endif // PROFILEACTION_H

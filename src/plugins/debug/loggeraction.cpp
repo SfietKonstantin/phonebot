@@ -62,8 +62,9 @@ LoggerAction::LoggerAction(QObject *parent) :
     QDir::root().mkpath(path);
 }
 
-bool LoggerAction::execute(Rule *rule)
+bool LoggerAction::execute(Rule *rule, QString &error)
 {
+    Q_UNUSED(error);
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QDir dir (path);
     QFile log (dir.absoluteFilePath("phonebot.log"));

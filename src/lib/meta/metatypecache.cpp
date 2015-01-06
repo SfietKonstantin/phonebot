@@ -279,7 +279,7 @@ void MetaTypeCachePrivate::populateCacheForType(const QQmlType *type, const QStr
     QObject *meta = componentMetaMeta->newInstance();
     if (!meta) {
         qWarning() << "Cannot get Phonebot metadata from" << componentType << ":"
-                   << "Phonebot metatype class " << metaName
+                   << "Phonebot metatype class" << metaName
                    << "don't have an invokable constructor and cannot be created.";
         return;
     }

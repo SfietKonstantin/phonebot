@@ -207,9 +207,9 @@ void WeekDayCondition::setOnSunday(bool onSunday)
     }
 }
 
-bool WeekDayCondition::isValid(Rule *rule)
+bool WeekDayCondition::isValid(Rule *rule) const
 {
-    Q_D(WeekDayCondition);
+    Q_D(const WeekDayCondition);
     Q_UNUSED(rule);
     int day = QDate::currentDate().dayOfWeek();
     return d->checkedDays.contains(day);

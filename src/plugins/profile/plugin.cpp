@@ -38,7 +38,7 @@ class PhoneBotProfilePlugin: public PhoneBotExtensionPlugin
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.SfietKonstantin.phonebot.PhoneBotExtensionInterface")
 public:
-    void registerTypes()
+    void registerTypes() override
     {
         qmlRegisterType<ProfileAction>("org.SfietKonstantin.phonebot.profile", 1, 0, "ProfileAction");
         qRegisterMetaType<ProfileActionMeta *>();

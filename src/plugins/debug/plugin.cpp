@@ -39,7 +39,7 @@ class PhoneBotDebugPlugin: public PhoneBotExtensionPlugin
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.SfietKonstantin.phonebot.PhoneBotExtensionInterface")
 public:
-    void registerTypes()
+    void registerTypes() override
     {
         qmlRegisterType<DebugTrigger>("org.SfietKonstantin.phonebot.debug", 1, 0, "DebugTrigger");
         qmlRegisterType<LoggerAction>("org.SfietKonstantin.phonebot.debug", 1, 0, "LoggerAction");

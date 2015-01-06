@@ -77,7 +77,7 @@ public:
     void setValid(bool valid) {
         m_valid = valid;
     }
-    bool isValid(Rule *rule) override
+    bool isValid(Rule *rule) const override
     {
         Q_UNUSED(rule)
         return m_valid;
@@ -91,9 +91,10 @@ class SimpleAction: public Action
     Q_OBJECT
 public:
     explicit SimpleAction(QObject *parent = 0) : Action(parent) {}
-    bool execute(Rule *rule) override
+    bool execute(Rule *rule, QString &error) override
     {
         Q_UNUSED(rule)
+        Q_UNUSED(error)
         emit executed();
         return true;
     }

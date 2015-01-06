@@ -39,7 +39,7 @@ class JsConditionPrivate: public ConditionPrivate
 {
 public:
     explicit JsConditionPrivate(Condition *q);
-    QJSValue condition;
+    mutable QJSValue condition;
 private:
     Q_DECLARE_PUBLIC(JsCondition)
 };
@@ -69,9 +69,9 @@ void JsCondition::setCondition(const QJSValue &condition)
     }
 }
 
-bool JsCondition::isValid(Rule *rule)
+bool JsCondition::isValid(Rule *rule) const
 {
-    Q_D(JsCondition);
+    Q_D(const JsCondition);
     if (!d->condition.isCallable()) {
         return false;
     }

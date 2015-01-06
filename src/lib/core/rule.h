@@ -39,7 +39,7 @@
 class Trigger;
 class Condition;
 class Action;
-class AbstractMapper;
+class Mapper;
 class RulePrivate;
 class Rule: public QObject, public QQmlParserStatus
 {
@@ -50,7 +50,7 @@ class Rule: public QObject, public QQmlParserStatus
     Q_PROPERTY(Trigger * trigger READ trigger WRITE setTrigger NOTIFY triggerChanged)
     Q_PROPERTY(Condition * condition READ condition WRITE setCondition NOTIFY conditionChanged)
     Q_PROPERTY(QQmlListProperty<Action> actions READ actions)
-    Q_PROPERTY(QQmlListProperty<AbstractMapper> mappers READ mappers)
+    Q_PROPERTY(QQmlListProperty<Mapper> mappers READ mappers)
 public:
     explicit Rule(QObject *parent = 0);
     virtual ~Rule();
@@ -65,12 +65,13 @@ public:
     Condition * condition() const;
     void setCondition(Condition *condition);
     QQmlListProperty<Action> actions();
-    QQmlListProperty<AbstractMapper> mappers();
+    QQmlListProperty<Mapper> mappers();
 Q_SIGNALS:
     void nameChanged();
     void enabledChanged();
     void triggerChanged();
     void conditionChanged();
+    void ruleExecuted(bool ok, const QStringList &errors);
 protected:
     QScopedPointer<RulePrivate> d_ptr;
 private:

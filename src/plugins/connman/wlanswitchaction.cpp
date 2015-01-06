@@ -90,12 +90,13 @@ void WlanSwitchAction::setEnable(bool enable)
     }
 }
 
-bool WlanSwitchAction::execute(Rule *rule)
+bool WlanSwitchAction::execute(Rule *rule, QString &error)
 {
     Q_UNUSED(rule);
     Q_D(WlanSwitchAction);
     qDebug() << "Wlan path:" << d->wifiTechnology->path();
     if (d->wifiTechnology->path().isEmpty()) {
+        error = tr("Technical issue: failed to find the WIFI network service");
         return false;
     }
 
@@ -104,6 +105,7 @@ bool WlanSwitchAction::execute(Rule *rule)
 
     // Don't interrupt tethering
     if (d->wifiTechnology->tethering()) {
+        error = tr("WIFI cannot be turned on or off when tethering");
         return false;
     }
 

@@ -49,7 +49,7 @@ public:
     void componentComplete() override;
     bool isEnabled() const;
     void setEnabled(bool enabled);
-    virtual bool execute(Rule *rule) = 0;
+    virtual bool execute(Rule *rule, QString &error) = 0;
 Q_SIGNALS:
     void enabledChanged();
 protected:

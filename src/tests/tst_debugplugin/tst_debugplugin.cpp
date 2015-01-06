@@ -43,24 +43,17 @@ class PongAction: public Action
 {
     Q_OBJECT
 public:
-    explicit PongAction(QObject *parent = 0);
-    bool execute(Rule *rule) override;
+    explicit PongAction(QObject *parent = 0) : Action(parent) {}
+    bool execute(Rule *rule, QString &error) override
+    {
+        Q_UNUSED(rule);
+        Q_UNUSED(error);
+        emit pong();
+        return true;
+    }
 Q_SIGNALS:
     void pong();
 };
-
-PongAction::PongAction(QObject *parent)
-    : Action(parent)
-{
-}
-
-bool PongAction::execute(Rule *rule)
-{
-    Q_UNUSED(rule)
-    emit pong();
-    return true;
-}
-
 
 class TstDebugPlugin : public QObject
 {

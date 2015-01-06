@@ -32,10 +32,10 @@
 #ifndef TIMEMAPPER_H
 #define TIMEMAPPER_H
 
-#include "abstractmapper.h"
+#include "mapper.h"
 
 class TimeMapperPrivate;
-class TimeMapper : public AbstractMapper
+class TimeMapper : public Mapper
 {
     Q_OBJECT
     Q_PROPERTY(int hour READ hour WRITE setHour NOTIFY hourChanged)

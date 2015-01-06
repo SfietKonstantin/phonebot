@@ -29,34 +29,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "abstractmapper.h"
-#include "abstractmapper_p.h"
+#ifndef MAPPER_H
+#define MAPPER_H
 
-AbstractMapperPrivate::AbstractMapperPrivate(AbstractMapper *q)
-    : q_ptr(q)
-{
-}
+#include <QtCore/QObject>
+#include <QtCore/QVariant>
 
-AbstractMapper::AbstractMapper(AbstractMapperPrivate &dd, QObject *parent)
-    : QObject(parent), d_ptr(&dd)
+class MapperPrivate;
+class Mapper : public QObject
 {
-}
+    Q_OBJECT
+    Q_PROPERTY(QVariant value READ value NOTIFY valueChanged)
+public:
+    virtual ~Mapper();
+    QVariant value() const;
+Q_SIGNALS:
+    void valueChanged();
+protected:
+    explicit Mapper(MapperPrivate &dd, QObject *parent);
+    void setValue(const QVariant &value);
+    QScopedPointer<MapperPrivate> d_ptr;
+private:
+    Q_DECLARE_PRIVATE(Mapper)
 
-AbstractMapper::~AbstractMapper()
-{
-}
+};
 
-QVariant AbstractMapper::value() const
-{
-    Q_D(const AbstractMapper);
-    return d->value;
-}
-
-void AbstractMapper::setValue(const QVariant &value)
-{
-    Q_D(AbstractMapper);
-    if (d->value != value) {
-        d->value = value;
-        emit valueChanged();
-    }
-}
+#endif // MAPPER_H

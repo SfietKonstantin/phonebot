@@ -2,6 +2,7 @@ TEMPLATE = app
 TARGET = phonebotd
 
 QT = core dbus qml
+CONFIG += c++11
 
 include(../../config.pri)
 include(../libs.pri)

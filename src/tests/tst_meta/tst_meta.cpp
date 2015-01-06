@@ -43,7 +43,7 @@ class TestCondition: public Condition
     Q_OBJECT
 public:
     explicit TestCondition(QObject *parent = 0) : Condition(parent) { }
-    bool isValid(Rule *rule) override
+    bool isValid(Rule *rule) const override
     {
         Q_UNUSED(rule);
         return false;
@@ -56,7 +56,7 @@ class TestCondition2: public Condition
     PHONEBOT_METADATA(MetaTestCondition2)
 public:
     explicit TestCondition2(QObject *parent = 0) : Condition(parent) {}
-    bool isValid(Rule *rule) override
+    bool isValid(Rule *rule) const override
     {
         Q_UNUSED(rule);
         return false;
@@ -69,7 +69,7 @@ class TestCondition3: public Condition
     PHONEBOT_METADATA(TestCondition3) // Error: the metadata refers to itself
 public:
     explicit TestCondition3(QObject *parent = 0) : Condition(parent) {}
-    bool isValid(Rule *rule) override
+    bool isValid(Rule *rule) const override
     {
         Q_UNUSED(rule);
         return false;
@@ -121,7 +121,7 @@ public:
     {
         Q_UNUSED(test)
     }
-    bool isValid(Rule *rule) override
+    bool isValid(Rule *rule) const override
     {
         Q_UNUSED(rule);
         return false;

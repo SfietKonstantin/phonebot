@@ -46,7 +46,7 @@ public:
     virtual ~WlanSwitchAction();
     bool enable() const;
     void setEnable(bool enable);
-    bool execute(Rule *rule);
+    bool execute(Rule *rule, QString &error) override;
 Q_SIGNALS:
     void enableChanged();
 private:
@@ -59,11 +59,11 @@ class WlanSwitchActionMeta: public AbstractMetaData
     Q_OBJECT
 public:
     Q_INVOKABLE explicit WlanSwitchActionMeta(QObject * parent = 0);
-    QString name() const;
-    QString description() const;
-    QString summary(const QVariantMap &properties) const;
+    QString name() const override;
+    QString description() const override;
+    QString summary(const QVariantMap &properties) const override;
 protected:
-    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const override;
 };
 
 #endif // WLANSWITCHACTION_H

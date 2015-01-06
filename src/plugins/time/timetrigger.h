@@ -60,11 +60,11 @@ class TimeTriggerMeta: public AbstractMetaData
     Q_OBJECT
 public:
     Q_INVOKABLE explicit TimeTriggerMeta(QObject * parent = 0);
-    QString name() const;
-    QString description() const;
-    QString summary(const QVariantMap &properties) const;
+    QString name() const override;
+    QString description() const override;
+    QString summary(const QVariantMap &properties) const override;
 protected:
-    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const override;
 };
 
 #endif // TIMETRIGGER_H

@@ -39,7 +39,7 @@ class PhoneBotConnmanPlugin: public PhoneBotExtensionPlugin
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.SfietKonstantin.phonebot.PhoneBotExtensionInterface")
 public:
-    void registerTypes()
+    void registerTypes() override
     {
         qmlRegisterType<DataSwitchAction>("org.SfietKonstantin.phonebot.connman", 1, 0, "DataSwitchAction");
         qRegisterMetaType<DataSwitchActionMeta *>();

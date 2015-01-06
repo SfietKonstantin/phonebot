@@ -2,6 +2,7 @@ TEMPLATE = app
 TARGET = harbour-phonebot
 
 QT = core gui qml quick dbus
+CONFIG += c++11
 
 !CONFIG(desktop) {
     CONFIG += sailfishapp

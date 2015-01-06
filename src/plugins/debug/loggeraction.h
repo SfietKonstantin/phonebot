@@ -41,7 +41,7 @@ class LoggerAction : public Action
     PHONEBOT_NO_METADATA
 public:
     explicit LoggerAction(QObject *parent = 0);
-    bool execute(Rule *rule);
+    bool execute(Rule *rule, QString &error) override;
 };
 
 #endif // LOGGERACTION_H

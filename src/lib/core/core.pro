@@ -6,7 +6,7 @@ TARGET = phonebot
 
 QT = core qml
 
-CONFIG += staticlib
+CONFIG += staticlib c++11
 
 include(../../config.pri)
 
@@ -24,9 +24,10 @@ HEADERS = rule.h \
     phonebotextensionplugin.h \
     jsaction.h \
     jscondition.h \
-    abstractmapper.h \
-    abstractmapper_p.h \
-    timemapper.h
+    mapper.h \
+    mapper_p.h \
+    timemapper.h \
+    ilogger.h
 
 SOURCES = rule.cpp \
     trigger.cpp \
@@ -36,5 +37,5 @@ SOURCES = rule.cpp \
     phonebotextensionplugin.cpp \
     jsaction.cpp \
     jscondition.cpp \
-    abstractmapper.cpp \
+    mapper.cpp \
     timemapper.cpp

@@ -49,7 +49,7 @@ class DummyCondition: public Condition
     Q_OBJECT
 public:
     explicit DummyCondition(QObject *parent = 0) : Condition(parent) {}
-    bool isValid(Rule *rule) override
+    bool isValid(Rule *rule) const override
     {
         Q_UNUSED(rule)
         return false;
@@ -61,9 +61,10 @@ class DummyAction: public Action
     Q_OBJECT
 public:
     explicit DummyAction(QObject *parent = 0) : Action(parent) {}
-    bool execute(Rule *rule) override
+    bool execute(Rule *rule, QString &error) override
     {
         Q_UNUSED(rule)
+        error = "Dummy error";
         return false;
     }
 };

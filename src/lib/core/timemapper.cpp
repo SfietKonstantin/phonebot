@@ -30,10 +30,10 @@
  */
 
 #include "timemapper.h"
-#include "abstractmapper_p.h"
+#include "mapper_p.h"
 #include <QtCore/QTime>
 
-class TimeMapperPrivate: public AbstractMapperPrivate
+class TimeMapperPrivate: public MapperPrivate
 {
 public:
     explicit TimeMapperPrivate(TimeMapper *q);
@@ -45,7 +45,7 @@ private:
 };
 
 TimeMapperPrivate::TimeMapperPrivate(TimeMapper *q)
-    : AbstractMapperPrivate(q)
+    : MapperPrivate(q)
     , hour(-1)
     , minute(-1)
 {
@@ -62,7 +62,7 @@ void TimeMapperPrivate::setTime()
 }
 
 TimeMapper::TimeMapper(QObject *parent) :
-    AbstractMapper(*(new TimeMapperPrivate(this)), parent)
+    Mapper(*(new TimeMapperPrivate(this)), parent)
 {
 }
 

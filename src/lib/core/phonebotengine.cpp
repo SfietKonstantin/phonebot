@@ -132,7 +132,7 @@ void PhoneBotEngine::registerTypes()
     qmlRegisterUncreatableType<Action>("org.SfietKonstantin.phonebot", 1, 0, "ActionBase", REASON);
     qmlRegisterType<JsAction>("org.SfietKonstantin.phonebot", 1, 0, "Action");
     qmlRegisterType<Rule>("org.SfietKonstantin.phonebot", 1, 0, "Rule");
-    qmlRegisterUncreatableType<AbstractMapper>("org.SfietKonstantin.phonebot", 1, 0, "Mapper", REASON);
+    qmlRegisterUncreatableType<Mapper>("org.SfietKonstantin.phonebot", 1, 0, "Mapper", REASON);
     qmlRegisterType<TimeMapper>("org.SfietKonstantin.phonebot", 1, 0, "TimeMapper");
 
     // Register static plugin paths

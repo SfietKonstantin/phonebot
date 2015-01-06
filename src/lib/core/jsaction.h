@@ -44,7 +44,7 @@ public:
     explicit JsAction(QObject *parent = 0);
     QJSValue action() const;
     void setAction(const QJSValue &action);
-    bool execute(Rule *rule) override;
+    bool execute(Rule *rule, QString &error) override;
 Q_SIGNALS:
     void actionChanged();
 private:

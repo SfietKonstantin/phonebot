@@ -43,10 +43,10 @@ public:
     static Action * actions_at(QQmlListProperty<Action> *list, int index);
     static void actions_clear(QQmlListProperty<Action> *list);
     static int actions_count(QQmlListProperty<Action> *list);
-    static void mappers_append(QQmlListProperty<AbstractMapper> *list, AbstractMapper *mapper);
-    static AbstractMapper * mappers_at(QQmlListProperty<AbstractMapper> *list, int index);
-    static void mappers_clear(QQmlListProperty<AbstractMapper> *list);
-    static int mappers_count(QQmlListProperty<AbstractMapper> *list);
+    static void mappers_append(QQmlListProperty<Mapper> *list, Mapper *mapper);
+    static Mapper * mappers_at(QQmlListProperty<Mapper> *list, int index);
+    static void mappers_clear(QQmlListProperty<Mapper> *list);
+    static int mappers_count(QQmlListProperty<Mapper> *list);
     void slotTriggered();
     QString name;
     bool enabled;
@@ -54,7 +54,7 @@ public:
     QMetaObject::Connection triggerConnection;
     Condition * condition;
     QList<Action *> actions;
-    QList<AbstractMapper *> mappers;
+    QList<Mapper *> mappers;
 protected:
     Rule * const q_ptr;
 private:

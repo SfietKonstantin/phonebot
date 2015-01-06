@@ -29,23 +29,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <phonebotextensionplugin.h>
-#include <QtQml/qqml.h>
-#include "timetrigger.h"
-#include "weekdaycondition.h"
+#ifndef MAPPER_P_H
+#define MAPPER_P_H
 
-class PhoneBotTimePlugin: public PhoneBotExtensionPlugin
+#include <QtCore/QVariant>
+
+class Mapper;
+class MapperPrivate
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.SfietKonstantin.phonebot.PhoneBotExtensionInterface")
 public:
-    void registerTypes() override
-    {
-        qmlRegisterType<TimeTrigger>("org.SfietKonstantin.phonebot.time", 1, 0, "TimeTrigger");
-        qRegisterMetaType<TimeTriggerMeta *>();
-        qmlRegisterType<WeekDayCondition>("org.SfietKonstantin.phonebot.time", 1, 0, "WeekDayCondition");
-        qRegisterMetaType<WeekDayConditionMeta *>();
-    }
+    explicit MapperPrivate(Mapper *q);
+    QVariant value;
+protected:
+    Mapper * const q_ptr;
+private:
+    Q_DECLARE_PUBLIC(Mapper)
 };
 
-#include "plugin.moc"
+#endif // MAPPER_P_H

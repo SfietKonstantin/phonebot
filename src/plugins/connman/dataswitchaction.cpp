@@ -99,18 +99,20 @@ void DataSwitchAction::setEnable(bool enable)
     }
 }
 
-bool DataSwitchAction::execute(Rule *rule)
+bool DataSwitchAction::execute(Rule *rule, QString &error)
 {
     Q_UNUSED(rule);
     Q_D(DataSwitchAction);
     qDebug() << "Data path:" << d->networkService->path();
     if (d->networkService->path().isEmpty()) {
+        error = tr("Technical issue: failed to find the data network service");
         return false;
     }
 
     qDebug() << "Data favorite:" << d->networkService->favorite();
     qDebug() << "Data auto-connect:" << d->networkService->autoConnect();
     if (!d->networkService->favorite()) {
+        error = tr("Technical issue: the data network service is not in the favorites");
         return false;
     }
 

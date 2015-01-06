@@ -69,7 +69,7 @@ void JsAction::setAction(const QJSValue &action)
     }
 }
 
-bool JsAction::execute(Rule *rule)
+bool JsAction::execute(Rule *rule, QString &error)
 {
     Q_D(JsAction);
     if (!d->action.isCallable()) {
@@ -89,6 +89,9 @@ bool JsAction::execute(Rule *rule)
     bool ok = true;
     if (returned.isBool()) {
         ok = returned.toBool();
+    } else if (returned.isError()) {
+        ok = false;
+        error = returned.toString();
     }
     return ok;
 }

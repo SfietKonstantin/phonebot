@@ -2,6 +2,7 @@ TEMPLATE = app
 TARGET = tst_meta
 
 QT = core dbus qml testlib
+CONFIG += c++11
 
 include(../../config.pri)
 

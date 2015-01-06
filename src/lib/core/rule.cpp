@@ -71,7 +71,7 @@ int RulePrivate::actions_count(QQmlListProperty<Action> *list)
     return rule->d_func()->actions.count();
 }
 
-void RulePrivate::mappers_append(QQmlListProperty<AbstractMapper> *list, AbstractMapper *mapper)
+void RulePrivate::mappers_append(QQmlListProperty<Mapper> *list, Mapper *mapper)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
     Q_ASSERT(rule);
@@ -80,7 +80,7 @@ void RulePrivate::mappers_append(QQmlListProperty<AbstractMapper> *list, Abstrac
     }
 }
 
-AbstractMapper * RulePrivate::mappers_at(QQmlListProperty<AbstractMapper> *list, int index)
+Mapper * RulePrivate::mappers_at(QQmlListProperty<Mapper> *list, int index)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
     Q_ASSERT(rule);
@@ -88,14 +88,14 @@ AbstractMapper * RulePrivate::mappers_at(QQmlListProperty<AbstractMapper> *list,
     return rule->d_func()->mappers.at(index);
 }
 
-void RulePrivate::mappers_clear(QQmlListProperty<AbstractMapper> *list)
+void RulePrivate::mappers_clear(QQmlListProperty<Mapper> *list)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
     Q_ASSERT(rule);
     rule->d_func()->mappers.clear();
 }
 
-int RulePrivate::mappers_count(QQmlListProperty<AbstractMapper> *list)
+int RulePrivate::mappers_count(QQmlListProperty<Mapper> *list)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
     Q_ASSERT(rule);
@@ -117,13 +117,21 @@ void RulePrivate::slotTriggered()
         }
     }
 
+    bool executionOk = true;
+    QStringList errors;
     if (ok) {
         for (Action *action : actions) {
+            QString error;
             if (action->isEnabled()) {
-                action->execute(q);
+                if (!action->execute(q, error)) {
+                    executionOk = false;
+                    errors.append(error);
+                }
             }
         }
     }
+
+    emit q->ruleExecuted(executionOk, errors);
 }
 
 Rule::Rule(QObject *parent)
@@ -221,13 +229,13 @@ QQmlListProperty<Action> Rule::actions()
                                     &RulePrivate::actions_clear);
 }
 
-QQmlListProperty<AbstractMapper> Rule::mappers()
+QQmlListProperty<Mapper> Rule::mappers()
 {
-    return QQmlListProperty<AbstractMapper>(this, nullptr,
-                                            &RulePrivate::mappers_append,
-                                            &RulePrivate::mappers_count,
-                                            &RulePrivate::mappers_at,
-                                            &RulePrivate::mappers_clear);
+    return QQmlListProperty<Mapper>(this, nullptr,
+                                    &RulePrivate::mappers_append,
+                                    &RulePrivate::mappers_count,
+                                    &RulePrivate::mappers_at,
+                                    &RulePrivate::mappers_clear);
 }
 
 #include "moc_rule.cpp"

@@ -42,7 +42,6 @@ class PhoneBotExtensionPlugin : public QObject, public PhoneBotExtensionInterfac
 public:
     explicit PhoneBotExtensionPlugin(QObject *parent = 0);
     virtual ~PhoneBotExtensionPlugin();
-    virtual void registerTypes() = 0;
 };
 
 #endif // PHONEBOTEXTENSIONPLUGIN_H
