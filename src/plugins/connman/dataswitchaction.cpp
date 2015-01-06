@@ -103,10 +103,13 @@ bool DataSwitchAction::execute(Rule *rule)
 {
     Q_UNUSED(rule);
     Q_D(DataSwitchAction);
+    qDebug() << "Data path:" << d->networkService->path();
     if (d->networkService->path().isEmpty()) {
         return false;
     }
 
+    qDebug() << "Data favorite:" << d->networkService->favorite();
+    qDebug() << "Data auto-connect:" << d->networkService->autoConnect();
     if (!d->networkService->favorite()) {
         return false;
     }

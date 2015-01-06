@@ -94,13 +94,14 @@ bool WlanSwitchAction::execute(Rule *rule)
 {
     Q_UNUSED(rule);
     Q_D(WlanSwitchAction);
-    qDebug() << d->wifiTechnology->path();
+    qDebug() << "Wlan path:" << d->wifiTechnology->path();
     if (d->wifiTechnology->path().isEmpty()) {
         return false;
     }
 
-    qDebug() << d->wifiTechnology->tethering();
-    qDebug() << d->wifiTechnology->powered();
+    qDebug() << "Wlan tethering:" << d->wifiTechnology->tethering();
+    qDebug() << "Wlan powered:" << d->wifiTechnology->powered();
+
     // Don't interrupt tethering
     if (d->wifiTechnology->tethering()) {
         return false;
