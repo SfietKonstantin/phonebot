@@ -139,7 +139,7 @@ QString WlanSwitchActionMeta::summary(const QVariantMap &properties) const
 MetaProperty * WlanSwitchActionMeta::getProperty(const QString &property, QObject *parent) const
 {
     if (property == ENABLE_KEY) {
-        return MetaProperty::create(property, MetaProperty::Bool, tr("Switch WLAN"), parent);
+        return MetaProperty::createBool(property, tr("Switch WLAN"), parent);
     }
     return 0;
 }

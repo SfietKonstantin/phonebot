@@ -146,7 +146,7 @@ QString DataSwitchActionMeta::summary(const QVariantMap &properties) const
 MetaProperty * DataSwitchActionMeta::getProperty(const QString &property, QObject *parent) const
 {
     if (property == ENABLE_KEY) {
-        return MetaProperty::create(property, MetaProperty::Bool, tr("Switch data"), parent);
+        return MetaProperty::createBool(property, tr("Switch data"), parent);
     }
     return 0;
 }

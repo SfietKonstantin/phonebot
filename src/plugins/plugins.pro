@@ -1,2 +1,7 @@
 TEMPLATE = subdirs
-SUBDIRS = debug profile time connman ambience
+SUBDIRS = debug \
+    profile \
+    time \
+    connman \
+    ambience \
+    launch

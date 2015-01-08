@@ -29,27 +29,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QtPlugin>
-#include "enginemanager.h"
+import QtQuick 2.0
+import Sailfish.Silica 1.0
 
-Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
-Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
-Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
-Q_IMPORT_PLUGIN(PhoneBotConnmanPlugin)
-Q_IMPORT_PLUGIN(PhoneBotAmbiencePlugin)
-Q_IMPORT_PLUGIN(PhoneBotLaunchPlugin)
+Dialog {
+    property QtObject component
+    property int index
 
-int main(int argc, char **argv)
-{
-    QCoreApplication app (argc, argv);
-    app.setOrganizationName("phonebot");
-    app.setApplicationName("phonebotd");
+//    onAccepted: {
+//        component.setValue(index, time)
+//    }
 
-    EngineManager manager;
-    manager.reloadEngine();
 
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, &manager, &EngineManager::stop);
 
-    return app.exec();
+
 }

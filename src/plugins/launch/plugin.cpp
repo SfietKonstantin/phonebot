@@ -29,27 +29,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QtPlugin>
-#include "enginemanager.h"
+#include <phonebotextensionplugin.h>
+#include <QtQml/qqml.h>
+#include "openurlaction.h"
+#include "launchapplicationaction.h"
 
-Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
-Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
-Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
-Q_IMPORT_PLUGIN(PhoneBotConnmanPlugin)
-Q_IMPORT_PLUGIN(PhoneBotAmbiencePlugin)
-Q_IMPORT_PLUGIN(PhoneBotLaunchPlugin)
-
-int main(int argc, char **argv)
+class PhoneBotLaunchPlugin: public PhoneBotExtensionPlugin
 {
-    QCoreApplication app (argc, argv);
-    app.setOrganizationName("phonebot");
-    app.setApplicationName("phonebotd");
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org.SfietKonstantin.phonebot.PhoneBotExtensionInterface")
+public:
+    void registerTypes()
+    {
+        qmlRegisterType<OpenUrlAction>("org.SfietKonstantin.phonebot.launch", 1, 0, "OpenUrlAction");
+        qRegisterMetaType<OpenUrlActionMeta *>();
+        qmlRegisterType<LaunchApplicationAction>("org.SfietKonstantin.phonebot.launch", 1, 0, "LaunchApplicationAction");
+        qRegisterMetaType<LaunchApplicationActionMeta *>();
+    }
+};
 
-    EngineManager manager;
-    manager.reloadEngine();
-
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, &manager, &EngineManager::stop);
-
-    return app.exec();
-}
+#include "plugin.moc"

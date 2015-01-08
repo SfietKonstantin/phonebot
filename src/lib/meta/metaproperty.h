@@ -58,7 +58,8 @@ public:
     };
     enum SubType {
         NoSubType,
-        ChoiceSubType
+        ChoiceSubType,
+        ApplicationSubType
     };
 
     explicit MetaProperty(QObject *parent = 0);
@@ -77,6 +78,8 @@ public:
                                      QObject *parent = 0);
     static MetaProperty * createChoice(const QString &name, const QString &description,
                                        ChoiceModel *choice, QObject *parent = 0);
+    static MetaProperty * createApplication(const QString &name, const QString &description,
+                                            QObject *parent = 0);
     QString name() const;
     Type type() const;
     SubType subType() const;

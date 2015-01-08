@@ -29,27 +29,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QtPlugin>
-#include "enginemanager.h"
+#ifndef LAUNCHAPPLICATIONACTION_H
+#define LAUNCHAPPLICATIONACTION_H
 
-Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
-Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
-Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
-Q_IMPORT_PLUGIN(PhoneBotConnmanPlugin)
-Q_IMPORT_PLUGIN(PhoneBotAmbiencePlugin)
-Q_IMPORT_PLUGIN(PhoneBotLaunchPlugin)
+#include <action.h>
+#include <abstractmetadata.h>
 
-int main(int argc, char **argv)
+class LaunchApplicationActionPrivate;
+class LaunchApplicationAction : public Action
 {
-    QCoreApplication app (argc, argv);
-    app.setOrganizationName("phonebot");
-    app.setApplicationName("phonebotd");
+    Q_OBJECT
+    Q_PROPERTY(QString desktopFile READ desktopFile WRITE setDesktopFile NOTIFY desktopFileChanged)
+    PHONEBOT_METADATA(LaunchApplicationActionMeta)
+public:
+    explicit LaunchApplicationAction(QObject *parent = 0);
+    virtual ~LaunchApplicationAction();
+    QString desktopFile() const;
+    void setDesktopFile(const QString &desktopFile);
+    bool execute(Rule *rule);
+Q_SIGNALS:
+    void desktopFileChanged();
+private:
+    Q_DECLARE_PRIVATE(LaunchApplicationAction)
+};
 
-    EngineManager manager;
-    manager.reloadEngine();
+class LaunchApplicationActionMeta: public AbstractMetaData
+{
+    Q_OBJECT
+public:
+    Q_INVOKABLE explicit LaunchApplicationActionMeta(QObject * parent = 0);
+    QString name() const;
+    QString description() const;
+    QString summary(const QVariantMap &properties) const;
+protected:
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
+};
 
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, &manager, &EngineManager::stop);
-
-    return app.exec();
-}
+#endif // LAUNCHAPPLICATIONACTION_H

@@ -115,6 +115,12 @@ MetaProperty * MetaProperty::createChoice(const QString &name, const QString &de
     return returned;
 }
 
+MetaProperty * MetaProperty::createApplication(const QString &name, const QString &description,
+                                               QObject *parent)
+{
+    return MetaProperty::create(name, String, ApplicationSubType, description, parent);
+}
+
 QString MetaProperty::name() const
 {
     Q_D(const MetaProperty);

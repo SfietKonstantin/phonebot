@@ -16,5 +16,6 @@
         <file>qml/TextField.qml</file>
         <file>qml/IntField.qml</file>
         <file>qml/DoubleField.qml</file>
+        <file>qml/ApplicationPicker.qml</file>
     </qresource>
 </RCC>

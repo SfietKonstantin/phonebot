@@ -21,6 +21,7 @@ LIBS += -L../../plugins/debug -lphonebotdebug \
     -L../../plugins/time -lphonebottime \
     -L../../plugins/connman -lphonebotconnman \
     -L../../plugins/ambience -lphonebotambience \
+    -L../../plugins/launch -lphonebotlaunch \
     -L../../lib/nemomw -lnemomw \
     -L../../lib/config -lphonebotconfig \
     -L../../lib/daemon -lphonebotdaemon \
@@ -61,5 +62,8 @@ qml.path = /usr/share/harbour-phonebot/qml
 qml.files = $$OTHER_FILES
 
 INSTALLS += target desktop icon qml
+
+DISTFILES += \
+    qml/ApplicationPicker.qml
 
 

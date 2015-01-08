@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = phonebotd
 
-QT = core dbus qml
+QT = core gui dbus qml
 
 include(../../lib/nemomw/nemomw-deps.pri)
 
@@ -13,6 +13,7 @@ LIBS += -L../../plugins/debug -lphonebotdebug \
     -L../../plugins/time -lphonebottime \
     -L../../plugins/connman -lphonebotconnman \
     -L../../plugins/ambience -lphonebotambience \
+    -L../../plugins/launch -lphonebotlaunch \
     -L../../lib/nemomw -lnemomw \
     -L../../lib/daemon -lphonebotdaemon \
     -L../../lib/meta -lphonebotmeta \

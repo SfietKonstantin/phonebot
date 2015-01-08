@@ -29,27 +29,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QtPlugin>
-#include "enginemanager.h"
+#ifndef OPENURLACTION_H
+#define OPENURLACTION_H
 
-Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
-Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
-Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
-Q_IMPORT_PLUGIN(PhoneBotConnmanPlugin)
-Q_IMPORT_PLUGIN(PhoneBotAmbiencePlugin)
-Q_IMPORT_PLUGIN(PhoneBotLaunchPlugin)
+#include <action.h>
+#include <abstractmetadata.h>
 
-int main(int argc, char **argv)
+class OpenUrlActionPrivate;
+class OpenUrlAction : public Action
 {
-    QCoreApplication app (argc, argv);
-    app.setOrganizationName("phonebot");
-    app.setApplicationName("phonebotd");
+    Q_OBJECT
+    Q_PROPERTY(QString url READ url WRITE setUrl NOTIFY urlChanged)
+    PHONEBOT_METADATA(OpenUrlActionMeta)
+public:
+    explicit OpenUrlAction(QObject *parent = 0);
+    virtual ~OpenUrlAction();
+    QString url() const;
+    void setUrl(const QString &url);
+    bool execute(Rule *rule);
+Q_SIGNALS:
+    void urlChanged();
+private:
+    Q_DECLARE_PRIVATE(OpenUrlAction)
+};
 
-    EngineManager manager;
-    manager.reloadEngine();
+class OpenUrlActionMeta: public AbstractMetaData
+{
+    Q_OBJECT
+public:
+    Q_INVOKABLE explicit OpenUrlActionMeta(QObject * parent = 0);
+    QString name() const;
+    QString description() const;
+    QString summary(const QVariantMap &properties) const;
+protected:
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
+};
 
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, &manager, &EngineManager::stop);
-
-    return app.exec();
-}
+#endif // OPENURLACTION_H
