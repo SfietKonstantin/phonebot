@@ -13,6 +13,7 @@ LIBS += -L../../plugins/debug -lphonebotdebug \
     -L../../plugins/time -lphonebottime \
     -L../../plugins/connman -lphonebotconnman \
     -L../../plugins/ambience -lphonebotambience \
+    -L../../plugins/notification -lphonebotnotification \
     -L../../lib/nemomw -lnemomw \
     -L../../lib/daemon -lphonebotdaemon \
     -L../../lib/meta -lphonebotmeta \
