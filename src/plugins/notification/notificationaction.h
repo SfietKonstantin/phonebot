@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Zeta Sagittarii <zeta@sagittarii.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,28 +29,52 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QtPlugin>
-#include "enginemanager.h"
+#ifndef AMBIANCEACTION_H
+#define AMBIANCEACTION_H
 
-Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
-Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
-Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
-Q_IMPORT_PLUGIN(PhoneBotConnmanPlugin)
-Q_IMPORT_PLUGIN(PhoneBotAmbiencePlugin)
-Q_IMPORT_PLUGIN(PhoneBotNotificationPlugin)
+#include <action.h>
+#include <abstractmetadata.h>
 
-
-int main(int argc, char **argv)
+class NotificationActionPrivate;
+class NotificationActionMeta;
+class NotificationAction : public Action
 {
-    QCoreApplication app (argc, argv);
-    app.setOrganizationName("phonebot");
-    app.setApplicationName("phonebotd");
+    Q_OBJECT
+    Q_PROPERTY(QString notificationSummary READ notificationSummary WRITE setNotificationSummary NOTIFY notificationSummaryChanged)
+    Q_PROPERTY(QString notificationText READ notificationText WRITE setNotificationText NOTIFY notificationTextChanged)
+    PHONEBOT_METADATA(NotificationActionMeta)
+//    PHONEBOT_NO_METADATA
 
-    EngineManager manager;
-    manager.reloadEngine();
+public:
+    explicit NotificationAction(QObject *parent = 0);
+    virtual ~NotificationAction();
+    QString notificationText() const;
+    void setNotificationText(const QString &notificationText);
+    QString notificationSummary() const;
+    void setNotificationSummary(const QString &notificationSummary);
+    bool execute(Rule *rule);
 
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, &manager, &EngineManager::stop);
+Q_SIGNALS:
+    void notificationTextChanged();
+    void notificationSummaryChanged();
 
-    return app.exec();
-}
+private:
+    Q_DECLARE_PRIVATE(NotificationAction)
+    void sendFreedesktopNotification(QString summary, QString text);
+};
+
+
+class NotificationActionMeta: public AbstractMetaData
+{
+    Q_OBJECT
+public:
+    Q_INVOKABLE explicit NotificationActionMeta(QObject * parent = 0);
+    QString name() const;
+    QString description() const;
+    QString summary(const QVariantMap &properties) const;
+protected:
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
+};
+
+
+#endif // AMBIANCEACTION_H
