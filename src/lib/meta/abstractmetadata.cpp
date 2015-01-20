@@ -3,7 +3,7 @@
 
 struct AbstractMetaDataPrivate
 {
-    QMap<QString, MetaProperty *> metaProperties;
+    mutable QMap<QString, MetaProperty *> metaProperties;
 };
 
 AbstractMetaData::AbstractMetaData(QObject *parent)
@@ -20,9 +20,8 @@ MetaProperty * AbstractMetaData::property(const QString &property) const
     Q_D(const AbstractMetaData);
     if (!d->metaProperties.contains(property)) {
         MetaProperty *meta = getProperty(property, const_cast<AbstractMetaData *>(this));
-        Q_ASSERT(meta->parent() == this);
-        AbstractMetaDataPrivate *dd = const_cast<AbstractMetaDataPrivate *>(d);
-        dd->metaProperties.insert(property, meta);
+        Q_ASSERT(meta && meta->parent() == this);
+        d->metaProperties.insert(property, meta);
         return meta;
     }
 

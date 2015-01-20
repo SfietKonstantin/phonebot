@@ -29,27 +29,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QtPlugin>
-#include "enginemanager.h"
+#ifndef NOTIFICATIONACTION_H
+#define NOTIFICATIONACTION_H
 
-Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
-Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
-Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
-Q_IMPORT_PLUGIN(PhoneBotConnmanPlugin)
-Q_IMPORT_PLUGIN(PhoneBotAmbiencePlugin)
-Q_IMPORT_PLUGIN(PhoneBotNotificationsPlugin)
+#include <action.h>
+#include <abstractmetadata.h>
 
-int main(int argc, char **argv)
+class NotificationActionPrivate;
+class NotificationAction : public Action
 {
-    QCoreApplication app (argc, argv);
-    app.setOrganizationName("phonebot");
-    app.setApplicationName("phonebotd");
+    Q_OBJECT
+    Q_PROPERTY(QString summary READ summary WRITE setSummary NOTIFY summaryChanged)
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    PHONEBOT_METADATA(NotificationActionMeta)
+public:
+    explicit NotificationAction(QObject *parent = 0);
+    virtual ~NotificationAction();
+    QString summary() const;
+    void setSummary(const QString &summary);
+    QString text() const;
+    void setText(const QString &text);
+    bool execute(Rule *rule);
+Q_SIGNALS:
+    void textChanged();
+    void summaryChanged();
+private:
+    Q_DECLARE_PRIVATE(NotificationAction)
+};
 
-    EngineManager manager;
-    manager.reloadEngine();
+class NotificationActionMeta: public AbstractMetaData
+{
+    Q_OBJECT
+public:
+    Q_INVOKABLE explicit NotificationActionMeta(QObject * parent = 0);
+    QString name() const;
+    QString description() const;
+    QString summary(const QVariantMap &properties) const;
+protected:
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
+};
 
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, &manager, &EngineManager::stop);
-
-    return app.exec();
-}
+#endif // NOTIFICATIONACTION_H
