@@ -305,7 +305,7 @@ QmlDocumentBase::Ptr RuleDefinition::toDocument() const
 
     // Mappers
     QVariantList mappersVariant;
-    foreach (QmlObject::Ptr mapper, mappers) {
+    for (QmlObject::Ptr mapper : mappers) {
         mappersVariant.append(QVariant::fromValue(mapper));
     }
 
@@ -314,7 +314,7 @@ QmlDocumentBase::Ptr RuleDefinition::toDocument() const
     }
 
     root->setProperties(properties);
-    foreach (ImportStatement::Ptr import, imports) {
+    for (ImportStatement::Ptr import : imports) {
         doc->addImport(import);
     }
     doc->setRootObject(root);

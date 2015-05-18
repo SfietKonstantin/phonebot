@@ -36,9 +36,9 @@
 #endif
 #include <QtCore/QStack>
 #include <QtCore/QTextStream>
-#include "qmljsengine_p.h"
-#include "qmljslexer_p.h"
-#include "qmljsparser_p.h"
+#include <QtQml/private/qqmljsengine_p.h>
+#include <QtQml/private/qqmljslexer_p.h>
+#include <QtQml/private/qqmljsparser_p.h>
 
 struct Error
 {
@@ -207,7 +207,7 @@ QStringList Reference::fieldMembers() const
 QString Reference::value() const
 {
     QString value = m_identifier;
-    foreach (const QString &identifier, m_fieldMembers) {
+    for (const QString &identifier : m_fieldMembers) {
         value.append(QString(".%1").arg(identifier));
     }
     return value;
@@ -367,7 +367,7 @@ static QString formatProperty(const QString &key, const QVariant &value, int ind
     case QMetaType::QVariantList:
     {
         QStringList components;
-        foreach (const QVariant &variant, value.toList()) {
+        for (const QVariant &variant : value.toList()) {
             components.append(formatProperty(QString(), variant, indentLevel + 1));
         }
         ss << "[" << endl << components.join(",\n") << endl << indent(indentLevel + 1) << "]";
@@ -411,7 +411,7 @@ QString QmlObject::toString(int indentLevel) const
         }
     }
 
-    foreach (QmlObject::Ptr object, d->children) {
+    for (QmlObject::Ptr object : d->children) {
         s << indent(indentLevel + 1) << object->toString(indentLevel + 1);
     }
     s << indent(indentLevel) << "}" << endl;
@@ -438,26 +438,26 @@ private:
 };
 
 // TODO: manage complex rules
-class QmlVisitor: protected QmlJS::AST::Visitor
+class QmlVisitor: protected QQmlJS::AST::Visitor
 {
 public:
     QmlDocument::ErrorType error;
     QList<Error> errors;
 
     QmlObject::Ptr operator()(const QString &source, QList<ImportStatement::Ptr> &imports,
-                              QmlJS::AST::Node *node)
+                              QQmlJS::AST::Node *node)
     {
         error = QmlDocument::NoError;
         errors.clear();
         _imports = &imports;
         _imports->clear();
         _source = source;
-        QmlJS::AST::Node::accept(node, this);
+        QQmlJS::AST::Node::accept(node, this);
         return _current;
     }
 protected:
 #ifdef QMLDOCUMENT_DEBUG
-    bool preVisit(QmlJS::AST::Node *ast)
+    bool preVisit(QQmlJS::AST::Node *ast)
     {
         qDebug() << "Begin:" << ast->kind;
         qDebug() << "Full:";
@@ -470,14 +470,14 @@ protected:
         return true;
     }
 
-    void postVisit(QmlJS::AST::Node *ast)
+    void postVisit(QQmlJS::AST::Node *ast)
     {
         qDebug() << "End:  " << ast->kind;
     }
 #endif
 
     // Manage the import
-    bool visit(QmlJS::AST::UiImport *ast)
+    bool visit(QQmlJS::AST::UiImport *ast)
     {
         if (error != QmlDocument::NoError) {
             return false;
@@ -502,7 +502,7 @@ protected:
     }
 
     // Manage bindings
-    bool visit(QmlJS::AST::UiScriptBinding *ast)
+    bool visit(QQmlJS::AST::UiScriptBinding *ast)
     {
         if (error != QmlDocument::NoError) {
             return false;
@@ -513,12 +513,12 @@ protected:
         return true;
     }
 
-    void endVisit(QmlJS::AST::UiScriptBinding *)
+    void endVisit(QQmlJS::AST::UiScriptBinding *)
     {
         endVisitBindings();
     }
 
-    bool visit(QmlJS::AST::ExpressionStatement *ast)
+    bool visit(QQmlJS::AST::ExpressionStatement *ast)
     {
         if (error != QmlDocument::NoError) {
             return false;
@@ -533,7 +533,7 @@ protected:
         return true;
     }
 
-    void endVisit(QmlJS::AST::ExpressionStatement *)
+    void endVisit(QQmlJS::AST::ExpressionStatement *)
     {
         Q_ASSERT(!_buffers.isEmpty());
         ExpressionBuffer::Ptr buffer = _buffers.top();
@@ -563,18 +563,18 @@ protected:
         }
     }
 
-    bool visit(QmlJS::AST::FieldMemberExpression *ast)
+    bool visit(QQmlJS::AST::FieldMemberExpression *ast)
     {
         QString identifier;
         QStringList fieldMembers;
-        QmlJS::AST::ExpressionNode *base = ast;
+        QQmlJS::AST::ExpressionNode *base = ast;
         while (base) {
-            if (base->kind == QmlJS::AST::Node::Kind_FieldMemberExpression) {
-                QmlJS::AST::FieldMemberExpression *astBase = static_cast<QmlJS::AST::FieldMemberExpression *>(base);
+            if (base->kind == QQmlJS::AST::Node::Kind_FieldMemberExpression) {
+                QQmlJS::AST::FieldMemberExpression *astBase = static_cast<QQmlJS::AST::FieldMemberExpression *>(base);
                 fieldMembers.prepend(astBase->name.toString());
                 base = astBase->base;
-            } else if (base->kind == QmlJS::AST::Node::Kind_IdentifierExpression) {
-                QmlJS::AST::IdentifierExpression *astBase = static_cast<QmlJS::AST::IdentifierExpression *>(base);
+            } else if (base->kind == QQmlJS::AST::Node::Kind_IdentifierExpression) {
+                QQmlJS::AST::IdentifierExpression *astBase = static_cast<QQmlJS::AST::IdentifierExpression *>(base);
                 identifier = astBase->name.toString();
                 base = 0;
             } else {
@@ -588,13 +588,13 @@ protected:
         return false;
     }
 
-    bool visit(QmlJS::AST::IdentifierExpression *ast)
+    bool visit(QQmlJS::AST::IdentifierExpression *ast)
     {
         _buffers.top()->buffer.append(QVariant::fromValue(Reference(ast->name.toString())));
         return true;
     }
 
-    bool visit(QmlJS::AST::NumericLiteral *ast)
+    bool visit(QQmlJS::AST::NumericLiteral *ast)
     {
         if (error != QmlDocument::NoError) {
             return false;
@@ -605,7 +605,7 @@ protected:
         return true;
     }
 
-    bool visit(QmlJS::AST::StringLiteral *ast)
+    bool visit(QQmlJS::AST::StringLiteral *ast)
     {
         if (error != QmlDocument::NoError) {
             return false;
@@ -616,7 +616,7 @@ protected:
         return true;
     }
 
-    bool visit(QmlJS::AST::TrueLiteral *)
+    bool visit(QQmlJS::AST::TrueLiteral *)
     {
         if (error != QmlDocument::NoError) {
             return false;
@@ -627,7 +627,7 @@ protected:
         return true;
     }
 
-    bool visit(QmlJS::AST::FalseLiteral *)
+    bool visit(QQmlJS::AST::FalseLiteral *)
     {
         if (error != QmlDocument::NoError) {
             return false;
@@ -639,7 +639,7 @@ protected:
     }
 
     // Arrays
-    bool visit(QmlJS::AST::UiArrayBinding *ast)
+    bool visit(QQmlJS::AST::UiArrayBinding *ast)
     {
         if (error != QmlDocument::NoError) {
             return false;
@@ -655,7 +655,7 @@ protected:
         return true;
     }
 
-    void endVisit(QmlJS::AST::UiArrayBinding *)
+    void endVisit(QQmlJS::AST::UiArrayBinding *)
     {
         // Pop the first buffer and aggregate in the new buffer
         QVariantList buffers = _buffers.pop()->buffer;
@@ -664,7 +664,7 @@ protected:
     }
 
     // Manage object bindings
-    bool visit(QmlJS::AST::UiObjectBinding *ast)
+    bool visit(QQmlJS::AST::UiObjectBinding *ast)
     {
         if (error != QmlDocument::NoError) {
             return false;
@@ -684,7 +684,7 @@ protected:
         return true;
     }
 
-    void endVisit(QmlJS::AST::UiObjectBinding *)
+    void endVisit(QQmlJS::AST::UiObjectBinding *)
     {
         Q_ASSERT(!_current->d()->parent.isNull());
         _current = _current->d()->parent;
@@ -692,7 +692,7 @@ protected:
     }
 
     // Component management
-    bool visit(QmlJS::AST::UiObjectDefinition *ast)
+    bool visit(QQmlJS::AST::UiObjectDefinition *ast)
     {
         if (error != QmlDocument::NoError) {
             return false;
@@ -705,7 +705,7 @@ protected:
         return true;
     }
 
-    void endVisit(QmlJS::AST::UiObjectDefinition *ast)
+    void endVisit(QQmlJS::AST::UiObjectDefinition *ast)
     {
         if (_current->d()->parent.isNull()) {
             // We are at root, let's check if the root is a Rule
@@ -735,7 +735,7 @@ protected:
 
 private:
     // Helper functions
-    void visitBindings(QmlJS::AST::UiQualifiedId *key)
+    void visitBindings(QQmlJS::AST::UiQualifiedId *key)
     {
         int offset = key->firstSourceLocation().offset;
         int length = key->lastSourceLocation().offset + key->lastSourceLocation().length - offset;
@@ -818,7 +818,7 @@ QString QmlDocumentBase::toString() const
     Q_D(const QmlDocumentBase);
     QString out;
     QTextStream s (&out);
-    foreach (ImportStatement::ConstPtr import, d->imports) {
+    for (ImportStatement::ConstPtr import : d->imports) {
         s << import->toString() << endl;
     }
 
@@ -868,15 +868,15 @@ QmlDocument::Ptr QmlDocument::create(const QString &fileName)
     object->d_func()->fileName = fileName;
 
 
-    QmlJS::Engine engine;
-    QmlJS::Lexer lexer (&engine);
-    QmlJS::Parser parser (&engine);
+    QQmlJS::Engine engine;
+    QQmlJS::Lexer lexer (&engine);
+    QQmlJS::Parser parser (&engine);
     lexer.setCode(source, 1, true);
     parser.parse();
 
-    const QList<QmlJS::DiagnosticMessage> diagnosticMessages = parser.diagnosticMessages();
+    const QList<QQmlJS::DiagnosticMessage> diagnosticMessages = parser.diagnosticMessages();
     if (diagnosticMessages.count() > 0) {
-        foreach (const QmlJS::DiagnosticMessage &message, diagnosticMessages) {
+        for (const QQmlJS::DiagnosticMessage &message : diagnosticMessages) {
             if (message.isError()) {
                 object->d_func()->error = QmlDocument::ParseError;
                 object->d_func()->errorMessage.append(formatError(message.loc.startLine,
@@ -891,7 +891,7 @@ QmlDocument::Ptr QmlDocument::create(const QString &fileName)
         object->d_func()->rootObject = visitor(source, object->d_func()->imports, parser.rootNode());
         object->d_func()->error = visitor.error;
 
-        foreach (const Error &error, visitor.errors) {
+        for (const Error &error : visitor.errors) {
             object->d_func()->errorMessage.append(formatError(error.line, error.column, error.message));
         }
     }

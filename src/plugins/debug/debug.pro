@@ -7,6 +7,7 @@ system(qdbusxml2cpp dbus/org.SfietKonstantin.phonebotdebug.xml -i debugtrigger.h
 INCLUDEPATH += ../../lib/core \
     ../../lib/meta
 
+CONFIG += c++11
 CONFIG += plugin static
 
 HEADERS = debugtrigger.h \

@@ -133,7 +133,7 @@ void RuleComponentsModel::setType(PhoneBotHelper::ComponentType type)
         QStringList components = cache->components((MetaTypeCache::Type) type);
 
         QList<RuleComponentsModelData *> items;
-        foreach (const QString &component, components) {
+        for (const QString &component : components) {
             RuleComponentsModelData *item = new RuleComponentsModelData;
             item->type = component;
             AbstractMetaData *meta = cache->metaData(component);

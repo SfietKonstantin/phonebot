@@ -177,7 +177,7 @@ void MetaTypeCachePrivate::populateCache()
     // 1. parse QQmlType, since you can extract version info from it.
     // 2. parse type name, since you can get the module. Use all versions
     //    to be able to get the module + version matching for a given component.
-    foreach (const QQmlType *type, QQmlMetaType::qmlTypes()) {
+    for (const QQmlType *type : QQmlMetaType::qmlTypes()) {
         QmlVersion version (type->majorVersion(), type->minorVersion());
         if (version.majorVersion != -1 && version.minorVersion != -1 && !versions.contains(version)) {
             versions.append(version);
@@ -186,7 +186,7 @@ void MetaTypeCachePrivate::populateCache()
 
     std::sort(versions.begin(), versions.end(), std::less<QmlVersion>());
 
-    foreach (const QString &typeName, QQmlMetaType::qmlTypeNames()) {
+    for (const QString &typeName : QQmlMetaType::qmlTypeNames()) {
         QQmlType *type = 0;
         int majorVersion = -1;
         int minorVersion = -1;
@@ -311,13 +311,13 @@ void MetaTypeCachePrivate::populateCacheForType(const QQmlType *type, const QStr
     }
 
     QStringList removedProperties;
-    foreach (const QString &property, properties) {
+    for (const QString &property : properties) {
         if (!castedMeta->property(property)) {
             qWarning() << property << "do not have metadata registered";
         }
     }
 
-    foreach (const QString &property, removedProperties) {
+    for (const QString &property : removedProperties) {
         properties.removeAll(property);
     }
 
@@ -384,7 +384,7 @@ QStringList MetaTypeCache::components(Type type) const
 {
     Q_D(const MetaTypeCache);
     QList<SortingMetaDataInfo> componentsMeta;
-    foreach (MetaTypeCacheItem *item, d->metaCache) {
+    for (MetaTypeCacheItem *item : d->metaCache) {
         if (type == item->type) {
             SortingMetaDataInfo info;
             info.type = item->metaObject->className();
@@ -395,7 +395,7 @@ QStringList MetaTypeCache::components(Type type) const
 
     std::sort(componentsMeta.begin(), componentsMeta.end(), metaDataLesser);
     QStringList components;
-    foreach (const SortingMetaDataInfo &info, componentsMeta) {
+    for (const SortingMetaDataInfo &info : componentsMeta) {
         components.append(info.type);
     }
 

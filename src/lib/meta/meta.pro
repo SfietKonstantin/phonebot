@@ -7,12 +7,13 @@ TARGET = phonebotmeta
 
 QT = core qml qml-private
 
+CONFIG += c++11
 CONFIG += staticlib
 
 INCLUDEPATH += ../core/
 
 # From QtCreator
-include(meta.pri)
+#include(meta.pri)
 
 HEADERS += \
     phonebotmeta.h \

@@ -129,7 +129,7 @@ QString RuleComponentModel::summary() const
         return QString();
     }
     QVariantMap properties;
-    foreach (RuleComponentModelData *item, d->m_data) {
+    for (RuleComponentModelData *item : d->m_data) {
         properties.insert(item->type->name(), item->value);
     }
     return d->metaData->summary(properties);
@@ -179,7 +179,7 @@ RuleComponentModel * RuleComponentModel::create(const QString &type, QObject *pa
     component->d_ptr->metaData = cache->metaData(type);
 
     QList<RuleComponentModelData *> items;
-    foreach (const QString &property, cache->properties(type)) {
+    for (const QString &property : cache->properties(type)) {
         RuleComponentModelData *item = new RuleComponentModelData;
         item->type = component->d_ptr->metaData->property(property);
         items.append(item);
@@ -195,7 +195,7 @@ RuleComponentModel * RuleComponentModel::clone(const RuleComponentModel *other, 
     cloned->d_ptr->metaData = other->d_ptr->metaData;
 
     QList<RuleComponentModelData *> items;
-    foreach (const RuleComponentModelData *item, other->d_ptr->m_data) {
+    for (const RuleComponentModelData *item : other->d_ptr->m_data) {
         RuleComponentModelData *clonedItem = new RuleComponentModelData;
         clonedItem->type = cloned->d_ptr->metaData->property(item->type->name());
         clonedItem->value = item->value;

@@ -131,7 +131,7 @@ void PhoneBotEngine::registerTypes()
 
     // Register static plugin paths
     QObjectList staticPlugins = QPluginLoader::staticInstances();
-    foreach (QObject *plugin, staticPlugins) {
+    for (QObject *plugin : staticPlugins) {
         PhoneBotExtensionPlugin *extensionPlugin = qobject_cast<PhoneBotExtensionPlugin *>(plugin);
         if (extensionPlugin) {
             extensionPlugin->registerTypes();
@@ -187,7 +187,7 @@ void PhoneBotEngine::start()
 {
     Q_D(PhoneBotEngine);
     d->ruleErrors.clear();
-    foreach (QQmlComponent *component, d->components) {
+    for (QQmlComponent *component : d->components) {
         QUrl url = component->url();
         QObject *ruleObject = component->create();
         if (!ruleObject) {
@@ -219,7 +219,7 @@ void PhoneBotEngine::stop()
     Q_D(PhoneBotEngine);
     d->ruleErrors.clear();
 
-    foreach (Rule *rule, d->rules) {
+    for (Rule *rule : d->rules) {
         PhoneBotEnginePrivate::deleteRule(rule);
     }
     d->rules.clear();
@@ -230,7 +230,7 @@ bool PhoneBotEngine::event(QEvent *e)
     Q_D(PhoneBotEngine);
     if (e->type() == QEvent::User) {
         e->accept();
-        foreach (QQmlComponent *component, d->loadedComponents) {
+        for (QQmlComponent *component : d->loadedComponents) {
             d->manageComponentFinished(component);
         }
         d->loadedComponents.clear();

@@ -161,7 +161,7 @@ void RulesModel::reload()
     }
 
     QStringList rules = m_proxy->Rules();
-    foreach (const QString &rule, rules) {
+    for (const QString &rule : rules) {
         bool valid = true;
 
         // Parse rule
@@ -175,7 +175,7 @@ void RulesModel::reload()
             QMap<QString, QmlObject::Ptr> mappers;
             if (root->hasProperty("mappers")) {
                 QVariantList mappersVariant = root->property("mappers").toList();
-                foreach (const QVariant &mapperVariant, mappersVariant) {
+                for (const QVariant &mapperVariant : mappersVariant) {
                     if (mapperVariant.canConvert<QmlObject::Ptr>()) {
                         QmlObject::Ptr mapper = mapperVariant.value<QmlObject::Ptr>();
                         mappers.insert(mapper->id(), mapper);
@@ -217,7 +217,7 @@ void RulesModel::reload()
             if (root->hasProperty("actions")) {
                 QVariantList actionsVariant = root->property("actions").toList();
                 RuleDefinitionActionModel *actions = ruleDefinition->actions();
-                foreach (const QVariant &actionVariant, actionsVariant) {
+                for (const QVariant &actionVariant : actionsVariant) {
                     if (actionVariant.canConvert<QmlObject::Ptr>()) {
                         int index = actions->count();
                         QmlObject::Ptr action = actionVariant.value<QmlObject::Ptr>();

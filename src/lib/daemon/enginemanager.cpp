@@ -241,7 +241,7 @@ void EngineManager::reloadEngine()
                                              QCoreApplication::instance()->applicationName()));
     qDebug() << "Using" << configRoot << "to search rules";
     QDir dir (configRoot);
-    foreach (const QString &subdirPath, dir.entryList(QDir::Dirs)) {
+    for (const QString &subdirPath : dir.entryList(QDir::Dirs)) {
         QDir subdir (dir);
         if (!subdir.cd(subdirPath)) {
             continue;

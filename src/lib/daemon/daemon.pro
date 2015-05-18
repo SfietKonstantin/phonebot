@@ -5,6 +5,7 @@ system(qdbusxml2cpp dbus/org.SfietKonstantin.phonebot.xml -i enginemanager.h -a 
 
 QT = core qml
 
+CONFIG += c++11
 CONFIG += staticlib
 
 INCLUDEPATH += ../../lib/core

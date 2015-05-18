@@ -128,7 +128,7 @@ void RulePrivate::slotTriggered()
     }
 
     if (ok) {
-        foreach (Action *action, actions) {
+        for (Action *action : actions) {
             action->execute(q);
         }
     }

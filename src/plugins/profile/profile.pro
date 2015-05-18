@@ -6,6 +6,7 @@ INCLUDEPATH += ../../lib/core \
     ../../lib/meta \
     ../../lib/nemomw
 
+CONFIG += c++11
 CONFIG += plugin static
 
 HEADERS = profileaction.h
