@@ -3,6 +3,6 @@
         <file>dummy.qml</file>
         <file>dummy_error.qml</file>
         <file>no_rule.qml</file>
-        <file>simplerule.qml</file>
+        <file>dummyrule.qml</file>
     </qresource>
 </RCC>

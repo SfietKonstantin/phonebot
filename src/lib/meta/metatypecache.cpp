@@ -47,14 +47,13 @@ static const char *NO_METADATA_MACRO = "NO_METADATA";
 
 struct SortingMetaDataInfo
 {
+    SortingMetaDataInfo(const QString &type, AbstractMetaData *metaData)
+        : type(type), metaData(metaData)
+    {
+    }
     QString type;
     AbstractMetaData *metaData;
 };
-
-bool metaDataLesser(const SortingMetaDataInfo &metaData1, const SortingMetaDataInfo &metaData2)
-{
-    return metaData1.metaData->name() < metaData2.metaData->name();
-}
 
 static bool isFilteredOut(const QByteArray &className)
 {
@@ -80,55 +79,48 @@ static MetaTypeCache::Type isComponent(const QByteArray &className)
 
 struct QmlVersion
 {
-    explicit QmlVersion();
-    explicit QmlVersion(int majorVersion, int minorVersion);
-    QmlVersion(const QmlVersion &other);
-    QmlVersion & operator=(const QmlVersion &other);
-    bool operator<(const QmlVersion &other) const;
-    bool operator==(const QmlVersion &other) const;
+    explicit QmlVersion() : majorVersion(-1), minorVersion(-1) {}
+    explicit QmlVersion(int majorVersion, int minorVersion)
+        : majorVersion(majorVersion), minorVersion(minorVersion)
+    {
+    }
+    QmlVersion(const QmlVersion &other)
+        : majorVersion(other.majorVersion), minorVersion(other.minorVersion)
+    {
+    }
+    QmlVersion & operator=(const QmlVersion &other)
+    {
+        majorVersion = other.majorVersion;
+        minorVersion = other.minorVersion;
+        return *this;
+    }
+    bool operator<(const QmlVersion &other) const
+    {
+        if (majorVersion == other.majorVersion) {
+            return minorVersion < other.minorVersion;
+        }
+        return majorVersion < other.majorVersion;
+    }
+    bool operator==(const QmlVersion &other) const
+    {
+        return majorVersion == other.majorVersion && minorVersion == other.minorVersion;
+    }
     int majorVersion;
     int minorVersion;
 };
 
-QmlVersion::QmlVersion()
-    : majorVersion(-1), minorVersion(-1)
-{
-}
-
-QmlVersion::QmlVersion(int majorVersion, int minorVersion)
-    : majorVersion(majorVersion), minorVersion(minorVersion)
-{
-}
-
-QmlVersion::QmlVersion(const QmlVersion &other)
-    : majorVersion(other.majorVersion), minorVersion(other.minorVersion)
-{
-}
-
-QmlVersion & QmlVersion::operator=(const QmlVersion &other)
-{
-    majorVersion = other.majorVersion;
-    minorVersion = other.minorVersion;
-    return *this;
-}
-
-bool QmlVersion::operator<(const QmlVersion &other) const
-{
-    if (majorVersion == other.majorVersion) {
-        return minorVersion < other.minorVersion;
-    }
-    return majorVersion < other.majorVersion;
-}
-
-bool QmlVersion::operator==(const QmlVersion &other) const
-{
-    return majorVersion == other.majorVersion && minorVersion == other.minorVersion;
-}
-
 struct MetaTypeCacheItem
 {
-    explicit MetaTypeCacheItem(const QMetaObject *metaObject);
-    virtual ~MetaTypeCacheItem();
+    explicit MetaTypeCacheItem(const QMetaObject *metaObject)
+        : metaData(0), metaObject(metaObject), majorVersion(-1), minorVersion(-1)
+    {
+    }
+    ~MetaTypeCacheItem()
+    {
+        if (metaData) {
+            metaData->deleteLater();
+        }
+    }
     AbstractMetaData *metaData;
     const QMetaObject *metaObject;
     QStringList properties;
@@ -138,17 +130,9 @@ struct MetaTypeCacheItem
     MetaTypeCache::Type type;
 };
 
-MetaTypeCacheItem::MetaTypeCacheItem(const QMetaObject *metaObject)
-    : metaData(0), metaObject(metaObject), majorVersion(-1), minorVersion(-1)
-{
-}
 
-MetaTypeCacheItem::~MetaTypeCacheItem()
-{
-    if (metaData) {
-        metaData->deleteLater();
-    }
-}
+
+
 
 class MetaTypeCachePrivate
 {
@@ -386,14 +370,14 @@ QStringList MetaTypeCache::components(Type type) const
     QList<SortingMetaDataInfo> componentsMeta;
     for (MetaTypeCacheItem *item : d->metaCache) {
         if (type == item->type) {
-            SortingMetaDataInfo info;
-            info.type = item->metaObject->className();
-            info.metaData = item->metaData;
-            componentsMeta.append(info);
+            componentsMeta.append(SortingMetaDataInfo (item->metaObject->className(), item->metaData));
         }
     }
 
-    std::sort(componentsMeta.begin(), componentsMeta.end(), metaDataLesser);
+    std::sort(componentsMeta.begin(), componentsMeta.end(),
+              [](const SortingMetaDataInfo &metaData1, const SortingMetaDataInfo &metaData2){
+        return metaData1.metaData->name() < metaData2.metaData->name();
+    });
     QStringList components;
     for (const SortingMetaDataInfo &info : componentsMeta) {
         components.append(info.type);
@@ -410,8 +394,7 @@ ImportStatement::Ptr MetaTypeCache::import(const QString &type) const
     }
 
     MetaTypeCacheItem *item = d->metaCache.value(type);
-    return ImportStatement::create(item->module, QString(),
-                                   QString("%1.%2").arg(QString::number(item->majorVersion),
-                                                        QString::number(item->minorVersion)),
-                                   QString());
+    return ImportStatement::createImport(item->module,
+                                         QString("%1.%2").arg(QString::number(item->majorVersion),
+                                                              QString::number(item->minorVersion)));
 }

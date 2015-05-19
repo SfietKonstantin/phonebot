@@ -54,8 +54,8 @@ class Rule: public QObject, public QQmlParserStatus
 public:
     explicit Rule(QObject *parent = 0);
     virtual ~Rule();
-    void classBegin();
-    void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
     QString name() const;
     void setName(const QString &name);
     bool isEnabled() const;
@@ -75,7 +75,6 @@ protected:
     QScopedPointer<RulePrivate> d_ptr;
 private:
     Q_DECLARE_PRIVATE(Rule)
-    Q_PRIVATE_SLOT(d_func(), void slotTriggered())
 };
 
 #endif // RULE_H

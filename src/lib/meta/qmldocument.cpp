@@ -108,22 +108,10 @@ QString ImportStatement::importUri() const
     return d->importUri;
 }
 
-void ImportStatement::setImportUri(const QString importUri)
-{
-    Q_D(ImportStatement);
-    d->importUri = importUri;
-}
-
 QString ImportStatement::importFile() const
 {
     Q_D(const ImportStatement);
     return d->importFile;
-}
-
-void ImportStatement::setImportFile(const QString importFile)
-{
-    Q_D(ImportStatement);
-    d->importFile = importFile;
 }
 
 QString ImportStatement::version() const
@@ -132,22 +120,10 @@ QString ImportStatement::version() const
     return d->version;
 }
 
-void ImportStatement::setVersion(const QString version)
-{
-    Q_D(ImportStatement);
-    d->version = version;
-}
-
 QString ImportStatement::importId() const
 {
     Q_D(const ImportStatement);
     return d->importId;
-}
-
-void ImportStatement::setImportId(const QString importId)
-{
-    Q_D(ImportStatement);
-    d->importId = importId;
 }
 
 QString ImportStatement::toString() const
@@ -171,13 +147,18 @@ QString ImportStatement::toString() const
     return out;
 }
 
-Expression::Expression()
-{
-}
-
 Expression::Expression(const QString &expression)
     : m_expression(expression)
 {
+}
+
+Expression::~Expression()
+{
+}
+
+Expression::Ptr Expression::create(const QString &expression)
+{
+    return Ptr(new Expression(expression));
 }
 
 QString Expression::value() const
@@ -185,13 +166,18 @@ QString Expression::value() const
     return m_expression;
 }
 
-Reference::Reference()
-{
-}
-
 Reference::Reference(const QString &identifier, const QStringList &fieldMembers)
     : m_identifier(identifier), m_fieldMembers(fieldMembers)
 {
+}
+
+Reference::~Reference()
+{
+}
+
+Reference::Ptr Reference::create(const QString &identifier, const QStringList &fieldMembers)
+{
+    return Ptr(new Reference(identifier, fieldMembers));
 }
 
 QString Reference::identifier() const
@@ -381,8 +367,8 @@ static QString formatProperty(const QString &key, const QVariant &value, int ind
             } else {
                 ok = false;
             }
-        } else if (value.canConvert<Reference>()) {
-            ss << value.value<Reference>().value();
+        } else if (value.canConvert<Reference::Ptr>()) {
+            ss << value.value<Reference::Ptr>()->value();
         }
         break;
     }
@@ -545,9 +531,9 @@ protected:
             ok = false;
         } else {
             QVariant first = buffer->buffer.first();
-            if (first.canConvert<Reference>()) {
-                Reference reference = first.value<Reference>();
-                if (reference.value() != buffer->source) {
+            if (first.canConvert<Reference::Ptr>()) {
+                Reference::Ptr reference = first.value<Reference::Ptr>();
+                if (reference->value() != buffer->source) {
                     ok = false;
 #ifdef QMLDOCUMENT_DEBUG
                     qDebug() << "Reference is" << reference.value() << "and source" << buffer->source;
@@ -559,7 +545,7 @@ protected:
 
         if (!ok) {
             buffer->buffer.clear();
-            buffer->buffer.append(QVariant::fromValue(Expression(buffer->source)));
+            buffer->buffer.append(QVariant::fromValue(Expression::create(buffer->source)));
         }
     }
 
@@ -584,13 +570,13 @@ protected:
 
         Q_ASSERT(!identifier.isEmpty());
         Q_ASSERT(!fieldMembers.isEmpty());
-        _buffers.top()->buffer.append(QVariant::fromValue(Reference(identifier, fieldMembers)));
+        _buffers.top()->buffer.append(QVariant::fromValue(Reference::create(identifier, fieldMembers)));
         return false;
     }
 
     bool visit(QQmlJS::AST::IdentifierExpression *ast)
     {
-        _buffers.top()->buffer.append(QVariant::fromValue(Reference(ast->name.toString())));
+        _buffers.top()->buffer.append(QVariant::fromValue(Reference::create(ast->name.toString())));
         return true;
     }
 
@@ -755,9 +741,9 @@ private:
         Q_ASSERT(buffer->buffer.count() == 1);
 
         QVariant value = buffer->buffer.first();
-        if (binding == "id" && value.canConvert<Reference>()) {
-            Reference id = value.value<Reference>();
-            _current->setId(id.identifier());
+        if (binding == "id" && value.canConvert<Reference::Ptr>()) {
+            Reference::Ptr id = value.value<Reference::Ptr>();
+            _current->setId(id->identifier());
         } else {
             _current->d()->properties.insert(binding, value);
         }

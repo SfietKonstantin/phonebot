@@ -44,7 +44,7 @@ class PongAction: public Action
     Q_OBJECT
 public:
     explicit PongAction(QObject *parent = 0);
-    bool execute(Rule *rule);
+    bool execute(Rule *rule) override;
 Q_SIGNALS:
     void pong();
 };
@@ -119,6 +119,7 @@ void TstDebugPlugin::testDebugTrigger()
 
 void TstDebugPlugin::cleanupTestCase()
 {
+    QTest::qWait(100); // Process delete later
 }
 
 

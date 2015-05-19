@@ -35,118 +35,76 @@
 #include <condition.h>
 #include <metacomponent.h>
 #include <phonebotmeta.h>
-#include <profileaction.h>
-#include <timetrigger.h>
-#include <weekdaycondition.h>
 #include <phonebotengine.h>
 #include <metatypecache.h>
-
-Q_IMPORT_PLUGIN(PhoneBotProfilePlugin)
-Q_IMPORT_PLUGIN(PhoneBotTimePlugin)
 
 class TestCondition: public Condition
 {
     Q_OBJECT
 public:
-    explicit TestCondition(QObject *parent = 0);
-    bool isValid(Rule *rule);
+    explicit TestCondition(QObject *parent = 0) : Condition(parent) { }
+    bool isValid(Rule *rule) override
+    {
+        Q_UNUSED(rule);
+        return false;
+    }
 };
-
-TestCondition::TestCondition(QObject *parent)
-    : Condition(parent)
-{
-}
-
-bool TestCondition::isValid(Rule *rule)
-{
-    Q_UNUSED(rule);
-    return false;
-}
 
 class TestCondition2: public Condition
 {
     Q_OBJECT
     PHONEBOT_METADATA(MetaTestCondition2)
 public:
-    explicit TestCondition2(QObject *parent = 0);
-    bool isValid(Rule *rule);
+    explicit TestCondition2(QObject *parent = 0) : Condition(parent) {}
+    bool isValid(Rule *rule) override
+    {
+        Q_UNUSED(rule);
+        return false;
+    }
 };
-
-TestCondition2::TestCondition2(QObject *parent)
-    : Condition(parent)
-{
-}
-
-bool TestCondition2::isValid(Rule *rule)
-{
-    Q_UNUSED(rule);
-    return false;
-}
 
 class TestCondition3: public Condition
 {
     Q_OBJECT
     PHONEBOT_METADATA(TestCondition3) // Error: the metadata refers to itself
 public:
-    explicit TestCondition3(QObject *parent = 0);
-    bool isValid(Rule *rule);
+    explicit TestCondition3(QObject *parent = 0) : Condition(parent) {}
+    bool isValid(Rule *rule) override
+    {
+        Q_UNUSED(rule);
+        return false;
+    }
 };
-
-TestCondition3::TestCondition3(QObject *parent)
-    : Condition(parent)
-{
-}
-
-bool TestCondition3::isValid(Rule *rule)
-{
-    Q_UNUSED(rule);
-    return false;
-}
 
 class MetaTestCondition4: public AbstractMetaData
 {
     Q_OBJECT
 public:
-    Q_INVOKABLE explicit MetaTestCondition4(QObject *parent = 0);
-    QString name() const;
-    QString description() const;
-    QString summary(const QVariantMap &properties) const;
+    Q_INVOKABLE explicit MetaTestCondition4(QObject *parent = 0) : AbstractMetaData(parent) {}
+    QString name() const override
+    {
+        return "No name";
+    }
+    QString description() const override
+    {
+        return "No description";
+    }
+    QString summary(const QVariantMap &properties) const override
+    {
+        Q_UNUSED(properties);
+        return "No summary";
+    }
 protected:
-    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const;
+    MetaProperty * getProperty(const QString &property, QObject *parent = 0) const override
+    {
+        if (property == "test") {
+            return MetaProperty::createBool(property, "test", parent);
+        }
+        return nullptr;
+    }
 };
 
 Q_DECLARE_METATYPE(MetaTestCondition4 *)
-
-MetaTestCondition4::MetaTestCondition4(QObject *parent)
-    : AbstractMetaData(parent)
-{
-}
-
-QString MetaTestCondition4::name() const
-{
-    return "No name";
-}
-
-QString MetaTestCondition4::description() const
-{
-    return "No description";
-}
-
-QString MetaTestCondition4::summary(const QVariantMap &properties) const
-{
-    Q_UNUSED(properties);
-    return "No summary";
-}
-
-MetaProperty * MetaTestCondition4::getProperty(const QString &property, QObject *parent) const
-{
-    if (property == "test") {
-        return MetaProperty::createBool(property, "test", parent);
-    }
-
-    return 0;
-}
-
 
 class TestCondition4: public Condition
 {
@@ -154,34 +112,23 @@ class TestCondition4: public Condition
     PHONEBOT_METADATA(MetaTestCondition4)
     Q_PROPERTY(bool test READ test WRITE setTest NOTIFY testChanged)
 public:
-    explicit TestCondition4(QObject *parent = 0);
-    bool test() const;
-    void setTest(bool test);
-    bool isValid(Rule *rule);
+    explicit TestCondition4(QObject *parent = 0) : Condition(parent) {}
+    bool test() const
+    {
+        return false;
+    }
+    void setTest(bool test)
+    {
+        Q_UNUSED(test)
+    }
+    bool isValid(Rule *rule) override
+    {
+        Q_UNUSED(rule);
+        return false;
+    }
 signals:
     void testChanged();
 };
-
-TestCondition4::TestCondition4(QObject *parent)
-    : Condition(parent)
-{
-}
-
-bool TestCondition4::test() const
-{
-    return false;
-}
-
-void TestCondition4::setTest(bool test)
-{
-    Q_UNUSED(test)
-}
-
-bool TestCondition4::isValid(Rule *rule)
-{
-    Q_UNUSED(rule);
-    return false;
-}
 
 class TstMeta : public QObject
 {
@@ -189,9 +136,7 @@ class TstMeta : public QObject
 private Q_SLOTS:
     void initTestCase();
     void testMeta();
-    void testProfileMeta();
-    void testTimeMeta();
-    void cleanupTestCase();
+   void cleanupTestCase();
 };
 
 void TstMeta::initTestCase()
@@ -222,71 +167,9 @@ void TstMeta::testMeta()
     QCOMPARE(property->type(), MetaProperty::Bool);
 }
 
-void TstMeta::testProfileMeta()
-{
-    MetaTypeCache cache;
-    AbstractMetaData *profileActionMeta = cache.metaData("ProfileAction");
-    QStringList properties = cache.properties("ProfileAction");
-    QVERIFY(profileActionMeta);
-    QCOMPARE(properties.count(), 1);
-    QCOMPARE(properties.first(), QString("profile"));
-    MetaProperty *property = profileActionMeta->property("profile");
-    QVERIFY(property);
-    QCOMPARE(property->type(), MetaProperty::String);
-}
-
-void TstMeta::testTimeMeta()
-{
-    MetaTypeCache cache;
-    AbstractMetaData *timeTriggerMeta = cache.metaData("TimeTrigger");
-    QStringList properties = cache.properties("TimeTrigger");
-    QVERIFY(timeTriggerMeta);
-    QCOMPARE(properties.count(), 1);
-    QCOMPARE(properties.first(), QString("time"));
-    MetaProperty *property = timeTriggerMeta->property("time");
-    QVERIFY(property);
-    QCOMPARE(property->type(), MetaProperty::Time);
-
-    AbstractMetaData *weekDayConditionMeta = cache.metaData("WeekDayCondition");
-    properties = cache.properties("WeekDayCondition");
-    QVERIFY(weekDayConditionMeta);
-    QCOMPARE(properties.count(), 7);
-    QVERIFY(properties.contains("onMonday"));
-    QVERIFY(properties.contains("onTuesday"));
-    QVERIFY(properties.contains("onWednesday"));
-    QVERIFY(properties.contains("onThursday"));
-    QVERIFY(properties.contains("onFriday"));
-    QVERIFY(properties.contains("onSaturday"));
-    QVERIFY(properties.contains("onSunday"));
-
-    property = weekDayConditionMeta->property("onMonday");
-    QVERIFY(property);
-    QCOMPARE(property->type(), MetaProperty::Bool);
-    property = weekDayConditionMeta->property("onTuesday");
-    QVERIFY(property);
-    QCOMPARE(property->type(), MetaProperty::Bool);
-    property = weekDayConditionMeta->property("onWednesday");
-    QVERIFY(property);
-    QCOMPARE(property->type(), MetaProperty::Bool);
-    property = weekDayConditionMeta->property("onThursday");
-    QVERIFY(property);
-    QCOMPARE(property->type(), MetaProperty::Bool);
-    property = weekDayConditionMeta->property("onFriday");
-    QVERIFY(property);
-    QCOMPARE(property->type(), MetaProperty::Bool);
-    property = weekDayConditionMeta->property("onSaturday");
-    QVERIFY(property);
-    QCOMPARE(property->type(), MetaProperty::Bool);
-    property = weekDayConditionMeta->property("onSunday");
-    QVERIFY(property);
-    QCOMPARE(property->type(), MetaProperty::Bool);
-}
-
-
 void TstMeta::cleanupTestCase()
 {
 }
-
 
 QTEST_MAIN(TstMeta)
 

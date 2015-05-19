@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>simpleactionrule.qml</file>
-        <file>SimpleAction.qml</file>
-    </qresource>
-</RCC>

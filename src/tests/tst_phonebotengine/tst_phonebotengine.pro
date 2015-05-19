@@ -16,5 +16,4 @@ OTHER_FILES += \
     dummy.qml \
     dummy_error.qml \
     no_rule.qml \
-    simplerule.qml
-
+    dummyrule.qml

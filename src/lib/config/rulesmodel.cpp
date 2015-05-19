@@ -131,11 +131,11 @@ static void populateRuleComponentModel(RuleComponentModel *component, QmlObject:
             if (object->hasProperty(key)) {
                 // TODO: migrate to MetaProperty
                 QVariant value = object->property(key);
-                if (value.canConvert<Reference>()) {
-                    Reference reference = value.value<Reference>();
-                    if (mappers.contains(reference.identifier())) {
+                if (value.canConvert<Reference::Ptr>()) {
+                    Reference::Ptr reference = value.value<Reference::Ptr>();
+                    if (mappers.contains(reference->identifier())) {
                         // Check mapper
-                        QmlObject::Ptr mapper = mappers.value(reference.identifier());
+                        QmlObject::Ptr mapper = mappers.value(reference->identifier());
                         if (mapper->type() == "TimeMapper") {
                             int hour = mapper->property("hour").toInt();
                             int minute = mapper->property("minute").toInt();

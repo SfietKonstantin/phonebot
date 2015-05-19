@@ -42,6 +42,10 @@ class ImportStatement
 public:
     typedef QSharedPointer<ImportStatement> Ptr;
     typedef QSharedPointer<const ImportStatement> ConstPtr;
+    ImportStatement(const ImportStatement &) = delete;
+    ImportStatement(ImportStatement &&) = delete;
+    ImportStatement & operator=(const ImportStatement &) = delete;
+    ImportStatement & operator=(ImportStatement &&) = delete;
     virtual ~ImportStatement();
     static ImportStatement::Ptr create(const QString &importUri, const QString &importFile,
                                        const QString &version, const QString &importId);
@@ -51,47 +55,56 @@ public:
                                                  const QString &version = QString(),
                                                  const QString &importId = QString());
     QString importUri() const;
-    void setImportUri(const QString importUri);
     QString importFile() const;
-    void setImportFile(const QString importFile);
     QString version() const;
-    void setVersion(const QString importVersion);
     QString importId() const;
-    void setImportId(const QString importId);
     QString toString() const;
 protected:
     QScopedPointer<ImportStatementPrivate> d_ptr;
 private:
-    ImportStatement();
+    explicit ImportStatement();
     Q_DECLARE_PRIVATE(ImportStatement)
 };
 
 class Expression
 {
 public:
-    explicit Expression();
-    explicit Expression(const QString &expression);
+    typedef QSharedPointer<Expression> Ptr;
+    Expression(const Expression &) = delete;
+    Expression(Expression &&) = delete;
+    Expression & operator=(const Expression &) = delete;
+    Expression & operator=(Expression &&) = delete;
+    virtual ~Expression();
+    static Ptr create(const QString &expression = QString());
     QString value() const;
 private:
+    explicit Expression(const QString &expression);
     QString m_expression;
 };
 
-Q_DECLARE_METATYPE(Expression)
+Q_DECLARE_METATYPE(Expression::Ptr)
 
 class Reference
 {
 public:
-    explicit Reference();
-    explicit Reference(const QString &identifier, const QStringList &fieldMembers = QStringList());
+    typedef QSharedPointer<Reference> Ptr;
+    Reference(const Reference &) = delete;
+    Reference(Reference &&) = delete;
+    Reference & operator=(const Reference &) = delete;
+    Reference & operator=(Reference &&) = delete;
+    virtual ~Reference();
+    static Ptr create(const QString &identifier = QString(),
+                      const QStringList &fieldMembers = QStringList());
     QString identifier() const;
     QStringList fieldMembers() const;
     QString value() const;
 private:
+    explicit Reference(const QString &identifier, const QStringList &fieldMembers);
     QString m_identifier;
     QStringList m_fieldMembers;
 };
 
-Q_DECLARE_METATYPE(Reference)
+Q_DECLARE_METATYPE(Reference::Ptr)
 
 class QmlObjectPrivate;
 class QmlObject
@@ -99,6 +112,10 @@ class QmlObject
 public:
     typedef QSharedPointer<QmlObject> Ptr;
     typedef QSharedPointer<const QmlObject> ConstPtr;
+    QmlObject(const QmlObject &) = delete;
+    QmlObject(QmlObject &&) = delete;
+    QmlObject & operator=(const QmlObject &) = delete;
+    QmlObject & operator=(QmlObject &&) = delete;
     virtual ~QmlObject();
     static QmlObject::Ptr create(const QString &type);
     QString type() const;
@@ -115,7 +132,7 @@ protected:
     explicit QmlObject(QmlObjectPrivate &dd);
     QScopedPointer<QmlObjectPrivate> d_ptr;
 private:
-    QmlObject();
+    explicit QmlObject();
     Q_DECLARE_PRIVATE(QmlObject)
 };
 
@@ -128,6 +145,10 @@ class QmlDocumentBase
 public:
     typedef QSharedPointer<QmlDocumentBase> Ptr;
     typedef QSharedPointer<const QmlDocumentBase> ConstPtr;
+    QmlDocumentBase(const QmlDocumentBase &) = delete;
+    QmlDocumentBase(QmlDocumentBase &&) = delete;
+    QmlDocumentBase & operator=(const QmlDocumentBase &) = delete;
+    QmlDocumentBase & operator=(QmlDocumentBase &&) = delete;
     virtual ~QmlDocumentBase();
     QList<ImportStatement::Ptr> imports() const;
     QmlObject::Ptr rootObject() const;

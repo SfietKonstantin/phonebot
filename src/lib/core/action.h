@@ -41,12 +41,17 @@ class Action: public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
 public:
     explicit Action(QObject *parent = 0);
     virtual ~Action();
-    void classBegin();
-    void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
+    bool isEnabled() const;
+    void setEnabled(bool enabled);
     virtual bool execute(Rule *rule) = 0;
+Q_SIGNALS:
+    void enabledChanged();
 protected:
     explicit Action(ActionPrivate &dd, QObject *parent);
     QScopedPointer<ActionPrivate> d_ptr;

@@ -36,14 +36,15 @@
 #include "trigger.h"
 
 RulePrivate::RulePrivate(Rule *q)
-    : enabled(true), trigger(0), condition(0), q_ptr(q)
+    : enabled(true), trigger(nullptr), condition(nullptr), q_ptr(q)
 {
 }
 
 void RulePrivate::actions_append(QQmlListProperty<Action> *list, Action *action)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
-    if (rule && action) {
+    Q_ASSERT(rule);
+    if (action != nullptr) {
         rule->d_func()->actions.append(action);
     }
 }
@@ -51,33 +52,32 @@ void RulePrivate::actions_append(QQmlListProperty<Action> *list, Action *action)
 Action * RulePrivate::actions_at(QQmlListProperty<Action> *list, int index)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
-    if (rule && index >= 0 && index < rule->d_func()->actions.count()) {
-        return rule->d_func()->actions.at(index);
+    Q_ASSERT(rule);
+    if (index < 0 && index >= rule->d_func()->actions.count()) {
+        return nullptr;
     }
-    return 0;
+    return rule->d_func()->actions.at(index);
 }
 
 void RulePrivate::actions_clear(QQmlListProperty<Action> *list)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
-    if (rule) {
-        rule->d_func()->actions.clear();
-    }
+    Q_ASSERT(rule);
+    rule->d_func()->actions.clear();
 }
 
 int RulePrivate::actions_count(QQmlListProperty<Action> *list)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
-    if (rule) {
-        return rule->d_func()->actions.count();
-    }
-    return 0;
+    Q_ASSERT(rule);
+    return rule->d_func()->actions.count();
 }
 
 void RulePrivate::mappers_append(QQmlListProperty<AbstractMapper> *list, AbstractMapper *mapper)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
-    if (rule && mapper) {
+    Q_ASSERT(rule);
+    if (mapper != nullptr) {
         rule->d_func()->mappers.append(mapper);
     }
 }
@@ -85,51 +85,47 @@ void RulePrivate::mappers_append(QQmlListProperty<AbstractMapper> *list, Abstrac
 AbstractMapper * RulePrivate::mappers_at(QQmlListProperty<AbstractMapper> *list, int index)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
-    if (rule && index >= 0 && index < rule->d_func()->mappers.count()) {
-        return rule->d_func()->mappers.at(index);
+    Q_ASSERT(rule);
+    if (index < 0 && index >= rule->d_func()->mappers.count()) {
+        return nullptr;
     }
-    return 0;
+    return rule->d_func()->mappers.at(index);
 }
 
 void RulePrivate::mappers_clear(QQmlListProperty<AbstractMapper> *list)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
-    if (rule) {
-        rule->d_func()->mappers.clear();
-    }
+    Q_ASSERT(rule);
+    rule->d_func()->mappers.clear();
 }
 
 int RulePrivate::mappers_count(QQmlListProperty<AbstractMapper> *list)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
-    if (rule) {
-        return rule->d_func()->mappers.count();
-    }
-    return 0;
+    Q_ASSERT(rule);
+    return rule->d_func()->mappers.count();
 }
 
 void RulePrivate::slotTriggered()
 {
     Q_Q(Rule);
+    Q_ASSERT(trigger != nullptr);
     if (!enabled) {
         return;
     }
 
-    if (!trigger) {
-        return;
-    }
-
     bool ok = true;
-    if (condition) {
-        ok = condition->isEnabled();
-        if (ok) {
+    if (condition != nullptr) {
+        if (condition->isEnabled()) {
             ok = condition->isValid(q);
         }
     }
 
     if (ok) {
         for (Action *action : actions) {
-            action->execute(q);
+            if (action->isEnabled()) {
+                action->execute(q);
+            }
         }
     }
 }
@@ -191,12 +187,15 @@ void Rule::setTrigger(Trigger *trigger)
 {
     Q_D(Rule);
     if (d->trigger != trigger) {
-        if (d->trigger) {
-            disconnect(d->trigger, SIGNAL(triggered()), this, SLOT(slotTriggered));
+        if (d->triggerConnection) {
+            disconnect(d->triggerConnection);
+            d->triggerConnection = (QMetaObject::Connection());
         }
         d->trigger = trigger;
-        if (d->trigger) {
-            connect(d->trigger, SIGNAL(triggered()), this, SLOT(slotTriggered()));
+        if (d->trigger != nullptr) {
+            d->triggerConnection = connect(d->trigger, &Trigger::triggered, [d](){
+                d->slotTriggered();
+            });
         }
         emit triggerChanged();
     }
@@ -219,7 +218,7 @@ void Rule::setCondition(Condition *condition)
 
 QQmlListProperty<Action> Rule::actions()
 {
-    return QQmlListProperty<Action>(this, 0,
+    return QQmlListProperty<Action>(this, nullptr,
                                     &RulePrivate::actions_append,
                                     &RulePrivate::actions_count,
                                     &RulePrivate::actions_at,
@@ -228,7 +227,7 @@ QQmlListProperty<Action> Rule::actions()
 
 QQmlListProperty<AbstractMapper> Rule::mappers()
 {
-    return QQmlListProperty<AbstractMapper>(this, 0,
+    return QQmlListProperty<AbstractMapper>(this, nullptr,
                                             &RulePrivate::mappers_append,
                                             &RulePrivate::mappers_count,
                                             &RulePrivate::mappers_at,

@@ -33,6 +33,7 @@
 #define RULE_P_H
 
 #include "rule.h"
+#include <QtCore/QMetaObject>
 
 class RulePrivate
 {
@@ -50,6 +51,7 @@ public:
     QString name;
     bool enabled;
     Trigger *trigger;
+    QMetaObject::Connection triggerConnection;
     Condition * condition;
     QList<Action *> actions;
     QList<AbstractMapper *> mappers;

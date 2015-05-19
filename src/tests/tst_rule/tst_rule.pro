@@ -1,17 +1,20 @@
 TEMPLATE = app
-TARGET = tst_action
+TARGET = tst_rule
 
 QT = core qml testlib
 
 include(../../config.pri)
 
 INCLUDEPATH += ../../lib/core
-LIBS += -L../../lib/core -lphonebot
+LIBS +=     -L../../lib/core -lphonebot
 
-SOURCES += tst_action.cpp
+SOURCES += tst_rule.cpp
 
 RESOURCES += res.qrc
 
 OTHER_FILES += \
-    SimpleAction.qml \
+    simplerule.qml \
+    SimpleJsCondition.qml \
+    SimpleJsAction.qml \
     simpleactionrule.qml
+

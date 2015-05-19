@@ -30,13 +30,11 @@
  */
 
 import org.SfietKonstantin.phonebot 1.0
+import org.SfietKonstantin.phonebot.tst_rule 1.0
 
-Action {
-    id: container
-    signal executed()
-    action: function execute(rule) {
-        console.debug(rule)
-        container.executed()
-    }
+Rule {
+    trigger: SimpleTrigger {}
+    condition: SimpleCondition {}
+    actions: [SimpleAction {}, SimpleAction {}]
 }
 

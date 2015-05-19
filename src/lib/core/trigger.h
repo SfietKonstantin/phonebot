@@ -40,17 +40,13 @@ class Trigger: public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
 public:
     explicit Trigger(QObject *parent = 0);
     virtual ~Trigger();
-    void classBegin();
-    void componentComplete();
-    bool isEnabled() const;
-    void setEnabled(bool enabled);
+    void classBegin() override;
+    void componentComplete() override;
 Q_SIGNALS:
     void triggered();
-    void enabledChanged();
 protected:
     explicit Trigger(TriggerPrivate &dd, QObject *parent);
     QScopedPointer<TriggerPrivate> d_ptr;

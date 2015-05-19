@@ -1,7 +1,10 @@
 TEMPLATE = subdirs
-SUBDIRS = debug \
+SUBDIRS = debug
+!CONFIG(testing):{
+SUBDIRS  += \
     profile \
     time \
     connman \
     ambience \
     notifications
+}

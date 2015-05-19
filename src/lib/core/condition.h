@@ -45,8 +45,8 @@ class Condition: public QObject, public QQmlParserStatus
 public:
     explicit Condition(QObject *parent = 0);
     virtual ~Condition();
-    void classBegin();
-    void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
     bool isEnabled() const;
     void setEnabled(bool enabled);
     virtual bool isValid(Rule *rule) = 0;

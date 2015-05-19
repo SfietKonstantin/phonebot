@@ -30,10 +30,14 @@
  */
 
 import org.SfietKonstantin.phonebot 1.0
-import org.SfietKonstantin.phonebot.tst_action 1.0
 
-Rule {
-    trigger: SimpleTrigger {}
-    actions: SimpleAction {}
+Action {
+    id: container
+    signal executed()
+    action: function execute(rule) {
+        console.debug(rule)
+        container.executed()
+        return true
+    }
 }
 

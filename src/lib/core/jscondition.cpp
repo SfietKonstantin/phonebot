@@ -77,14 +77,10 @@ bool JsCondition::isValid(Rule *rule)
     }
 
     QQmlContext *context = QQmlEngine::contextForObject(this);
-    if (!context) {
-        return false;
-    }
+    Q_ASSERT(context);
 
     QQmlEngine *engine = context->engine();
-    if (!engine) {
-        return false;
-    }
+    Q_ASSERT(engine);
 
     QJSValueList args;
     args.append(engine->newQObject(rule));

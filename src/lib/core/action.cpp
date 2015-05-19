@@ -33,7 +33,7 @@
 #include "action_p.h"
 
 ActionPrivate::ActionPrivate(Action *q)
-    : q_ptr(q)
+    : enabled(true), q_ptr(q)
 {
 }
 
@@ -57,5 +57,20 @@ void Action::classBegin()
 
 void Action::componentComplete()
 {
+}
+
+bool Action::isEnabled() const
+{
+    Q_D(const Action);
+    return d->enabled;
+}
+
+void Action::setEnabled(bool enabled)
+{
+    Q_D(Action);
+    if (d->enabled != enabled) {
+        d->enabled = enabled;
+        emit enabledChanged();
+    }
 }
 

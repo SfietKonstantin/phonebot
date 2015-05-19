@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>simplerule.qml</file>
+        <file>simpleactionrule.qml</file>
+        <file>SimpleJsAction.qml</file>
+        <file>SimpleJsCondition.qml</file>
+    </qresource>
+</RCC>

@@ -29,26 +29,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef JSCONDITION_H
-#define JSCONDITION_H
+import org.SfietKonstantin.phonebot 1.0
 
-#include "condition.h"
-#include <QtQml/QJSValue>
+Condition {
+    id: container
+    property bool isCurrentlyValid: false
+    condition: function isValid(rule) {
+        console.debug(rule)
+        isCurrentlyValid = !isCurrentlyValid
+        return isCurrentlyValid
+    }
+}
 
-class JsConditionPrivate;
-class JsCondition : public Condition
-{
-    Q_OBJECT
-    Q_PROPERTY(QJSValue condition READ condition WRITE setCondition NOTIFY conditionChanged)
-public:
-    explicit JsCondition(QObject *parent = 0);
-    QJSValue condition() const;
-    void setCondition(const QJSValue &condition);
-    bool isValid(Rule *rule) override;
-Q_SIGNALS:
-    void conditionChanged();
-private:
-    Q_DECLARE_PRIVATE(JsCondition)
-};
-
-#endif // JSCONDITION_H

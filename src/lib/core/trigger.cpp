@@ -59,17 +59,3 @@ void Trigger::componentComplete()
 {
 }
 
-bool Trigger::isEnabled() const
-{
-    Q_D(const Trigger);
-    return d->enabled;
-}
-
-void Trigger::setEnabled(bool enabled)
-{
-    Q_D(Trigger);
-    if (d->enabled != enabled) {
-        d->enabled = enabled;
-        emit enabledChanged();
-    }
-}

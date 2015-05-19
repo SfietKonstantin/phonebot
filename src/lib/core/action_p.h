@@ -38,6 +38,7 @@ class ActionPrivate
 {
 public:
     explicit ActionPrivate(Action *q);
+    bool enabled;
 protected:
     Action * const q_ptr;
 private:

@@ -223,7 +223,7 @@ static QmlObject::Ptr convertComponentModelToObject(RuleComponentModel *componen
                     mappers.append(timeMapper);
                     QStringList fieldValues;
                     fieldValues.append("value");
-                    properties.insert(type->name(), QVariant::fromValue(Reference(id, fieldValues)));
+                    properties.insert(type->name(), QVariant::fromValue(Reference::create(id, fieldValues)));
                 }
             } else {
                 // Insert key value
@@ -267,7 +267,7 @@ QmlDocumentBase::Ptr RuleDefinition::toDocument() const
     WritableQmlDocument::Ptr doc = WritableQmlDocument::create();
     QmlObject::Ptr root = QmlObject::create("Rule");
     QSet<ImportStatement::Ptr> imports;
-    imports.insert(ImportStatement::create("org.SfietKonstantin.phonebot", QString(), "1.0", QString()));
+    imports.insert(ImportStatement::createImport("org.SfietKonstantin.phonebot", "1.0"));
     QList<QmlObject::Ptr> mappers;
     QVariantMap properties;
 

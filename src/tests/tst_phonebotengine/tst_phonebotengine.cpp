@@ -41,51 +41,32 @@ class DummyTrigger: public Trigger
 {
     Q_OBJECT
 public:
-    explicit DummyTrigger(QObject *parent = 0);
+    explicit DummyTrigger(QObject *parent = 0) : Trigger(parent) {}
 };
-
-DummyTrigger::DummyTrigger(QObject *parent)
-    : Trigger(parent)
-{
-}
 
 class DummyCondition: public Condition
 {
     Q_OBJECT
 public:
-    explicit DummyCondition(QObject *parent = 0);
-    bool isValid(Rule *rule);
+    explicit DummyCondition(QObject *parent = 0) : Condition(parent) {}
+    bool isValid(Rule *rule) override
+    {
+        Q_UNUSED(rule)
+        return false;
+    }
 };
-
-DummyCondition::DummyCondition(QObject *parent)
-    : Condition(parent)
-{
-}
-
-bool DummyCondition::isValid(Rule *rule)
-{
-    Q_UNUSED(rule)
-    return false;
-}
 
 class DummyAction: public Action
 {
     Q_OBJECT
 public:
-    explicit DummyAction(QObject *parent = 0);
-    bool execute(Rule *rule);
+    explicit DummyAction(QObject *parent = 0) : Action(parent) {}
+    bool execute(Rule *rule) override
+    {
+        Q_UNUSED(rule)
+        return false;
+    }
 };
-
-DummyAction::DummyAction(QObject *parent)
-    : Action(parent)
-{
-}
-
-bool DummyAction::execute(Rule *rule)
-{
-    Q_UNUSED(rule)
-    return false;
-}
 
 class TstPhoneBotEngine : public QObject
 {
@@ -106,17 +87,17 @@ void TstPhoneBotEngine::initTestCase()
 
 void TstPhoneBotEngine::components()
 {
-    PhoneBotEngine *engine = new PhoneBotEngine(this);
-    engine->registerTypes();
+    PhoneBotEngine engine;
+    engine.registerTypes();
 
     // Insert a simple component
     QUrl source ("qrc:/dummy.qml");
-    engine->addComponent(source);
+    engine.addComponent(source);
 
     // Check that component is not available
-    QVERIFY(!engine->component(source));
+    QVERIFY(engine.component(source) == nullptr);
 
-    QSignalSpy spy(engine, SIGNAL(componentLoadingFinished(QUrl,bool)));
+    QSignalSpy spy(&engine, SIGNAL(componentLoadingFinished(QUrl,bool)));
     while (spy.count() == 0) {
         QTest::qWait(100);
     }
@@ -127,19 +108,19 @@ void TstPhoneBotEngine::components()
     QCOMPARE(arguments.at(1).toBool(), true);
 
     // Check if component is available
-    QVERIFY(engine->component(source));
-    QCOMPARE(engine->component(source)->url(), source);
-    QVERIFY(engine->componentError(source).isNull());
+    QVERIFY(engine.component(source)  != nullptr);
+    QCOMPARE(engine.component(source)->url(), source);
+    QVERIFY(engine.componentError(source).isNull());
 
     // Insert a simple component with error
     QUrl sourceFailure ("qrc:/dummy_error.qml");
 
-    engine->addComponent(sourceFailure);
+    engine.addComponent(sourceFailure);
 
     // Check that component is not available
-    QVERIFY(!engine->component(sourceFailure));
+    QVERIFY(engine.component(sourceFailure) == nullptr);
 
-    QSignalSpy spyFailure(engine, SIGNAL(componentLoadingFinished(QUrl,bool)));
+    QSignalSpy spyFailure(&engine, SIGNAL(componentLoadingFinished(QUrl,bool)));
     while (spyFailure.count() == 0) {
         QTest::qWait(100);
     }
@@ -150,17 +131,17 @@ void TstPhoneBotEngine::components()
     QCOMPARE(arguments.at(1).toBool(), false);
 
     // Check if component is not available
-    QVERIFY(!engine->component(sourceFailure));
-    QVERIFY(!engine->componentError(sourceFailure).isEmpty());
+    QVERIFY(engine.component(sourceFailure) == nullptr);
+    QVERIFY(!engine.componentError(sourceFailure).isEmpty());
 
     // Insert a more complex component
-    QUrl complexSource ("qrc:/simplerule.qml");
-    engine->addComponent(complexSource);
+    QUrl complexSource ("qrc:/dummyrule.qml");
+    engine.addComponent(complexSource);
 
     // Check that component is not available
-    QVERIFY(!engine->component(complexSource));
+    QVERIFY(engine.component(complexSource) == nullptr);
 
-    QSignalSpy complexSpy(engine, SIGNAL(componentLoadingFinished(QUrl,bool)));
+    QSignalSpy complexSpy(&engine, SIGNAL(componentLoadingFinished(QUrl,bool)));
     while (complexSpy.count() == 0) {
         QTest::qWait(100);
     }
@@ -171,55 +152,55 @@ void TstPhoneBotEngine::components()
     QCOMPARE(arguments.at(1).toBool(), true);
 
     // Check if component is available
-    QVERIFY(engine->component(complexSource));
-    QCOMPARE(engine->component(complexSource)->url(), complexSource);
-    QVERIFY(engine->componentError(complexSource).isNull());
+    QVERIFY(engine.component(complexSource) != nullptr);
+    QCOMPARE(engine.component(complexSource)->url(), complexSource);
+    QVERIFY(engine.componentError(complexSource).isNull());
 
     // Reinsert
-    QVERIFY(!engine->addComponent(complexSource));
+    QVERIFY(!engine.addComponent(complexSource));
 }
 
 void TstPhoneBotEngine::rules()
 {
-    PhoneBotEngine *engine = new PhoneBotEngine(this);
-    engine->registerTypes();
+    PhoneBotEngine engine;
+    engine.registerTypes();
 
     // Insert a simple component
     QUrl sourceNoRule ("qrc:/no_rule.qml");
     QUrl sourceBadRule ("qrc:/dummy.qml");
-    QUrl sourceSimpleRule ("qrc:/simplerule.qml");
-    engine->addComponent(sourceNoRule);
-    engine->addComponent(sourceBadRule);
-    engine->addComponent(sourceSimpleRule);
+    QUrl sourceDummyRule ("qrc:/dummyrule.qml");
+    engine.addComponent(sourceNoRule);
+    engine.addComponent(sourceBadRule);
+    engine.addComponent(sourceDummyRule);
 
     // Wait
-    QSignalSpy spy(engine, SIGNAL(componentLoadingFinished(QUrl,bool)));
+    QSignalSpy spy(&engine, SIGNAL(componentLoadingFinished(QUrl,bool)));
     while (spy.count() != 3) {
         QTest::qWait(100);
     }
 
     // Start
-    engine->start();
+    engine.start();
 
-    QVERIFY(!engine->rule(sourceNoRule));
-    QVERIFY(!engine->ruleError(sourceNoRule).isEmpty());
-    QVERIFY(!engine->rule(sourceBadRule));
-    QVERIFY(!engine->ruleError(sourceBadRule).isEmpty());
-    QVERIFY(engine->rule(sourceSimpleRule));
-    QVERIFY(engine->ruleError(sourceSimpleRule).isEmpty());
+    QVERIFY(engine.rule(sourceNoRule) == nullptr);
+    QVERIFY(!engine.ruleError(sourceNoRule).isEmpty());
+    QVERIFY(engine.rule(sourceBadRule) == nullptr);
+    QVERIFY(!engine.ruleError(sourceBadRule).isEmpty());
+    QVERIFY(engine.rule(sourceDummyRule) != nullptr);
+    QVERIFY(engine.ruleError(sourceDummyRule).isEmpty());
 
-    engine->stop();
-    QVERIFY(!engine->rule(sourceNoRule));
-    QVERIFY(engine->ruleError(sourceNoRule).isNull());
-    QVERIFY(!engine->rule(sourceBadRule));
-    QVERIFY(engine->ruleError(sourceBadRule).isNull());
-    QVERIFY(!engine->rule(sourceSimpleRule));
-    QVERIFY(engine->ruleError(sourceSimpleRule).isNull());
-
+    engine.stop();
+    QVERIFY(engine.rule(sourceNoRule) == nullptr);
+    QVERIFY(engine.ruleError(sourceNoRule).isNull());
+    QVERIFY(engine.rule(sourceBadRule) == nullptr);
+    QVERIFY(engine.ruleError(sourceBadRule).isNull());
+    QVERIFY(engine.rule(sourceDummyRule)  == nullptr);
+    QVERIFY(engine.ruleError(sourceDummyRule).isNull());
 }
 
 void TstPhoneBotEngine::cleanupTestCase()
 {
+    QTest::qWait(100); // Process delete later
 }
 
 

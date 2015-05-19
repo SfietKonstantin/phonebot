@@ -77,9 +77,6 @@ void TstParser::parseRule()
     QVERIFY(import->version().isEmpty());
     QVERIFY(import->importId().isEmpty());
 
-
-
-
     QmlObject::Ptr root = document->rootObject();
     QVERIFY(!root.isNull());
     QCOMPARE(root->properties().count(), 6);
@@ -98,12 +95,12 @@ void TstParser::parseRule()
     QCOMPARE(item->id(), QString("subTest"));
     QVERIFY(root->hasProperty("anchors.top"));
     QVariant anchorsTopProperty = root->property("anchors.top");
-    QVERIFY(anchorsTopProperty.canConvert<Reference>());
-    QCOMPARE(anchorsTopProperty.value<Reference>().value(), QString("parent.top"));
+    QVERIFY(anchorsTopProperty.canConvert<Reference::Ptr>());
+    QCOMPARE(anchorsTopProperty.value<Reference::Ptr>()->value(), QString("parent.top"));
     QVERIFY(root->hasProperty("js"));
     QVariant jsProperty = root->property("js");
-    QVERIFY(jsProperty.canConvert<Expression>());
-    QCOMPARE(jsProperty.value<Expression>().value(), QString("new Date(1960, 1, 1)"));
+    QVERIFY(jsProperty.canConvert<Expression::Ptr>());
+    QCOMPARE(jsProperty.value<Expression::Ptr>()->value(), QString("new Date(1960, 1, 1)"));
     QVERIFY(root->hasProperty("array"));
 
     // Children
@@ -120,8 +117,8 @@ void TstParser::parseRule()
     QCOMPARE(child->properties().count(), 1);
     QVERIFY(child->hasProperty("test.anchors.left"));
     QVariant testAnchorsLeft = child->property("test.anchors.left");
-    QVERIFY(testAnchorsLeft.canConvert<Reference>());
-    QCOMPARE(testAnchorsLeft.value<Reference>().value(), QString("test.anchors.right"));
+    QVERIFY(testAnchorsLeft.canConvert<Reference::Ptr>());
+    QCOMPARE(testAnchorsLeft.value<Reference::Ptr>()->value(), QString("test.anchors.right"));
 }
 
 void TstParser::testDocument()

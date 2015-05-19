@@ -88,7 +88,7 @@ void PhoneBotEnginePrivate::setRuleError(const QUrl &url, const QString &error)
 
 bool PhoneBotEnginePrivate::checkRule(Rule *rule)
 {
-    if (!rule) {
+    if (rule == nullptr) {
         return false;
     }
 
@@ -116,6 +116,12 @@ PhoneBotEngine::PhoneBotEngine(QObject *parent)
 PhoneBotEngine::~PhoneBotEngine()
 {
     stop();
+
+    // Delete static plugins (Qt do not perform this cleanup)
+    QObjectList staticPlugins = QPluginLoader::staticInstances();
+    for (QObject *plugin : staticPlugins) {
+        delete plugin;
+    }
 }
 
 void PhoneBotEngine::registerTypes()
@@ -174,7 +180,7 @@ QString PhoneBotEngine::componentError(const QUrl &url)const
 Rule * PhoneBotEngine::rule(const QUrl &url) const
 {
     Q_D(const PhoneBotEngine);
-    return d->rules.value(url, 0);
+    return d->rules.value(url, nullptr);
 }
 
 QString PhoneBotEngine::ruleError(const QUrl &url)const
