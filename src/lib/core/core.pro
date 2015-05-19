@@ -6,8 +6,9 @@ TARGET = phonebot
 
 QT = core qml
 
-CONFIG += c++11
 CONFIG += staticlib
+
+include(../../config.pri)
 
 HEADERS = rule.h \
     rule_p.h \

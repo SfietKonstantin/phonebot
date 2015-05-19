@@ -5,8 +5,9 @@ system(qdbusxml2cpp ../daemon/dbus/org.SfietKonstantin.phonebot.xml -p proxy)
 
 QT = core qml
 
-CONFIG += c++11
 CONFIG += staticlib
+
+include(../../config.pri)
 
 INCLUDEPATH += ../../lib/core \
     ../../lib/meta

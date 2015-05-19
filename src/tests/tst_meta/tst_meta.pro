@@ -3,6 +3,7 @@ TARGET = tst_meta
 
 QT = core dbus qml testlib
 
+include(../../config.pri)
 include(../../lib/nemomw/nemomw-deps.pri)
 
 INCLUDEPATH += ../../lib/core \

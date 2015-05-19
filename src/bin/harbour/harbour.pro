@@ -10,6 +10,7 @@ QT = core gui qml quick dbus
     RESOURCES += res.qrc
 }
 
+include(../../config.pri)
 include(../../lib/nemomw/nemomw-deps.pri)
 
 INCLUDEPATH += ../../lib/core \

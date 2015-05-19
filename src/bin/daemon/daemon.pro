@@ -3,6 +3,7 @@ TARGET = phonebotd
 
 QT = core dbus qml
 
+include(../../config.pri)
 include(../../lib/nemomw/nemomw-deps.pri)
 
 INCLUDEPATH += ../../lib/core \

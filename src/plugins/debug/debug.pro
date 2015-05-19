@@ -10,6 +10,8 @@ INCLUDEPATH += ../../lib/core \
 CONFIG += c++11
 CONFIG += plugin static
 
+include(../../config.pri)
+
 HEADERS = debugtrigger.h \
     adaptor.h \
     loggeraction.h

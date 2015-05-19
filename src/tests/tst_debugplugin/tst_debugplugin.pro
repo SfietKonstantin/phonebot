@@ -3,6 +3,8 @@ TARGET = tst_debugplugin
 
 QT = core dbus qml testlib
 
+include(../../config.pri)
+
 INCLUDEPATH += ../../lib/core \
     ../../plugins/debug
 LIBS += -L../../plugins/debug -lphonebotdebug \

@@ -3,6 +3,8 @@ TARGET = tst_action
 
 QT = core qml testlib
 
+include(../../config.pri)
+
 INCLUDEPATH += ../../lib/core
 LIBS += -L../../lib/core -lphonebot
 

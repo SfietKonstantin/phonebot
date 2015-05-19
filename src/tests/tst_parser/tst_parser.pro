@@ -3,6 +3,8 @@ TARGET = tst_parser
 
 QT = core qml testlib
 
+include(../../config.pri)
+
 INCLUDEPATH += ../../lib/meta
 LIBS +=     -L../../lib/meta -lphonebotmeta
 

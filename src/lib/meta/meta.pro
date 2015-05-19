@@ -7,8 +7,9 @@ TARGET = phonebotmeta
 
 QT = core qml qml-private
 
-CONFIG += c++11
 CONFIG += staticlib
+
+include(../../config.pri)
 
 INCLUDEPATH += ../core/
 
