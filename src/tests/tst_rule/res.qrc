@@ -4,5 +4,6 @@
         <file>simpleactionrule.qml</file>
         <file>SimpleJsAction.qml</file>
         <file>SimpleJsCondition.qml</file>
+        <file>mapperrule.qml</file>
     </qresource>
 </RCC>

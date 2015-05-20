@@ -16,5 +16,6 @@ OTHER_FILES += \
     simplerule.qml \
     SimpleJsCondition.qml \
     SimpleJsAction.qml \
-    simpleactionrule.qml
+    simpleactionrule.qml \
+    mapperrule.qml
 

@@ -169,6 +169,7 @@ void TstMeta::testMeta()
 
 void TstMeta::cleanupTestCase()
 {
+    QTest::qWait(100); // Process delete later
 }
 
 QTEST_MAIN(TstMeta)

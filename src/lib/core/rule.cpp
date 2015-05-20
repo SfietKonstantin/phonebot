@@ -53,9 +53,7 @@ Action * RulePrivate::actions_at(QQmlListProperty<Action> *list, int index)
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
     Q_ASSERT(rule);
-    if (index < 0 && index >= rule->d_func()->actions.count()) {
-        return nullptr;
-    }
+    Q_ASSERT(index >= 0 && index < rule->d_func()->actions.count());
     return rule->d_func()->actions.at(index);
 }
 
@@ -86,9 +84,7 @@ AbstractMapper * RulePrivate::mappers_at(QQmlListProperty<AbstractMapper> *list,
 {
     Rule *rule = qobject_cast<Rule *>(list->object);
     Q_ASSERT(rule);
-    if (index < 0 && index >= rule->d_func()->mappers.count()) {
-        return nullptr;
-    }
+    Q_ASSERT(index >= 0 && index < rule->d_func()->mappers.count());
     return rule->d_func()->mappers.at(index);
 }
 

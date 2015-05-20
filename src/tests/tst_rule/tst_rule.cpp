@@ -36,6 +36,7 @@
 #include <jscondition.h>
 #include <phonebotengine.h>
 #include <rule.h>
+#include <timemapper.h>
 #include <trigger.h>
 
 class SimpleTrigger: public Trigger
@@ -46,6 +47,26 @@ public:
     void sendSignal() {
         emit triggered();
     }
+};
+
+class TimeTrigger: public Trigger
+{
+    Q_OBJECT
+    Q_PROPERTY(QTime time READ time WRITE setTime NOTIFY timeChanged)
+public:
+    explicit TimeTrigger(QObject *parent = 0) : Trigger(parent) {}
+    QTime time() const { return m_time; }
+    void setTime(const QTime &time)
+    {
+        if (m_time != time) {
+            m_time = time;
+            emit timeChanged();
+        }
+    }
+signals:
+    void timeChanged();
+private:
+    QTime m_time;
 };
 
 class SimpleCondition: public Condition
@@ -86,13 +107,15 @@ class TstRule : public QObject
 private Q_SLOTS:
     void initTestCase();
     void testJs();
-    void disable();
+    void testDisable();
+    void testMapper();
     void cleanupTestCase();
 };
 
 void TstRule::initTestCase()
 {
     qmlRegisterType<SimpleTrigger>("org.SfietKonstantin.phonebot.tst_rule", 1, 0, "SimpleTrigger");
+    qmlRegisterType<TimeTrigger>("org.SfietKonstantin.phonebot.tst_rule", 1, 0, "TimeTrigger");
     qmlRegisterType<SimpleCondition>("org.SfietKonstantin.phonebot.tst_rule", 1, 0, "SimpleCondition");
     qmlRegisterType<SimpleAction>("org.SfietKonstantin.phonebot.tst_rule", 1, 0, "SimpleAction");
 }
@@ -119,11 +142,11 @@ void TstRule::testJs()
     rule->setEnabled(true);
     QVERIFY(rule != nullptr);
 
-    Trigger *trigger = rule->trigger();
-    QVERIFY(trigger != nullptr);
+    Trigger *triggerObject = rule->trigger();
+    QVERIFY(triggerObject != nullptr);
 
-    SimpleTrigger *simpleTrigger = qobject_cast<SimpleTrigger *>(trigger);
-    QVERIFY(simpleTrigger != nullptr);
+    SimpleTrigger *trigger = qobject_cast<SimpleTrigger *>(triggerObject);
+    QVERIFY(trigger != nullptr);
 
     Condition *conditionObject = rule->condition();
     QVERIFY(conditionObject != nullptr);
@@ -152,16 +175,16 @@ void TstRule::testJs()
     QVERIFY(signalIndex != -1);
 
     QSignalSpy actionSpy (action, SIGNAL(executed()));
-    simpleTrigger->sendSignal();
+    trigger->sendSignal();
     QCOMPARE(actionSpy.count(), 1);
     QCOMPARE(property.read(condition).toBool(), true);
 
-    simpleTrigger->sendSignal();
+    trigger->sendSignal();
     QCOMPARE(actionSpy.count(), 1);
     QCOMPARE(property.read(condition).toBool(), false);
 }
 
-void TstRule::disable()
+void TstRule::testDisable()
 {
     PhoneBotEngine engine;
     engine.registerTypes();
@@ -182,11 +205,11 @@ void TstRule::disable()
     rule->setEnabled(true);
     QVERIFY(rule != nullptr);
 
-    Trigger *trigger = rule->trigger();
-    QVERIFY(trigger != nullptr);
+    Trigger *triggerObject = rule->trigger();
+    QVERIFY(triggerObject != nullptr);
 
-    SimpleTrigger *simpleTrigger = qobject_cast<SimpleTrigger *>(trigger);
-    QVERIFY(simpleTrigger != nullptr);
+    SimpleTrigger *trigger = qobject_cast<SimpleTrigger *>(triggerObject);
+    QVERIFY(trigger != nullptr);
 
     Condition *condition = rule->condition();
     QVERIFY(condition != nullptr);
@@ -213,19 +236,19 @@ void TstRule::disable()
     // Standard condition
     QSignalSpy actionSpy1 (simpleAction1, SIGNAL(executed()));
     QSignalSpy actionSpy2 (simpleAction2, SIGNAL(executed()));
-    simpleTrigger->sendSignal();
+    trigger->sendSignal();
     QCOMPARE(actionSpy1.count(), 1);
     QCOMPARE(actionSpy2.count(), 1);
 
     // Condition is not true
     simpleCondition->setValid(false);
-    simpleTrigger->sendSignal();
+    trigger->sendSignal();
     QCOMPARE(actionSpy1.count(), 1);
     QCOMPARE(actionSpy2.count(), 1);
 
     // Disable condition (should work even if the condition is not true)
     simpleCondition->setEnabled(false);
-    simpleTrigger->sendSignal();
+    trigger->sendSignal();
     QCOMPARE(actionSpy1.count(), 2);
     QCOMPARE(actionSpy2.count(), 2);
 
@@ -233,16 +256,75 @@ void TstRule::disable()
     simpleCondition->setEnabled(true);
     simpleCondition->setValid(true);
     simpleAction1->setEnabled(false);
-    simpleTrigger->sendSignal();
+    trigger->sendSignal();
     QCOMPARE(actionSpy1.count(), 2);
     QCOMPARE(actionSpy2.count(), 3);
 
     // Disable the rule
     simpleAction1->setEnabled(true);
+    QVERIFY(rule->isEnabled());
     rule->setEnabled(false);
-    simpleTrigger->sendSignal();
+    QVERIFY(!rule->isEnabled());
+    trigger->sendSignal();
     QCOMPARE(actionSpy1.count(), 2);
     QCOMPARE(actionSpy2.count(), 3);
+}
+
+void TstRule::testMapper()
+{
+    PhoneBotEngine engine;
+    engine.registerTypes();
+
+    // Insert component
+    QUrl source ("qrc:/mapperrule.qml");
+    engine.addComponent(source);
+
+    // Wait
+    QSignalSpy spy(&engine, SIGNAL(componentLoadingFinished(QUrl,bool)));
+    while (spy.count() < 1) {
+        QTest::qWait(100);
+    }
+
+    // Some checks
+    engine.start();
+    Rule *rule = engine.rule(source);
+    rule->setEnabled(true);
+    QVERIFY(rule != nullptr);
+
+    Trigger *triggerObject = rule->trigger();
+    QVERIFY(triggerObject != nullptr);
+
+    TimeTrigger *trigger = qobject_cast<TimeTrigger *>(triggerObject);
+    QVERIFY(trigger != nullptr);
+
+    QQmlListReference actions (rule, "actions");
+    QCOMPARE(actions.count(), 1);
+
+    QObject *actionObject = actions.at(0);
+    QVERIFY(actionObject != nullptr);
+
+    SimpleAction *action = qobject_cast<SimpleAction *>(actionObject);
+    QVERIFY(action != nullptr);
+
+    QQmlListReference mappers (rule, "mappers");
+    QCOMPARE(mappers.count(), 1);
+
+    QObject *mapperObject = mappers.at(0);
+    QVERIFY(mapperObject != nullptr);
+
+    TimeMapper *mapper = qobject_cast<TimeMapper *>(mapperObject);
+    QVERIFY(mapper != nullptr);
+
+    // Test mapper
+    QSignalSpy triggerSpy(trigger, SIGNAL(timeChanged()));
+    mapper->setHour(12);
+    QCOMPARE(triggerSpy.count(), 1);
+    QCOMPARE(trigger->time().hour(), 0); // Invalid time got mapped to 0:00 in JS
+    QCOMPARE(trigger->time().minute(), 0); // Invalid time got mapped to 0:00 in JS
+    mapper->setMinute(34);
+    QCOMPARE(triggerSpy.count(), 2);
+    QCOMPARE(trigger->time().hour(), mapper->hour());
+    QCOMPARE(trigger->time().minute(), mapper->minute());
 }
 
 void TstRule::cleanupTestCase()
