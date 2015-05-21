@@ -109,6 +109,7 @@ private Q_SLOTS:
     void testJs();
     void testDisable();
     void testMapper();
+    void testSetTrigger();
     void cleanupTestCase();
 };
 
@@ -325,6 +326,28 @@ void TstRule::testMapper()
     QCOMPARE(triggerSpy.count(), 2);
     QCOMPARE(trigger->time().hour(), mapper->hour());
     QCOMPARE(trigger->time().minute(), mapper->minute());
+}
+
+void TstRule::testSetTrigger()
+{
+    // Set trigger test
+    Rule rule;
+    SimpleTrigger trigger1;
+    rule.setTrigger(&trigger1);
+    QQmlListReference actions (&rule, "actions");
+    SimpleAction action;
+    actions.append(&action);
+    QSignalSpy actionSpy(&action, SIGNAL(executed()));
+    trigger1.sendSignal();
+    QCOMPARE(actionSpy.count(), 1);
+
+    SimpleTrigger trigger2;
+    rule.setTrigger(&trigger2);
+
+    trigger1.sendSignal();
+    QCOMPARE(actionSpy.count(), 1);
+    trigger2.sendSignal();
+    QCOMPARE(actionSpy.count(), 2);
 }
 
 void TstRule::cleanupTestCase()

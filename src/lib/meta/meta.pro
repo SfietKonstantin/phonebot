@@ -13,9 +13,6 @@ include(../../config.pri)
 
 INCLUDEPATH += ../core/
 
-# From QtCreator
-#include(meta.pri)
-
 HEADERS += \
     phonebotmeta.h \
     abstractmetadata.h \

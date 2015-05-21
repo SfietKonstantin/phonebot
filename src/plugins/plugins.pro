@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 SUBDIRS = debug
-!CONFIG(testing):{
+!CONFIG(coverage):{
 SUBDIRS  += \
     profile \
     time \

@@ -1,5 +1,5 @@
 include(../../3rdparty/libnemomw/nemomw-static.pri)
-!CONFIG(testing):{
+!CONFIG(coverage):{
 include(../../3rdparty/libnemomw/keepalive/keepalive.pri)
 include(../../3rdparty/libnemomw/profile/profile.pri)
 include(../../3rdparty/libnemomw/connman/connman.pri)

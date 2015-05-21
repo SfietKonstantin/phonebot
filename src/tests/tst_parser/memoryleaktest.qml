@@ -29,20 +29,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-import org.SfietKonstantin.phonebot 1.0
-import org.SfietKonstantin.phonebot.debug 1.0
-import org.SfietKonstantin.phonebot.tst_debugplugin 1.0
+import QtQuick 2.0
 
-Rule {
-    name: "Debug rule"
-    trigger: DebugTrigger {
-        path: "/test"
-    }
-    condition: DummyCondition {}
-    actions: [PongAction {}, LoggerAction{}]
-    mappers: TimeMapper {
-        hour: 12
-        minute: 34
-    }
+Rectangle {
+    Item {}
+    states: State {}
 }
 

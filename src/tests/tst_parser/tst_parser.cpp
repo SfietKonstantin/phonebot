@@ -38,7 +38,8 @@ class TstParser : public QObject
     Q_OBJECT
 private Q_SLOTS:
     void initTestCase();
-    void parseRule();
+    void testParseRule();
+    void testParseMemoryLeakRule();
     void testDocument();
     void cleanupTestCase();
 };
@@ -47,7 +48,31 @@ void TstParser::initTestCase()
 {
 }
 
-void TstParser::parseRule()
+class DummyShared
+{
+public:
+    typedef QSharedPointer<DummyShared> Ptr;
+    DummyShared(const DummyShared &) = delete;
+    DummyShared(DummyShared &&) = delete;
+    DummyShared & operator=(const DummyShared &) = delete;
+    DummyShared & operator=(DummyShared &&) = delete;
+    ~DummyShared()
+    {
+        m_destructorCalled = true;
+    }
+    static Ptr create(bool &destructorCalled)
+    {
+        destructorCalled = false;
+        return Ptr(new DummyShared(destructorCalled));
+    }
+private:
+    explicit DummyShared(bool &destructorCalled) : m_destructorCalled(destructorCalled) {}
+    bool &m_destructorCalled;
+};
+
+Q_DECLARE_METATYPE(DummyShared::Ptr)
+
+void TstParser::testParseRule()
 {
     QString fileName = ":/simpletest.qml";
     QmlDocument::Ptr document = QmlDocument::create(fileName);
@@ -119,6 +144,23 @@ void TstParser::parseRule()
     QVariant testAnchorsLeft = child->property("test.anchors.left");
     QVERIFY(testAnchorsLeft.canConvert<Reference::Ptr>());
     QCOMPARE(testAnchorsLeft.value<Reference::Ptr>()->value(), QString("test.anchors.right"));
+}
+
+void TstParser::testParseMemoryLeakRule()
+{
+    // Used to debug the tricky QmlObject::~QmlObject not called issue
+    // Basically, QmlObject contains a hiearchy of QmlObjects, and QSharedPointer
+    // creates a destruction hiearchy. However, during parsing, this hiearchy is not
+    // ready, making some objects not destroyable.
+    QWeakPointer<QmlObject> weakRoot;
+    {
+        QString fileName = ":/memoryleaktest.qml";
+        QmlDocument::Ptr document = QmlDocument::create(fileName);
+        QVERIFY(!document.isNull());
+        QVERIFY(!document->rootObject().isNull());
+        weakRoot = document->rootObject().toWeakRef();
+    }
+    QVERIFY(weakRoot.isNull());
 }
 
 void TstParser::testDocument()

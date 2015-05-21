@@ -111,7 +111,6 @@ class QmlObject
 {
 public:
     typedef QSharedPointer<QmlObject> Ptr;
-    typedef QSharedPointer<const QmlObject> ConstPtr;
     QmlObject(const QmlObject &) = delete;
     QmlObject(QmlObject &&) = delete;
     QmlObject & operator=(const QmlObject &) = delete;
@@ -157,7 +156,6 @@ protected:
     explicit QmlDocumentBase(QmlDocumentBasePrivate &dd);
     QScopedPointer<QmlDocumentBasePrivate> d_ptr;
 private:
-    explicit QmlDocumentBase();
     Q_DECLARE_PRIVATE(QmlDocumentBase)
 };
 

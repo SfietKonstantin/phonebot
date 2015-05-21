@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>simpletest.qml</file>
         <file>Test.qml</file>
+        <file>memoryleaktest.qml</file>
     </qresource>
 </RCC>

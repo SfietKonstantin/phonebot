@@ -136,7 +136,7 @@ class TstMeta : public QObject
 private Q_SLOTS:
     void initTestCase();
     void testMeta();
-   void cleanupTestCase();
+    void cleanupTestCase();
 };
 
 void TstMeta::initTestCase()

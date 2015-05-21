@@ -13,5 +13,6 @@ SOURCES += tst_parser.cpp
 RESOURCES += res.qrc
 
 OTHER_FILES += simpletest.qml \
-    Test.qml
+    Test.qml \
+    memoryleaktest.qml
 

@@ -84,22 +84,14 @@ ImportStatement::Ptr ImportStatement::createImport(const QString &importUri,
                                                    const QString &version,
                                                    const QString &importId)
 {
-    ImportStatement::Ptr object = ImportStatement::Ptr(new ImportStatement);
-    object->d_ptr->importUri = importUri;
-    object->d_ptr->version = version;
-    object->d_ptr->importId = importId;
-    return object;
+    return ImportStatement::create(importUri, QString(), version, importId);
 }
 
 ImportStatement::Ptr ImportStatement::createFileImport(const QString &importFile,
                                                        const QString &version,
                                                        const QString &importId)
 {
-    ImportStatement::Ptr object = ImportStatement::Ptr(new ImportStatement);
-    object->d_ptr->importFile = importFile;
-    object->d_ptr->version = version;
-    object->d_ptr->importId = importId;
-    return object;
+    return ImportStatement::create(QString(), importFile, version, importId);
 }
 
 QString ImportStatement::importUri() const
@@ -204,13 +196,12 @@ class CreatableQmlObject: public QmlObject
 {
 public:
     typedef QSharedPointer<CreatableQmlObject> Ptr;
-    typedef QSharedPointer<const CreatableQmlObject> ConstPtr;
-    explicit CreatableQmlObject();
     static CreatableQmlObject::Ptr create(const QString &type);
     static QmlObject::Ptr toObject(Ptr creatable);
     QmlObjectPrivate * d();
     const QmlObjectPrivate * d() const;
 private:
+    explicit CreatableQmlObject();
     Q_DECLARE_PRIVATE(QmlObject)
 };
 
@@ -435,11 +426,11 @@ public:
     {
         error = QmlDocument::NoError;
         errors.clear();
-        _imports = &imports;
-        _imports->clear();
-        _source = source;
+        m_imports = &imports;
+        m_imports->clear();
+        m_source = source;
         QQmlJS::AST::Node::accept(node, this);
-        return _current;
+        return m_current;
     }
 protected:
 #ifdef QMLDOCUMENT_DEBUG
@@ -449,10 +440,10 @@ protected:
         qDebug() << "Full:";
         int offset = ast->firstSourceLocation().offset;
         int length = ast->lastSourceLocation().offset + ast->lastSourceLocation().length - offset;
-        qDebug() << _source.mid(offset, length);
+        qDebug() << m_source.mid(offset, length);
         qDebug() << "First";
         length = ast->firstSourceLocation().length;
-        qDebug() << _source.mid(offset, length);
+        qDebug() << m_source.mid(offset, length);
         return true;
     }
 
@@ -476,14 +467,14 @@ protected:
 
         int offset = ast->versionToken.offset;
         int length = ast->versionToken.length;
-        QString version = _source.mid(offset, length);
+        QString version = m_source.mid(offset, length);
 
         QString fileName = ast->fileName.toString();
         QString importId = ast->importId.toString();
 
         ImportStatement::Ptr import = ImportStatement::create(importUri, fileName, version,
                                                               importId);
-        _imports->append(import);
+        m_imports->append(import);
         return true;
     }
 
@@ -510,19 +501,19 @@ protected:
             return false;
         }
 
-        Q_ASSERT(!_buffers.isEmpty());
-        ExpressionBuffer::Ptr buffer = _buffers.top();
+        Q_ASSERT(!m_buffers.isEmpty());
+        ExpressionBuffer::Ptr buffer = m_buffers.top();
 
         int offset = ast->firstSourceLocation().offset;
         int length = ast->lastSourceLocation().offset + ast->lastSourceLocation().length - offset;
-        buffer->source = _source.mid(offset, length);
+        buffer->source = m_source.mid(offset, length);
         return true;
     }
 
     void endVisit(QQmlJS::AST::ExpressionStatement *)
     {
-        Q_ASSERT(!_buffers.isEmpty());
-        ExpressionBuffer::Ptr buffer = _buffers.top();
+        Q_ASSERT(!m_buffers.isEmpty());
+        ExpressionBuffer::Ptr buffer = m_buffers.top();
 
         // If we found an unparsable entry, we just put
         // the source
@@ -536,7 +527,7 @@ protected:
                 if (reference->value() != buffer->source) {
                     ok = false;
 #ifdef QMLDOCUMENT_DEBUG
-                    qDebug() << "Reference is" << reference.value() << "and source" << buffer->source;
+                    qDebug() << "Reference is" << reference->value() << "and source" << buffer->source;
 #endif
                 }
             }
@@ -570,13 +561,13 @@ protected:
 
         Q_ASSERT(!identifier.isEmpty());
         Q_ASSERT(!fieldMembers.isEmpty());
-        _buffers.top()->buffer.append(QVariant::fromValue(Reference::create(identifier, fieldMembers)));
+        m_buffers.top()->buffer.append(QVariant::fromValue(Reference::create(identifier, fieldMembers)));
         return false;
     }
 
     bool visit(QQmlJS::AST::IdentifierExpression *ast)
     {
-        _buffers.top()->buffer.append(QVariant::fromValue(Reference::create(ast->name.toString())));
+        m_buffers.top()->buffer.append(QVariant::fromValue(Reference::create(ast->name.toString())));
         return true;
     }
 
@@ -586,8 +577,8 @@ protected:
             return false;
         }
 
-        Q_ASSERT(!_bindings.isEmpty());
-        _buffers.top()->buffer.append(ast->value);
+        Q_ASSERT(!m_bindings.isEmpty());
+        m_buffers.top()->buffer.append(ast->value);
         return true;
     }
 
@@ -597,8 +588,8 @@ protected:
             return false;
         }
 
-        Q_ASSERT(!_bindings.isEmpty());
-        _buffers.top()->buffer.append(ast->value.toString());
+        Q_ASSERT(!m_bindings.isEmpty());
+        m_buffers.top()->buffer.append(ast->value.toString());
         return true;
     }
 
@@ -608,8 +599,8 @@ protected:
             return false;
         }
 
-        Q_ASSERT(!_bindings.isEmpty());
-        _buffers.top()->buffer.append(QVariant(true));
+        Q_ASSERT(!m_bindings.isEmpty());
+        m_buffers.top()->buffer.append(QVariant(true));
         return true;
     }
 
@@ -619,8 +610,8 @@ protected:
             return false;
         }
 
-        Q_ASSERT(!_bindings.isEmpty());
-        _buffers.top()->buffer.append(QVariant(false));
+        Q_ASSERT(!m_bindings.isEmpty());
+        m_buffers.top()->buffer.append(QVariant(false));
         return true;
     }
 
@@ -637,15 +628,15 @@ protected:
         // Push a second buffer for list
         ExpressionBuffer::Ptr buffer = ExpressionBuffer::create();
         buffer->isArray = true;
-        _buffers.push(buffer);
+        m_buffers.push(buffer);
         return true;
     }
 
     void endVisit(QQmlJS::AST::UiArrayBinding *)
     {
         // Pop the first buffer and aggregate in the new buffer
-        QVariantList buffers = _buffers.pop()->buffer;
-        _buffers.top()->buffer.append(QVariant(buffers));
+        QVariantList buffers = m_buffers.pop()->buffer;
+        m_buffers.top()->buffer.append(QVariant(buffers));
         endVisitBindings();
     }
 
@@ -662,18 +653,20 @@ protected:
 
         // Also push an object
         CreatableQmlObject::Ptr object = CreatableQmlObject::create(ast->qualifiedTypeNameId->name.toString());
-        object->d()->parent = _current;
-        _current = object;
+        object->d()->parent = m_current;
+        m_current = object;
 
         // Directly insert the object inside the buffer
-        _buffers.top()->buffer.append(QVariant::fromValue(CreatableQmlObject::toObject(object)));
+        m_buffers.top()->buffer.append(QVariant::fromValue(CreatableQmlObject::toObject(object)));
         return true;
     }
 
     void endVisit(QQmlJS::AST::UiObjectBinding *)
     {
-        Q_ASSERT(!_current->d()->parent.isNull());
-        _current = _current->d()->parent;
+        Q_ASSERT(!m_current->d()->parent.isNull());
+        CreatableQmlObject::Ptr parent = m_current->d()->parent;
+        m_current->d()->parent.clear(); // Remove circular references on children and parent
+        m_current = parent;
         endVisitBindings();
     }
 
@@ -685,17 +678,17 @@ protected:
         }
 
         CreatableQmlObject::Ptr object = CreatableQmlObject::create(ast->qualifiedTypeNameId->name.toString());
-        object->d()->parent = _current;
+        object->d()->parent = m_current;
 
-        _current = object;
+        m_current = object;
         return true;
     }
 
     void endVisit(QQmlJS::AST::UiObjectDefinition *ast)
     {
-        if (_current->d()->parent.isNull()) {
+        if (m_current->d()->parent.isNull()) {
             // We are at root, let's check if the root is a Rule
-            if (_current->type() != "Rule") {
+            if (m_current->type() != "Rule") {
                 Error ruleError;
                 ruleError.column = ast->firstSourceLocation().startColumn;
                 ruleError.line = ast->firstSourceLocation().startLine;
@@ -708,15 +701,17 @@ protected:
         }
 
         bool inArray = false;
-        if (!_buffers.isEmpty()) {
-            inArray = _buffers.top()->isArray;
+        if (!m_buffers.isEmpty()) {
+            inArray = m_buffers.top()->isArray;
         }
         if (!inArray) {
-            _current->d()->parent->d()->children.append(_current);
+            m_current->d()->parent->d()->children.append(m_current);
         } else {
-            _buffers.top()->buffer.append(QVariant::fromValue(CreatableQmlObject::toObject(_current)));
+            m_buffers.top()->buffer.append(QVariant::fromValue(CreatableQmlObject::toObject(m_current)));
         }
-        _current = _current->d()->parent;
+        CreatableQmlObject::Ptr parent = m_current->d()->parent;
+        m_current->d()->parent.clear(); // Remove circular references on children and parent
+        m_current = parent;
     }
 
 private:
@@ -725,39 +720,39 @@ private:
     {
         int offset = key->firstSourceLocation().offset;
         int length = key->lastSourceLocation().offset + key->lastSourceLocation().length - offset;
-        _bindings.push(_source.mid(offset, length));
+        m_bindings.push(m_source.mid(offset, length));
 
         // Also push a buffer
-        _buffers.push(ExpressionBuffer::create());
+        m_buffers.push(ExpressionBuffer::create());
     }
 
     void endVisitBindings()
     {
-        Q_ASSERT(!_buffers.isEmpty());
-        Q_ASSERT(!_bindings.isEmpty());
-        Q_ASSERT(!_current.isNull());
-        QString binding = _bindings.pop();
-        ExpressionBuffer::Ptr buffer = _buffers.pop();
+        Q_ASSERT(!m_buffers.isEmpty());
+        Q_ASSERT(!m_bindings.isEmpty());
+        Q_ASSERT(!m_current.isNull());
+        QString binding = m_bindings.pop();
+        ExpressionBuffer::Ptr buffer = m_buffers.pop();
         Q_ASSERT(buffer->buffer.count() == 1);
 
         QVariant value = buffer->buffer.first();
         if (binding == "id" && value.canConvert<Reference::Ptr>()) {
             Reference::Ptr id = value.value<Reference::Ptr>();
-            _current->setId(id->identifier());
+            m_current->setId(id->identifier());
         } else {
-            _current->d()->properties.insert(binding, value);
+            m_current->d()->properties.insert(binding, value);
         }
     }
 
-    QList<ImportStatement::Ptr> *_imports;
-    QString _source;
+    QList<ImportStatement::Ptr> *m_imports;
+    QString m_source;
     // Stack of values of the current binding
-    QStack<QString> _bindings;
+    QStack<QString> m_bindings;
     // Value of the current object being filled. Initially empty
     // it's created when the first object is found.
-    CreatableQmlObject::Ptr _current;
+    CreatableQmlObject::Ptr m_current;
     // Expression buffer, filled when needed (evaluating JS or binding)
-    QStack<ExpressionBuffer::Ptr> _buffers;
+    QStack<ExpressionBuffer::Ptr> m_buffers;
 
 };
 
@@ -770,11 +765,6 @@ struct QmlDocumentBasePrivate
 };
 
 QmlDocumentBasePrivate::QmlDocumentBasePrivate()
-{
-}
-
-QmlDocumentBase::QmlDocumentBase()
-    : d_ptr(new QmlDocumentBasePrivate)
 {
 }
 

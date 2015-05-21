@@ -34,10 +34,23 @@
 #include <QtDBus/QDBusInterface>
 #include <QtQml/qqml.h>
 #include <action.h>
+#include <condition.h>
 #include <phonebotengine.h>
 #include <rule.h>
 
 Q_IMPORT_PLUGIN(PhoneBotDebugPlugin)
+
+class DummyCondition: public Condition
+{
+    Q_OBJECT
+public:
+    explicit DummyCondition(QObject *parent = 0) : Condition(parent) {}
+    bool isValid(Rule *rule) override
+    {
+        Q_UNUSED(rule)
+        return true;
+    }
+};
 
 class PongAction: public Action
 {
@@ -79,6 +92,7 @@ void TstDebugPlugin::testDebugTrigger()
 {
     PhoneBotEngine *engine = new PhoneBotEngine(this);
     engine->registerTypes();
+    qmlRegisterType<DummyCondition>("org.SfietKonstantin.phonebot.tst_debugplugin", 1, 0, "DummyCondition");
     qmlRegisterType<PongAction>("org.SfietKonstantin.phonebot.tst_debugplugin", 1, 0, "PongAction");
 
     // Insert component
