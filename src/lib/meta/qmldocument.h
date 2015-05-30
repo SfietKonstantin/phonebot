@@ -96,7 +96,6 @@ public:
     static Ptr create(const QString &identifier = QString(),
                       const QStringList &fieldMembers = QStringList());
     QString identifier() const;
-    QStringList fieldMembers() const;
     QString value() const;
 private:
     explicit Reference(const QString &identifier, const QStringList &fieldMembers);
@@ -174,8 +173,6 @@ public:
 
     virtual ~QmlDocument();
     static Ptr create(const QString &fileName);
-    static QmlDocumentBase::Ptr toBase(Ptr object);
-    static QmlDocumentBase::ConstPtr toBase(ConstPtr object);
     QString fileName() const;
     ErrorType error() const;
     QString errorMessage() const;
@@ -194,7 +191,6 @@ public:
     static Ptr create();
     static QmlDocumentBase::Ptr toBase(Ptr object);
     static QmlDocumentBase::ConstPtr toBase(ConstPtr object);
-    void clearImports();
     void addImport(ImportStatement::Ptr import);
     void setRootObject(QmlObject::Ptr rootObject);
 private:

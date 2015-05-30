@@ -14,5 +14,6 @@ RESOURCES += res.qrc
 
 OTHER_FILES += simpletest.qml \
     Test.qml \
-    memoryleaktest.qml
+    memoryleaktest.qml \
+    parseerrorrule.qml
 

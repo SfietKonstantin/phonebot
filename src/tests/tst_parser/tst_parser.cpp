@@ -41,6 +41,7 @@ private Q_SLOTS:
     void testParseRule();
     void testParseMemoryLeakRule();
     void testDocument();
+    void testParseError();
     void cleanupTestCase();
 };
 
@@ -104,7 +105,7 @@ void TstParser::testParseRule()
 
     QmlObject::Ptr root = document->rootObject();
     QVERIFY(!root.isNull());
-    QCOMPARE(root->properties().count(), 6);
+    QCOMPARE(root->properties().count(), 9);
     QCOMPARE(root->type(), QString("Rectangle"));
     QCOMPARE(root->id(), QString("test"));
 
@@ -113,6 +114,10 @@ void TstParser::testParseRule()
     QCOMPARE(root->property("width"), QVariant(100));
     QVERIFY(root->hasProperty("text"));
     QCOMPARE(root->property("text"), QVariant("Test"));
+    QVERIFY(root->hasProperty("enabled"));
+    QCOMPARE(root->property("enabled"), QVariant(true));
+    QVERIFY(root->hasProperty("visible"));
+    QCOMPARE(root->property("visible"), QVariant(false));
     QVERIFY(root->hasProperty("item"));
     QmlObject::Ptr item = root->property("item").value<QmlObject::Ptr>();
     QVERIFY(!item.isNull());
@@ -127,6 +132,15 @@ void TstParser::testParseRule()
     QVERIFY(jsProperty.canConvert<Expression::Ptr>());
     QCOMPARE(jsProperty.value<Expression::Ptr>()->value(), QString("new Date(1960, 1, 1)"));
     QVERIFY(root->hasProperty("array"));
+    QVariant arrayProperty = root->property("array");
+    QVERIFY(arrayProperty.canConvert<Expression::Ptr>());
+    QCOMPARE(arrayProperty.value<Expression::Ptr>()->value(), QString("[1, 2, 3]"));
+    QVariant childrenProperty = root->property("children");
+    QVERIFY(childrenProperty.canConvert<QVariantList>());
+    const QVariantList &childrenList = childrenProperty.toList();
+    QCOMPARE(childrenList.count(), 1);
+    QVERIFY(childrenList.first().canConvert<QmlObject::Ptr>());
+    QCOMPARE(childrenList.first().value<QmlObject::Ptr>()->type(), QString("Item"));
 
     // Children
     QCOMPARE(root->children().count(), 2);
@@ -165,25 +179,78 @@ void TstParser::testParseMemoryLeakRule()
 
 void TstParser::testDocument()
 {
-    QmlObject::Ptr root = QmlObject::create("Test");
-    root->setId("test");
+    QmlObject::Ptr object = QmlObject::create("Test");
+    object->setId("test");
+
+    QmlObject::Ptr small = QmlObject::create("Small");
+    QList<QmlObject::Ptr>  children;
+    children.append(small);
+    object->setChildren(children);
 
     QVariantMap properties;
     QVariantList intList;
+    properties.insert("boolTrue", QVariant(true));
+    properties.insert("boolFalse", QVariant(false));
+    properties.insert("float", QVariant(123.45));
     intList << 1 << 2 << 3 << 4;
     properties.insert("intList", intList);
-    QString string = "My test string";
-    properties.insert("string", string);
-    root->setProperties(properties);
-    qWarning() << root->toString(0);
-
-    QmlObject::Ptr superRoot = QmlObject::create("Super");
-    QVariantMap superProperties;
     QVariantList objectList;
-    objectList << QVariant::fromValue(root);
-    superProperties.insert("objectList", objectList);
-    superRoot->setProperties(superProperties);
-    qWarning() << superRoot->toString(0);
+    objectList << QVariant::fromValue(small);
+    properties.insert("objectList", objectList);
+    QStringList fieldValues;
+    fieldValues << "root" << "reference";
+    properties.insert("reference", QVariant::fromValue(Reference::create("parent", fieldValues)));
+    properties.insert("string", "My test string");
+    object->setProperties(properties);
+    QString result;
+    QTextStream resultStream(&result);
+    resultStream << "Test {" << endl
+                 << "    id: test" << endl
+                 << "    boolFalse: false" << endl
+                 << "    boolTrue: true" << endl
+                 << "    float: 123.45" << endl
+                 << "    intList: [" << endl
+                 << "        1," << endl
+                 << "        2," << endl
+                 << "        3," << endl
+                 << "        4" << endl
+                 << "    ]" << endl
+                 << "    objectList: [" << endl
+                 << "        Small {" << endl
+                 << "        }" << endl
+                 << "    ]" << endl
+                 << "    reference: parent.root.reference" << endl
+                 << "    string: \"My test string\"" << endl
+                 << "    Small {" << endl
+                 << "    }" << endl
+                 << "}" << endl;
+    QCOMPARE(object->toString(0), result);
+
+    WritableQmlDocument::Ptr document = WritableQmlDocument::create();
+    document->addImport(ImportStatement::createImport("QtQuick", "2.0", "QQ"));
+    document->addImport(ImportStatement::createFileImport("Test.js"));
+    document->setRootObject(object);
+
+    QString documentResult;
+    QTextStream documentResultStream(&documentResult);
+    documentResultStream << "import QtQuick 2.0 as QQ" << endl
+                         << "import \"Test.js\"" << endl
+                         << endl
+                         << result;
+    QCOMPARE(document->toString(), documentResult);
+}
+
+void TstParser::testParseError()
+{
+    // Invalid file
+    QmlDocument::Ptr invalidDocument = QmlDocument::create(":/invalid.qml");
+    QVERIFY(invalidDocument.isNull());
+
+    // Parse error
+    QmlDocument::Ptr parseErrorDocument = QmlDocument::create(":/parseerrorrule.qml");
+    QVERIFY(!parseErrorDocument.isNull());
+    QCOMPARE(parseErrorDocument->error(), QmlDocument::ParseError);
+    QVERIFY(!parseErrorDocument->errorMessage().isEmpty());
 }
 
 void TstParser::cleanupTestCase()

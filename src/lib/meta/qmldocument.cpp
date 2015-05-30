@@ -177,11 +177,6 @@ QString Reference::identifier() const
     return m_identifier;
 }
 
-QStringList Reference::fieldMembers() const
-{
-    return m_fieldMembers;
-}
-
 QString Reference::value() const
 {
     QString value = m_identifier;
@@ -199,7 +194,6 @@ public:
     static CreatableQmlObject::Ptr create(const QString &type);
     static QmlObject::Ptr toObject(Ptr creatable);
     QmlObjectPrivate * d();
-    const QmlObjectPrivate * d() const;
 private:
     explicit CreatableQmlObject();
     Q_DECLARE_PRIVATE(QmlObject)
@@ -234,12 +228,6 @@ QmlObject::Ptr CreatableQmlObject::toObject(CreatableQmlObject::Ptr creatable)
 QmlObjectPrivate * CreatableQmlObject::d()
 {
     Q_D(QmlObject);
-    return d;
-}
-
-const QmlObjectPrivate * CreatableQmlObject::d() const
-{
-    Q_D(const QmlObject);
     return d;
 }
 
@@ -545,7 +533,7 @@ protected:
         QString identifier;
         QStringList fieldMembers;
         QQmlJS::AST::ExpressionNode *base = ast;
-        while (base) {
+        while (base != nullptr) {
             if (base->kind == QQmlJS::AST::Node::Kind_FieldMemberExpression) {
                 QQmlJS::AST::FieldMemberExpression *astBase = static_cast<QQmlJS::AST::FieldMemberExpression *>(base);
                 fieldMembers.prepend(astBase->name.toString());
@@ -553,9 +541,9 @@ protected:
             } else if (base->kind == QQmlJS::AST::Node::Kind_IdentifierExpression) {
                 QQmlJS::AST::IdentifierExpression *astBase = static_cast<QQmlJS::AST::IdentifierExpression *>(base);
                 identifier = astBase->name.toString();
-                base = 0;
+                base = nullptr;
             } else {
-                base = 0;
+                base = nullptr;
             }
         }
 
@@ -875,16 +863,6 @@ QmlDocument::Ptr QmlDocument::create(const QString &fileName)
     return object;
 }
 
-QmlDocumentBase::Ptr QmlDocument::toBase(Ptr object)
-{
-    return qSharedPointerCast<QmlDocumentBase>(object);
-}
-
-QmlDocumentBase::ConstPtr QmlDocument::toBase(ConstPtr object)
-{
-    return qSharedPointerCast<const QmlDocumentBase>(object);
-}
-
 QString QmlDocument::fileName() const
 {
     Q_D(const QmlDocument);
@@ -926,12 +904,6 @@ QmlDocumentBase::Ptr WritableQmlDocument::toBase(Ptr object)
 QmlDocumentBase::ConstPtr WritableQmlDocument::toBase(ConstPtr object)
 {
     return qSharedPointerCast<const QmlDocumentBase>(object);
-}
-
-void WritableQmlDocument::clearImports()
-{
-    Q_D(QmlDocumentBase);
-    d->imports.clear();
 }
 
 void WritableQmlDocument::addImport(ImportStatement::Ptr import)

@@ -29,40 +29,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-import QtQuick 2.0
-import "Test.qml" 1.0 as Test
-import QtQuick 2.0 as QQ
-import "Test.qml"
+import org.SfietKonstantin.phonebot 1.0
 
-Rectangle {
-    id: test
-    property var js
-    property string text
-    property var item
-    enabled: true
-    visible: false
-    width: 100
-    text: "Test"
-    item: Item {
-        id: subTest
-    }
-    anchors.top: parent.top
-    js: new Date(1960, 1, 1)
-
-    Text {
-        id: someText
-        text: "Test 2"
-    }
-
-    Test {
-        test.anchors.left: test.anchors.right
-    }
-
-    property var array
-    array: [1, 2, 3]
-
-    children: [
-        Item {}
-    ]
-}
-
+Rule {
+    trigger: Trigger {
+    actions: Action {}

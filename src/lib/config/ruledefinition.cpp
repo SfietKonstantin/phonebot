@@ -210,7 +210,6 @@ static QmlObject::Ptr convertComponentModelToObject(RuleComponentModel *componen
             }
 
             if (type->type() == MetaProperty::Time) {
-                // Insert time linker (TODO)
                 QmlObject::Ptr timeMapper = QmlObject::create("TimeMapper");
                 QVariantMap timeProperties;
                 QTime valueTime = value.toTime();

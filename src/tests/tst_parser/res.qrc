@@ -3,5 +3,6 @@
         <file>simpletest.qml</file>
         <file>Test.qml</file>
         <file>memoryleaktest.qml</file>
+        <file>parseerrorrule.qml</file>
     </qresource>
 </RCC>
